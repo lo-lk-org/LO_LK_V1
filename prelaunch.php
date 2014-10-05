@@ -141,22 +141,23 @@ var site_url ="http://"+(document.domain =='localhost'?'localhost:13080':documen
     var access_token = '';
     function signInCallback(authResult)
     {
-	print(authResult);
 	
 	 var authorizeButton = document.getElementById('signinButton');
 	  if (authResult && !authResult.error) {
 	      //============
 	      access_token= authResult.access_token;
-//	      console.log( access_token );
-	      alert(access_token);
+////	      console.log( access_token );
+////	      alert(access_token);
 	      //console.log( authResult );//return false;
 //	      initializeApi();
 	      //============
 	    authorizeButton.style.visibility = 'hidden';
-	    $(".aflog").show();
-	    $(".blog").hide();
+//	    $(".aflog").show();
+//	    $(".blog").hide();
 	    makeApiCall();
-
+		    var redirecturl=site_url+'welcome';
+//		    var redirecturl= $(location).attr('href');
+		    window.location.href=redirecturl;
 	      
 	  } else {
 	    authorizeButton.style.visibility = '';
@@ -164,27 +165,27 @@ var site_url ="http://"+(document.domain =='localhost'?'localhost:13080':documen
 	  }
 
     }
-    
-    // Load the API and make an API call.  Display the results on the screen.
+//    
+//    // Load the API and make an API call.  Display the results on the screen.
     function makeApiCall() {
-        
-	   
-            // Step 4: Load the Google+ API
+//        
+//	   
+//            // Step 4: Load the Google+ API
             gapi.client.load('plus', 'v1', function() {
-                
-                // Step 5: Assemble the API request
+//                
+//                // Step 5: Assemble the API request
                   var request = gapi.client.plus.people.get({
                     'userId': 'me'
                   });
                   
-//		   $("#signin_result").html("Loading...");
-                  
-                // Step 6: Execute the API request
+		   $("#signin_result").html("Loading...");
+//                  
+//                // Step 6: Execute the API request
                   request.execute(function(resp) {
-		      console.log(resp);
-                        //var heading = document.createElement('h4');var image = document.createElement('img');image.src = resp.image.url;heading.appendChild(image);heading.appendChild(document.createTextNode(resp.displayName));document.getElementById('content').appendChild(heading);
+//		      console.log(resp);
+//                        var heading = document.createElement('h4');var image = document.createElement('img');image.src = resp.image.url;heading.appendChild(image);heading.appendChild(document.createTextNode(resp.displayName));document.getElementById('content').appendChild(heading);
                         var rdata = resp.result;
-			/*
+			
 			//API WORK
                         var gid=rdata.id;
                         //uid=rdata.id;
@@ -199,10 +200,10 @@ var site_url ="http://"+(document.domain =='localhost'?'localhost:13080':documen
 			var timezone=getTimeStamp();
 			var lat='4567345';
 			var long='45.6645';
-                        var img_url=rdata.image.url;//enco(currency)
-                        */
-//                        console.log(postData);
-			/*var getData="action=write&module=profile&content_style=single_content";
+//                        var img_url=rdata.image.url;//enco(currency)
+                        
+                        console.log(postData);
+			var getData="action=write&module=profile&content_style=single_content";
 			var postData = {gid:enco(gid),name:enco(name),email:enco(email),fname:enco(fname),lname:enco(lname),uname:enco(uname),phone:enco(phone),timezone:enco(timezone),img_url:enco(img_url)};//,uid:uid/
 			$.post(site_url+"api/?"+getData,{},function(resp){
 			    if(resp.status=='success')
@@ -217,7 +218,7 @@ var site_url ="http://"+(document.domain =='localhost'?'localhost:13080':documen
 			    {
 				alert(resp.message);
 			    }
-			},'json');*/
+			},'json');
 			var name=rdata.displayName;
 			
 			var welcomemsg = "Welcome, "+name;
@@ -226,14 +227,14 @@ var site_url ="http://"+(document.domain =='localhost'?'localhost:13080':documen
 			
 			
 			
-//			var redirecturl='/welcome';
+			var redirecturl='/welcome';
 //	    	      var redirecturl= $(location).attr('href');
-//			window.location.href=redirecturl;
+			window.location.href=redirecturl;
 
 		  });
 	    });
     }
-        
+
     /**
      * Set required API keys and check authentication status.
      */
