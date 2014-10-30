@@ -27,8 +27,8 @@ handlers:
 #==< DONE Money Category >====
 
 #==< Bower components >====
-#- url: /components/paper-menu-button/demo.html
-#  script: components/paper-menu-button/demo.html
+- url: /components/paper-menu-button/demo.html
+  script: components/paper-menu-button/demo.html
   
 - url: /components
   static_dir: components
