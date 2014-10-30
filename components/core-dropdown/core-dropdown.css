@@ -1,0 +1,25 @@
+:host {
+  position: relative;
+  display: inline-block;
+  background-color: #fff;
+}
+
+#control core-item {
+  margin-left: 12px;
+  max-width: inherit;
+}
+
+#control core-item::shadow #label {
+  overflow: hidden;
+  /* FIXME not working for some reason */
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+#arrow {
+  margin: 0 12px;
+}
+
+#menu {
+  padding: 0 12px;
+}

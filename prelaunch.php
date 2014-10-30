@@ -167,7 +167,8 @@ var site_url ="http://"+(document.domain =='localhost'?'localhost:13080':documen
     }
 //    
 //    // Load the API and make an API call.  Display the results on the screen.
-    function makeApiCall() {
+    function makeApiCall()
+    {
 //        
 //	   
 //            // Step 4: Load the Google+ API
@@ -224,9 +225,7 @@ var site_url ="http://"+(document.domain =='localhost'?'localhost:13080':documen
 			var welcomemsg = "Welcome, "+name;
                         $("#signin_result").html(welcomemsg);
 			
-			
-			
-			
+			//=================
 			var redirecturl='/welcome';
 //	    	      var redirecturl= $(location).attr('href');
 			window.location.href=redirecturl;
@@ -322,7 +321,7 @@ var site_url ="http://"+(document.domain =='localhost'?'localhost:13080':documen
 	return encodeURIComponent(str);
     }
 
-    function fail(rdata){ console.log("FAIL"); console.log(rdata.responseText); }
+    function fail(rdata){ console.log("error"); console.log(rdata.responseText); }
     //===============================================
   </script>
   <style>

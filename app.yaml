@@ -6,7 +6,7 @@ application: lyfekit
 version: 1
 runtime: php
 api_version: 1
-threadsafe: false
+threadsafe: yes
 
 handlers:
 - url: /api/*
@@ -14,7 +14,42 @@ handlers:
   
 - url: /welcome
   script: welcome.php
-    
+  
+#==< Money Category >====
+- url: /platform/dashboard/money-category
+  script: category/money-category.php
+  
+- url: /platform/dashboard/money-category-add
+  script: category/money-category-add.php
+  
+- url: /platform/dashboard/money-category-del/?
+  script: category/money-category-del.php
+#==< DONE Money Category >====
+
+#==< Bower components >====
+#- url: /components/paper-menu-button/demo.html
+#  script: components/paper-menu-button/demo.html
+  
+- url: /components
+  static_dir: components
+
+- url: /elements
+  static_dir: elements
+  
+- url: /lyfekit-polymer
+  script: lyfekit-polymer.html
+
+  
+- url: /favicon\.ico
+  static_files: favicon.ico
+  upload: favicon\.ico
+#==
+
+ #==============================================
 - url: /+
   script: prelaunch.php
+  
+#libraries:
+#- name: webapp2
+#  version: "2.5.2"
   

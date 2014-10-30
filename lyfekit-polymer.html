@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+    <head>
+	<title></title>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+	<meta name="mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	
+	<script src="components/platform/platform.js"></script>
+	
+	<link rel="import" href="elements/core-scaffold.html">
+	<link rel="import" href="components/core-header-panel/core-header-panel.html">
+	<link rel="import" href="components/core-menu/core-menu.html">
+	<link rel="import" href="components/core-item/core-item.html">
+	<link rel="import" href="core-toolbar.html">
+
+	<link rel="import" href="elements/core-menu-button.html">
+	
+	
+	<style>
+
+	    html, body {
+	      height: 100%;
+	      margin: 0;
+	    }
+
+	    body {
+	      font-family: sans-serif;
+	      margin: 0;
+	    }
+
+	    core-scaffold {
+	      position: absolute;
+	      top: 0;
+	      right: 0;
+	      bottom: 0;
+	      left: 0;
+	    }
+
+	    .content {
+	      background-color: #fff;
+	      height: 5000px;
+	      padding: 20px;
+	    }
+
+	    /* some default styles for mode="cover" on core-scaffold */
+	    core-scaffold[mode=cover]::shadow core-header-panel::shadow #mainContainer {
+	      left: 120px;
+	    }
+
+	    core-scaffold[mode=cover] .content {
+	      margin: 20px 100px 20px 0;
+	    }
+	    
+	   
+	    core-toolbar {
+		background-color: #cfa0e9;
+		overflow: hidden;
+	    }
+    
+	    core-toolbar.dark-theme {
+		background-color: #7D25AC;
+		color: #f1f1f1;
+		fill: #f1f1f1;
+	    }
+	    
+	    core-menu-button::shadow #menu {
+		border: 1px solid #ccc;
+	    }
+	    core-item {
+		padding: 12px;
+	    }
+	    
+	    .small::shadow core-icon-button {
+		    padding: 12px;
+	    }
+	    
+	    .small::shadow core-icon-button::shadow core-icon {
+		    display: block;
+		    height: 14px;
+		    width: 14px;
+	    }
+	</style>
+
+    </head>
+    <body class="core-body-text" unresolved>
+	<!--<core-header-panel navigation flex mode="seamed">-->
+	<core-toolbar navigation flex mode="seamed">
+	    
+	    <core-menu-button icon="menu">
+		<core-item icon="settings" label="Settings"></core-item>
+			<core-item icon="add" label="Add"></core-item>
+			<core-item icon="search" label="Search"></core-item>
+	    </core-menu-button>
+	    
+	    <span flex>Toolbar</span>
+	    <core-icon-button icon="refresh"></core-icon-button>
+	    <core-icon-button icon="add"></core-icon-button>
+	    
+	    
+<!--	    <core-menu-button icon="more-vert" valign="top">
+
+		    <core-item icon="visibility" label="Visibility"></core-item>
+		    <core-item icon="extension" label="Extension"></core-item>
+		    <core-item icon="info" label="Info"></core-item>
+
+	    </core-menu-button>-->
+
+
+	    <core-menu-button icon="menu">
+
+			<core-item icon="settings" label="Settings"></core-item>
+			<core-item icon="add" label="Add"></core-item>
+			<core-item icon="search" label="Search"></core-item>
+
+		</core-menu-button>
+	    
+	</core-toolbar>
+
+	
+    
+
+<!--	<core-scaffold>
+  
+	    <div tool>LyfeKit</div>
+	    
+	    <core-header-panel navigation flex mode="seamed">
+	      <core-toolbar style="background-color: #526E9C; color: #fff;">Application</core-toolbar>
+	      <core-menu>
+		<core-item icon="settings" label="item1"></core-item>
+		<core-item icon="settings" label="item2"></core-item>
+	      </core-menu>
+	    </core-header-panel>
+
+	    <div class="content">
+		
+	    </div>
+
+      </core-scaffold>-->
+
+	    <div class="content">
+		Welcome
+	    </div>
+    </body>
+</html>

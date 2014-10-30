@@ -11,6 +11,7 @@ use \google\appengine\api\taskqueue\PushTask;
 $output= '';
 include "blocks/paths.php";
 include $myclass_url;
+include "includes/easyPagination.php";
 
 $ob=new Myactions();
 

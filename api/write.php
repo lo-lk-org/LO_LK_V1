@@ -11,15 +11,22 @@ use \google\appengine\api\taskqueue\PushTask;
 //include "blocks/paths.php";
 //include $myclass_url;
 
-/**
- * Write Class
- */
 class Write extends Baseclass
 {
+    /**
+     * Write Class
+     * @author Shivaraj<mrshivaraj123@gmail.com>_Oct_07_2014
+     */
     function __construct() {
         parent::__construct();
     }
     
+    /**
+     * Function to create session store
+     * @author Shivaraj<mrshivaraj123@gmail.com>_Oct_07_2014
+     * @param type $get
+     * @return type
+     */
     function create_session($get)
     {
 	$linkid = $this->db_conn();
@@ -60,14 +67,15 @@ class Write extends Baseclass
 	
 	if($module=='profile')
 	{
-                    if(!isset($get['gid'])) $ob->print_error(array("status"=>"fail","response"=>"Undefined gid."));
-                    if(!isset($get['name'])) $ob->print_error(array("status"=>"fail","response"=>"Undefined name."));
-                    if(!isset($get['email'])) $ob->print_error(array("status"=>"fail","response"=>"Undefined email."));
                     $output = $this->create_profile($get);
 			//session
 			$get['uid']=$output['uid'];
 //			$session_id=$this->create_session($get);
 //		    $output['session_id']=$session_id;
+	}
+	if($module=='social-contact')
+	{
+		$output = $this->create_social_contact($get);
 	}
 	elseif($module=='group')
 	{
@@ -80,8 +88,8 @@ class Write extends Baseclass
 	else
 	{
 	    
-	    if(!isset($get['uid'])) $ob->print_error(array("status"=>"fail","response"=>"Undefined uid."));
-	    if(!isset($get['timestamp'])) $ob->print_error(array("status"=>"fail","response"=>"Undefined timestamp."));
+	    if(!isset($get['uid'])) $ob->print_error(array("status"=>"error","response"=>"Undefined uid."));
+	    if(!isset($get['timestamp'])) $ob->print_error(array("status"=>"error","response"=>"Undefined timestamp."));
 	    
 	    $uid=mysql_real_escape_string(($get['uid']));
 	    
@@ -112,8 +120,8 @@ class Write extends Baseclass
 	    //=============
 	    
 	    if($module == 'note') {
-		    if(!isset($get['note_text'])) $this->print_error(array("status"=>"fail","response"=>"Undefined note text."));
-		    if(!isset($get['module'])) $this->print_error(array("status"=>"fail","response"=>"Undefined content type."));
+		    if(!isset($get['note_text'])) $this->print_error(array("status"=>"error","response"=>"Undefined note text."));
+		    if(!isset($get['module'])) $this->print_error(array("status"=>"error","response"=>"Undefined content type."));
 
 		    //,`timestamp`,`lat`,`long`,`shared_with`
 
@@ -126,7 +134,7 @@ class Write extends Baseclass
 		    mysql_query("update `tbl_notes` set `note_id`='".$insert_id."' where `sno`=$insert_id") or $this->print_error(mysql_error($linkid));
 
 		    if(mysql_errno($linkid)) {
-			$this->print_error(array("status"=>"fail","response"=>mysql_error($linkid)));
+			$this->print_error(array("status"=>"error","response"=>mysql_error($linkid)));
 		    }
 		    else {
 			$rslt_arr = array("status"=>"success","content_id"=>$content_id);
@@ -136,13 +144,13 @@ class Write extends Baseclass
 	    }
 	    elseif($module == 'money')
 	    {
-		    if(!isset($get['money_title'])) $this->print_error(array("status"=>"fail","response"=>"Please specify money title."));
-		    if(!isset($get['money_amount'])) $this->print_error(array("status"=>"fail","response"=>"Please specify amount."));
-		    if(!isset($get['item_unit_price'])) $this->print_error(array("status"=>"fail","response"=>"Please specify item price."));
-		    if(!isset($get['item_units'])) $this->print_error(array("status"=>"fail","response"=>"Please specify item units."));
-		    if(!isset($get['item_qty'])) $this->print_error(array("status"=>"fail","response"=>"Please specify item quantity."));
-		    if(!isset($get['total_price'])) $this->print_error(array("status"=>"fail","response"=>"Please specify item quantity."));
-		    if(!isset($get['money_flow_direction'])) $this->print_error(array("status"=>"fail","response"=>"Please specify money flow direction."));
+		    if(!isset($get['money_title'])) $this->print_error(array("status"=>"error","response"=>"Please specify money title."));
+		    if(!isset($get['money_amount'])) $this->print_error(array("status"=>"error","response"=>"Please specify amount."));
+		    if(!isset($get['item_unit_price'])) $this->print_error(array("status"=>"error","response"=>"Please specify item price."));
+		    if(!isset($get['item_units'])) $this->print_error(array("status"=>"error","response"=>"Please specify item units."));
+		    if(!isset($get['item_qty'])) $this->print_error(array("status"=>"error","response"=>"Please specify item quantity."));
+		    if(!isset($get['total_price'])) $this->print_error(array("status"=>"error","response"=>"Please specify item quantity."));
+		    if(!isset($get['money_flow_direction'])) $this->print_error(array("status"=>"error","response"=>"Please specify money flow direction."));
 
 		    $money_title=mysql_real_escape_string(urldecode($get['money_title']));
 		    $money_amount=mysql_real_escape_string(urldecode($get['money_amount']));
@@ -161,7 +169,7 @@ class Write extends Baseclass
 		    mysql_query("update `$tbl_name` set `money_id`='".$insert_id."' where `sno`=$insert_id") or $this->print_error(mysql_error($linkid));
 
 		    if(mysql_errno($linkid)) {
-			$this->print_error(array("status"=>"fail","response"=>mysql_error($linkid)));
+			$this->print_error(array("status"=>"error","response"=>mysql_error($linkid)));
 		    }
 		    else {
 			
@@ -179,8 +187,8 @@ class Write extends Baseclass
 		    }
 	    }
 	    elseif($module == 'reminder') {//todo
-		    if(!isset($get['remind_time'])) $this->print_error(array("status"=>"fail","response"=>"Please specify remind time."));
-		    if(!isset($get['reminder_name'])) $this->print_error(array("status"=>"fail","response"=>"Please specify reminder name."));
+		    if(!isset($get['remind_time'])) $this->print_error(array("status"=>"error","response"=>"Please specify remind time."));
+		    if(!isset($get['reminder_name'])) $this->print_error(array("status"=>"error","response"=>"Please specify reminder name."));
 
 		    $remind_time=strtotime(mysql_real_escape_string(urldecode($get['remind_time'])));
 		    $reminder_name=mysql_real_escape_string(urldecode($get['reminder_name']));
@@ -195,7 +203,7 @@ class Write extends Baseclass
 		    mysql_query("update `tbl_reminders` set `reminder_id`='".$insert_id."' where `sno`=$insert_id") or $this->print_error(mysql_error($linkid));;
 
 		    if(mysql_errno($linkid)) {
-			$this->print_error(array("status"=>"fail","response"=>mysql_error($linkid)));
+			$this->print_error(array("status"=>"error","response"=>mysql_error($linkid)));
 		    }
 		    else {
 			$rslt_arr = array("status"=>"success","content_id"=>$content_id);
@@ -204,7 +212,7 @@ class Write extends Baseclass
 		    }
 	    }
 	    elseif($module == 'shoppinglist') {
-		    if(!isset($get['item_name'])) $this->print_error(array("status"=>"fail","response"=>"Please enter item name."));
+		    if(!isset($get['item_name'])) $this->print_error(array("status"=>"error","response"=>"Please enter item name."));
 
 		    $item_name=mysql_real_escape_string(urldecode($get['item_name']));
 		    $item_qty=(!isset($get['item_qty']) )? '1' : mysql_real_escape_string(urldecode($get['item_qty']));
@@ -222,7 +230,7 @@ class Write extends Baseclass
 		    mysql_query("update `tbl_shoppinglist` set `shop_list_item_id`='".$insert_id."' where `sno`=$insert_id") or $this->print_error(mysql_error($linkid));;
 
 		    if(mysql_errno($linkid)) {
-			$this->print_error(array("status"=>"fail","response"=>mysql_error($linkid)));
+			$this->print_error(array("status"=>"error","response"=>mysql_error($linkid)));
 		    }
 		    else {
 			$rslt_arr = array("status"=>"success","content_id"=>$content_id);
@@ -236,10 +244,19 @@ class Write extends Baseclass
 
         return $output;
     }
-
+    
+    /**
+     * Function to create user profile
+     * @author Shivaraj<mrshivaraj123@gmail.com>_Oct_07_2014
+     * @param type $get
+     * @return string
+     */
     function create_profile($get) {
         $linkid=$this->db_conn();
-        
+        if(!isset($get['gid'])) $ob->print_error(array("status"=>"error","response"=>"Undefined gid."));
+	if(!isset($get['name'])) $ob->print_error(array("status"=>"error","response"=>"Undefined name."));
+	if(!isset($get['email'])) $ob->print_error(array("status"=>"error","response"=>"Undefined email."));
+		    
         $module=mysql_real_escape_string(urldecode($get['module']));//req
 //        $uid=mysql_real_escape_string(urldecode($get['uid'])); 
         $gid=mysql_real_escape_string(urldecode($get['gid'])); //req
@@ -269,7 +286,7 @@ class Write extends Baseclass
 		mysql_query($sql) or $this->print_error(mysql_error($linkid));//`uid`='".$uid."',`gid`='".$gid."',
 			
 		if(mysql_errno($linkid)) {
-		    $this->print_error(array("status"=>"fail","response"=>mysql_error($linkid)));
+		    $this->print_error(array("status"=>"error","response"=>mysql_error($linkid)));
 		}
 		else { 
 
@@ -284,7 +301,7 @@ class Write extends Baseclass
 	//	die('<pre>'.$sql.'</pre>');
 		mysql_query($sql,$linkid);
 		if(mysql_errno($linkid)) {
-		    $this->print_error(array("status"=>"fail","response"=>mysql_error($linkid)));
+		    $this->print_error(array("status"=>"error","response"=>mysql_error($linkid)));
 		}
 		else { 
 
@@ -295,17 +312,80 @@ class Write extends Baseclass
     }
     
     /**
+     * Function to store social contact of profile user
+     * @author Shivaraj<mrshivaraj123@gmail.com>_Oct_07_2014
+     * @param type $get
+     */
+    function create_social_contact($get)
+    {
+	$linkid=$this->db_conn();
+	if(!isset($get['uid'])) $ob->print_error(array("status"=>"error","response"=>"Undefined uid."));
+	if(!isset($get['gid'])) $ob->print_error(array("status"=>"error","response"=>"Undefined gid."));
+	if(!isset($get['following_uid'])) $ob->print_error(array("status"=>"error","response"=>"Undefined following_uid."));
+	if(!isset($get['following_gid'])) $ob->print_error(array("status"=>"error","response"=>"Undefined following_gid."));
+//	if(!isset($get['following_uname'])) $ob->print_error(array("status"=>"error","response"=>"Undefined following_uname."));
+//	if(!isset($get['following_name'])) $ob->print_error(array("status"=>"error","response"=>"Undefined following_name."));
+	
+
+        $uid=mysql_real_escape_string(urldecode($get['uid']));  //req
+        $gid=mysql_real_escape_string(urldecode($get['gid'])); //req
+        $following_uid=mysql_real_escape_string(urldecode($get['following_uid'])); //req
+        $following_gid=mysql_real_escape_string(urldecode($get['following_gid'])); //req
+	$datetime = date("Y-m-d H:i:s",time());
+	
+        $following_uname=(!isset($get['following_uname']))? '' : mysql_real_escape_string(urldecode($get['following_uname']));
+        $following_name=(!isset($get['following_name']))? '' : mysql_real_escape_string(urldecode($get['following_name']));
+
+	$profile_res=mysql_query("SELECT * FROM m_social_contacts WHERE uid='".$uid."' AND gid='".$gid."' AND following_uid='".$following_uid."' AND following_gid='".$following_gid."' LIMIT 1",$linkid) or $this->print_error(mysql_error($linkid));
+	if(mysql_affected_rows($linkid)>0)
+	{
+		$profile_det=mysql_fetch_assoc($profile_res);
+		$rowid=$profile_det['sno'];
+		$sql="UPDATE m_social_contacts SET
+				    `following_uname`='".$following_uname."',`following_name`='".$following_name."'
+			    WHERE uid='".$uid."' AND gid='".$gid."' AND following_uid='".$following_uid."' AND following_gid='".$following_gid."' ";
+		mysql_query($sql) or $this->print_error(mysql_error($linkid));//`uid`='".$uid."',`gid`='".$gid."',
+			
+		if(mysql_errno($linkid)) {
+		    $this->print_error(array("status"=>"error","response"=>mysql_error($linkid)));
+		}
+		else { 
+
+		    $rslt_arr = array("status"=>"success",'following_uid'=>$following_uid,'message'=>"Contact Updated");
+		}
+		
+	}
+	else {
+	    
+		$sql="INSERT INTO m_social_contacts (uid,gid,following_uid,following_gid,following_uname,following_name)
+				VALUES('".$uid."','".$gid."','".$following_uid."','".$following_gid."','".$following_uname."','".$following_name."')";
+		
+	//	die('<pre>'.$sql.'</pre>');
+		mysql_query($sql,$linkid);
+		if(mysql_errno($linkid)) {
+		    $this->print_error(array("status"=>"error","response"=>mysql_error($linkid)));
+		}
+		else { 
+
+		    $rslt_arr = array("status"=>"success",'following_uid'=>$following_uid,'message'=>"Contact Created");
+		}
+	}
+        return $rslt_arr;
+    }
+
+    /**
      * Create Group
+     * @author Shivaraj<mrshivaraj123@gmail.com>_Oct_07_2014
      * @param type $get array
      * @return type array
      */
     function create_group($get) {
         $linkid=$this->db_conn();
         
-	if(!isset($get['group_owner_uid'])) $this->print_error(array("status"=>"fail","response"=>"Please enter Group Owner UID."));//group_owner_uid
-	if(!isset($get['group_type'])) $this->print_error(array("status"=>"fail","response"=>"Please enter group type."));
-        if(!isset($get['group_name'])) $this->print_error(array("status"=>"fail","response"=>"Please enter group name."));
-        if(!isset($get['group_description'])) $this->print_error(array("status"=>"fail","response"=>"Please enter group description.")); 
+	if(!isset($get['group_owner_uid'])) $this->print_error(array("status"=>"error","response"=>"Please enter Group Owner UID."));//group_owner_uid
+	if(!isset($get['group_type'])) $this->print_error(array("status"=>"error","response"=>"Please enter group type."));
+        if(!isset($get['group_name'])) $this->print_error(array("status"=>"error","response"=>"Please enter group name."));
+        if(!isset($get['group_description'])) $this->print_error(array("status"=>"error","response"=>"Please enter group description.")); 
 	
 	
 	$datetime = date("Y-m-d H:i:s",time());
@@ -341,7 +421,7 @@ class Write extends Baseclass
         mysql_query("update `m_groups` set `group_id`='".$grp_insert_id."' where `sno`=$grp_insert_id") or $this->print_error(mysql_error($linkid));
 	
 	if(mysql_errno($linkid)) {
-            $this->print_error(array("status"=>"fail","response"=>mysql_error($linkid)));
+            $this->print_error(array("status"=>"error","response"=>mysql_error($linkid)));
         }
         else {
 
@@ -364,6 +444,7 @@ class Write extends Baseclass
     
     /**
      * Create member
+     * @author Shivaraj<mrshivaraj123@gmail.com>_Oct_07_2014
      * @param type $get array
      * @return string array
      */
@@ -372,12 +453,12 @@ class Write extends Baseclass
         $linkid=$this->db_conn();
 	//m_member: member_id,uid,member_name,member_img_file_id,member_email,member_phone,member_role,managed_by_uid_1,managed_by_uid_2,group_id
 	
-        if(!isset($get['uid'])) $this->print_error(array("status"=>"fail","response"=>"Please enter UID."));
-        if(!isset($get['group_id'])) $this->print_error(array("status"=>"fail","response"=>"Please enter Group ID."));
-        if(!isset($get['member_name'])) $this->print_error(array("status"=>"fail","response"=>"Please enter member name."));
-        if(!isset($get['member_email'])) $this->print_error(array("status"=>"fail","response"=>"Please enter member email."));
-        if(!isset($get['member_role'])) $this->print_error(array("status"=>"fail","response"=>"Please enter member role."));
-        if(!isset($get['member_phone'])) $this->print_error(array("status"=>"fail","response"=>"Please enter member phone."));
+        if(!isset($get['uid'])) $this->print_error(array("status"=>"error","response"=>"Please enter UID."));
+        if(!isset($get['group_id'])) $this->print_error(array("status"=>"error","response"=>"Please enter Group ID."));
+        if(!isset($get['member_name'])) $this->print_error(array("status"=>"error","response"=>"Please enter member name."));
+        if(!isset($get['member_email'])) $this->print_error(array("status"=>"error","response"=>"Please enter member email."));
+        if(!isset($get['member_role'])) $this->print_error(array("status"=>"error","response"=>"Please enter member role."));
+        if(!isset($get['member_phone'])) $this->print_error(array("status"=>"error","response"=>"Please enter member phone."));
 
         $uid = mysql_real_escape_string(urldecode($get["uid"]));
 	$group_id = mysql_real_escape_string(urldecode($get['group_id']));
@@ -388,6 +469,7 @@ class Write extends Baseclass
 	
 	$managed_by_uid_1 = (!isset($get['managed_by_uid_1']))? '' : mysql_real_escape_string(urldecode($get["managed_by_uid_1"]));
 	$managed_by_uid_2 = (!isset($get['managed_by_uid_2']))? '' : mysql_real_escape_string(urldecode($get["managed_by_uid_2"]));
+	
 	$created_on = date("Y-m-d H:i:s",time());
 	$member_img_file_id='';
 	
@@ -397,42 +479,48 @@ class Write extends Baseclass
         if($row['uid']=='') { $this->print_error("User/uid does not exits."); }
 	
         mysql_query("insert into `m_member`(`uid`,`member_name`,`member_img_file_id`,`member_email`,`member_phone`,`member_role`,`managed_by_uid_1`,`managed_by_uid_2`
-            ,`group_id`,`created_on`) values
+		,`group_id`,`created_on`) values
             ( '".$uid."','".$member_name."','".$member_img_file_id."','".$member_email."','".$member_phone."','".$member_role."','".$managed_by_uid_1."','".$managed_by_uid_2."'
                 ,'".$group_id."','".$created_on."')",$linkid) or $this->print_error(mysql_error($linkid));
 
-        $insert_id = mysql_insert_id();
-        mysql_query("update `m_member` set `member_id`='".$insert_id."' where `sno`=$insert_id") or $this->print_error(mysql_error($linkid));
+        $member_id=$insert_id = mysql_insert_id();
+        mysql_query("update `m_member` set `member_id`='".$member_id."' where `sno`=$insert_id") or $this->print_error(mysql_error($linkid));
+	
+	//================ update permission table =======================
+	$permission_profile = (!($get['permission_profile']))? 0 : mysql_real_escape_string(urldecode($get["permission_profile"]));
+	$permission_notes = (!($get['permission_notes']))? 0 : mysql_real_escape_string(urldecode($get["permission_notes"]));
+	$permission_money = (!($get['permission_money']))? 0 : mysql_real_escape_string(urldecode($get["permission_money"]));
+	$permission_todo = (!($get['permission_todo']))? 0 : mysql_real_escape_string(urldecode($get["permission_todo"]));
+	$permission_shopping = (!($get['permission_shopping']))? 0 : mysql_real_escape_string(urldecode($get["permission_shopping"]));
+	$permission_contacts = (!($get['permission_contacts']))? 0 : mysql_real_escape_string(urldecode($get["permission_contacts"]));
+	$permission_recipes = (!($get['permission_recipes']))? 0 : mysql_real_escape_string(urldecode($get["permission_recipes"]));
+	$permission_groups = (!($get['permission_groups']))? 0 : mysql_real_escape_string(urldecode($get["permission_groups"]));
+	$permission_members = (!($get['permission_members']))? 0 : mysql_real_escape_string(urldecode($get["permission_members"]));
+	$permission_services = (!($get['permission_services']))? 0 : mysql_real_escape_string(urldecode($get["permission_services"]));
+	$permission_products = (!($get['permission_products']))? 0 : mysql_real_escape_string(urldecode($get["permission_products"]));
+	$permission_store = (!($get['permission_store']))? 0 : mysql_real_escape_string(urldecode($get["permission_store"]));
+	$permission_orders = (!($get['permission_orders']))? 0 : mysql_real_escape_string(urldecode($get["permission_orders"]));
+	
+	$sql="INSERT INTO `m_permissions` ( `member_id`, `uid`, `group_id`
+		    ,`permission_profile`,`permission_notes`,`permission_money`,`permission_todo`,`permission_shopping`,`permission_contacts`,`permission_recipes`,`permission_groups`,`permission_members`
+		    ,`permission_services`,`permission_products`,`permission_store`,`permission_orders`
+		    ) VALUES 
+		    ( '".$member_id."','".$uid."','".$group_id."'
+			,'".$permission_profile."','".$permission_notes."','".$permission_money."','".$permission_todo."','".$permission_shopping."','".$permission_contacts."','".$permission_recipes."'
+			,'".$permission_groups."','".$permission_members."','".$permission_services."','".$permission_products."','".$permission_store."','".$permission_orders."'
+		    )";
+        mysql_query($sql,$linkid) or $this->print_error(mysql_error($linkid));
 
+        $insert_id = mysql_insert_id();
+        mysql_query("update `m_permissions` set `permission_id`='".$insert_id."' where `sno`=$insert_id") or $this->print_error(mysql_error($linkid));
+	//================ update permission table =======================
+	
         if(mysql_errno($linkid)) {
-            $this->print_error(array("status"=>"fail","response"=>mysql_error($linkid)));
+            $this->print_error(array("status"=>"error","response"=>mysql_error($linkid)));
         }
         else {
-            $rslt_arr = array("status"=>"success","response"=>"Member created.","id"=>$insert_id);
+            $rslt_arr = array("status"=>"success","response"=>"Member created.","id"=>$member_id);
         }
-	
-//        $permission_group = mysql_real_escape_string(urldecode($get["permission_group"]));
-//        $permission_branch = mysql_real_escape_string(urldecode($get["permission_branch"]));
-//        $permission_money = mysql_real_escape_string(urldecode($get["permission_money"]));
-//        $permission_content = mysql_real_escape_string(urldecode($get["permission_content"]));
-//        $permission_team = mysql_real_escape_string(urldecode($get["permission_team"]));
-//        $branch_id = mysql_real_escape_string(urldecode($get["branch_id"]));
-        
-//        mysql_query("insert into `m_member`(`uid`,`member_name`,`member_img_file_id`,`member_email`,`member_phone`,`member_role`,`managed_by_uid_1`,`managed_by_uid_2`
-//            ,`permission_team`,`approval_team_req`,`permission_content`,`approval_content_req`,`permission_branch`,`approval_branch_req`,`permission_group`,`approval_group_req`,`permission_money`,`approval_money_req`,`branch_id`,`group_id`,`created_on`) values
-//            ( '','".$member_name."',NULL,'".$member_email."','".$member_phone."','".$member_role."',NULL,NULL
-//                ,'".$permission_team."',NULL,'".$permission_content."',NULL,'".$permission_branch."',NULL,'".$permission_group."',NULL,'".$permission_money."',NULL,'".$branch_id."','".$group_id."','".$created_on."')",$linkid) or $this->print_error(mysql_error($linkid));
-//
-//        $insert_id = mysql_insert_id();
-//        mysql_query("update `m_member` set `member_id`='".$insert_id."' where `sno`=$insert_id") or $this->print_error(mysql_error($linkid));
-//
-//        if(mysql_errno($linkid)) {
-//            $this->print_error(array("status"=>"fail","response"=>mysql_error($linkid)));
-//        }
-//        else {
-//            $rslt_arr = array("status"=>"success","response"=>"Member created.","id"=>$insert_id);
-//
-//        }
         return $rslt_arr;
     }
     
@@ -456,7 +544,7 @@ class Write extends Baseclass
             //mysql_query('alter table `oneapp_db`.`tbl_reminders` add column `remainder_name` varchar (150)  NULL  after `timestamp`,change `note_id` `content_id` varchar (100)  NULL  COLLATE latin1_swedish_ci');
             //mysql_query('alter table `oneapp_db`.`generic_profile` change `slno` `sno` bigint (20)  NOT NULL AUTO_INCREMENT;',$linkid);
             //mysql_query('alter table `oneapp_db`.`generic_profile` change `uid` `uid` bigint(20) NOT NULL UNIQUE;',$linkid);
-            /*if(mysql_errno($linkid)) { $this->print_error(array("status"=>"fail","response"=>mysql_error($linkid))); }
+            /*if(mysql_errno($linkid)) { $this->print_error(array("status"=>"error","response"=>mysql_error($linkid))); }
             else { $rslt_arr = array("affected_rows"=>mysql_affected_rows($linkid),"result"=>"User info has inserted."); }*/
             $this->print_msg($rslt_arr);
         }
@@ -476,16 +564,16 @@ class Write extends Baseclass
     /*function do_branch($get) {
         $linkid=$this->db_conn();
         
-        if(!isset($get['group_id'])) $this->print_error(array("status"=>"fail","response"=>"Please group id is missing."));
-        if(!isset($get['branchname'])) $this->print_error(array("status"=>"fail","response"=>"Please enter Branch Name."));
-        if(!isset($get['branchdescr'])) $this->print_error(array("status"=>"fail","response"=>"Please enter Branch Description."));
-        if(!isset($get['branch_addr_line_1'])) $this->print_error(array("status"=>"fail","response"=>"Please enter Branch Addressline1."));
-        //if(!isset($get['branch_addr_line_2'])) $this->print_error(array("status"=>"fail","response"=>"Please enter Branch Addressline2."));
-        //if(!isset($get['branch_addr_line_3'])) $this->print_error(array("status"=>"fail","response"=>"Please enter Branch Addressline3."));
-        if(!isset($get['branch_addr_city'])) $this->print_error(array("status"=>"fail","response"=>"Please enter Branch City."));
-        if(!isset($get['branch_addr_state'])) $this->print_error(array("status"=>"fail","response"=>"Please enter Branch State."));
-        if(!isset($get['branch_addr_country'])) $this->print_error(array("status"=>"fail","response"=>"Please enter Branch Country."));
-        if(!isset($get['branch_addr_zip'])) $this->print_error(array("status"=>"fail","response"=>"Please enter Branch Zip."));
+        if(!isset($get['group_id'])) $this->print_error(array("status"=>"error","response"=>"Please group id is missing."));
+        if(!isset($get['branchname'])) $this->print_error(array("status"=>"error","response"=>"Please enter Branch Name."));
+        if(!isset($get['branchdescr'])) $this->print_error(array("status"=>"error","response"=>"Please enter Branch Description."));
+        if(!isset($get['branch_addr_line_1'])) $this->print_error(array("status"=>"error","response"=>"Please enter Branch Addressline1."));
+        //if(!isset($get['branch_addr_line_2'])) $this->print_error(array("status"=>"error","response"=>"Please enter Branch Addressline2."));
+        //if(!isset($get['branch_addr_line_3'])) $this->print_error(array("status"=>"error","response"=>"Please enter Branch Addressline3."));
+        if(!isset($get['branch_addr_city'])) $this->print_error(array("status"=>"error","response"=>"Please enter Branch City."));
+        if(!isset($get['branch_addr_state'])) $this->print_error(array("status"=>"error","response"=>"Please enter Branch State."));
+        if(!isset($get['branch_addr_country'])) $this->print_error(array("status"=>"error","response"=>"Please enter Branch Country."));
+        if(!isset($get['branch_addr_zip'])) $this->print_error(array("status"=>"error","response"=>"Please enter Branch Zip."));
 
         $branch_owner_uid = mysql_real_escape_string(urldecode($get["uid"]));
         $group_id = mysql_real_escape_string(urldecode($get["group_id"]));
@@ -507,7 +595,7 @@ class Write extends Baseclass
         mysql_query("update `tbl_branch` set `branch_id`='".$brn_insert_id."' where `sno`=$brn_insert_id") or $this->print_error(mysql_error($linkid));
 
         if(mysql_errno($linkid)) {
-            $this->print_error(array("status"=>"fail","response"=>mysql_error($linkid)));
+            $this->print_error(array("status"=>"error","response"=>mysql_error($linkid)));
         }
         else {
             //Insert into member table
@@ -539,7 +627,7 @@ class Write extends Baseclass
     /*function do_put_picklist($get)
     {
         $linkid=$this->db_conn();
-        if(!isset($get['people_picker_type'])) $this->print_error(array("status"=>"fail","response"=>"Please enter people_picker type."));
+        if(!isset($get['people_picker_type'])) $this->print_error(array("status"=>"error","response"=>"Please enter people_picker type."));
 
         $uid = mysql_real_escape_string(urldecode($get["uid"]));
         $friend_uids = $get["friend_uids"];
@@ -621,7 +709,7 @@ class Write extends Baseclass
     /*function do_session($get)
     {
         $linkid=$this->db_conn();
-        //if(!isset($get['member_name'])) $this->print_error(array("status"=>"fail","response"=>"Please enter member name."));
+        //if(!isset($get['member_name'])) $this->print_error(array("status"=>"error","response"=>"Please enter member name."));
         $uid = mysql_real_escape_string(urldecode($get["uid"]));
         $session_src = ( !isset($get['session_src']) ) ? 'web': mysql_real_escape_string(urldecode($get["session_src"]));
         $created_on = date("Y-m-d H:i:s",time()); // 1day:-6 0*6 0*24
@@ -659,7 +747,7 @@ $ob = new Write();
 switch($get['content_style']) {
     
     case 'single_content': 
-                if(!isset($get['module'])) $ob->print_error(array("status"=>"fail","response"=>"Undefined content type."));
+                if(!isset($get['module'])) $ob->print_error(array("status"=>"error","response"=>"Undefined content type."));
                 $output = $ob->put_single_content_info($get);
         break;
         
@@ -682,12 +770,12 @@ switch($get['content_style']) {
                    
         break;
     case 'do_put_picklist': 
-                if(!isset($get['uid'])) $ob->print_error(array("status"=>"fail","response"=>"Undefined uid."));
+                if(!isset($get['uid'])) $ob->print_error(array("status"=>"error","response"=>"Undefined uid."));
                 $output = $ob->do_put_picklist($get);
                 break;
     
     case 'session': 
-                if(!isset($get['uid'])) $ob->print_error(array("status"=>"fail","response"=>"Undefined uid."));
+                if(!isset($get['uid'])) $ob->print_error(array("status"=>"error","response"=>"Undefined uid."));
                 $output = $ob->do_session($get);
                 break;*/
     default : $output = $ob->unknown();

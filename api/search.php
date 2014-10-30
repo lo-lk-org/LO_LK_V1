@@ -9,6 +9,316 @@ $output= '';
  */
 class Search extends Baseclass {
     function __construct() { }
+    
+    
+    /**
+     * Get user profile by uid
+     * @param type $uid int
+     * @return type array
+     */
+    function _view_profile($get) {
+        $linkid=$this->db_conn();
+	if(!isset($get['uid'])) $this->print_error(array("status"=>"error","response"=>"Undefined uid."));
+	$uid=mysql_real_escape_string($get['uid']);
+	$sql = "SELECT * FROM `m_profile` WHERE `uid`='$uid'";
+        $rslt = mysql_query($sql,$linkid);
+        if(mysql_errno($linkid)) {
+            $rslt_arr=array("status"=>"error","response"=>mysql_error($linkid));
+        }
+        else {
+            if(mysql_affected_rows($linkid) > 0) {
+                while($row = mysql_fetch_assoc($rslt)) {
+                    $result['uid']=$row['uid'];
+                    $result['gid']=$row['gid'];
+                    $result['fname']=$row['fname'];
+                    $result['mname']=$row['mname'];
+                    $result['lname']=$row['lname'];
+                    $result['name']=$row['name'];
+                    $result['uname']=$row['uname'];
+                    $result['email']=$row['email'];
+                    $result['phone']=$row['phone'];
+                    $result['image_url']=$row['image_url'];
+                    $result['timezone']=$row['timezone'];
+                    $result['stream_id']=$row['stream_id'];
+                    $result['info_update_timestamp']=$row['info_update_timestamp'];
+		    $result['status']="success";
+                }
+            }
+            else {
+                $result['error']="No Records found.";
+            }
+            //$result['rows']=mysql_affected_rows($linkid);
+
+            $rslt_arr = $result;
+        }
+        return $rslt_arr;
+    }
+    
+    function _group_info($get)
+    {
+        $linkid=$this->db_conn();
+        if(!isset($get['group_id'])) $this->print_error(array("status"=>"error","response"=>"Undefined group id."));
+        $group_id = mysql_real_escape_string(urldecode($get['group_id']));//$group_id = trim($group_id,',');
+         //find_in_set(`group_id`,'$group_ids')
+            $rslt=mysql_query("SELECT * FROM m_groups WHERE group_id='$group_id' ",$linkid) or $this->print_error(mysql_error($linkid));
+
+            if(mysql_errno($linkid)) {
+                $rslt_arr=array("status"=>"error","response"=>mysql_error($linkid));
+            }
+	    elseif(mysql_num_rows($rslt)==0)
+	    {
+		$this->print_error("No records found");
+	    }
+            else {
+                $i=0;$data_array=array();
+                while ($row=mysql_fetch_assoc($rslt))
+                {
+
+                    //$data_array[$i]['group_id'] = $row['group_id'];
+                    $data_array['group_id'] = $row['group_id'];
+                    $data_array['group_type'] = ucfirst($row['group_type']);
+                    $data_array['group_name'] = ucfirst($this->format_text($row['group_name']));
+                    $data_array['group_description'] = $this->format_text($row['group_description']);
+                    $data_array['group_owner_uid'] = $row['group_owner_uid'];
+                    $mems_count_qry = mysql_query("select count(*) as ttl_members from m_member where group_id=".$row['group_id']);
+                    $member = mysql_fetch_array($mems_count_qry);
+                    $group_member_ctr = $member['ttl_members'];
+                    $data_array['group_member_ctr'] = $group_member_ctr; //$row['group_member_ctr'];
+                    $data_array['file_id'] = $row['file_id'];
+                    $data_array['group_addr_line_1'] = $row['group_addr_line_1'];
+                    $data_array['group_addr_line_2'] = $row['group_addr_line_2'];
+                    $data_array['group_addr_line_3'] = $row['group_addr_line_3'];
+                    $data_array['group_addr_city'] = $row['group_addr_city'];
+                    $data_array['group_addr_state'] = $row['group_addr_state'];
+                    $data_array['group_addr_country'] = $row['group_addr_country'];
+                    $data_array['group_addr_zip'] = $row['group_addr_zip'];
+                    $data_array['group_addr_zip'] = $row['group_addr_zip'];
+                    $data_array['entity_id'] = $row['entity_id'];
+                    $data_array['created_on'] = $row['created_on'];
+
+                    //$data_array[$i]['branch'] =  $this->get_group_branch_info($linkid,$row['group_id']);//$data_array2;
+                    //$i++;
+                }
+                $rslt_arr = array("status"=>"success","results"=>$data_array);
+        }
+        return $rslt_arr;
+    }
+
+    /**
+     * 
+     * @param type $get array
+     */
+    function _member_info($get)
+    {
+        $linkid=$this->db_conn();
+        if(!isset($get['member_id'])) $this->print_error(array("status"=>"error","response"=>"Undefined Member id."));
+//        $group_id = mysql_real_escape_string(urldecode($get['group_id']));
+        $member_id = mysql_real_escape_string(urldecode($get['member_id']));
+        
+        $rslt = mysql_query("select * from m_member where member_id=".$member_id."",$linkid) or $this->print_error(mysql_error($linkid));
+        if(mysql_errno($linkid)) {
+            $rslt_arr=array("status"=>"error","response"=>mysql_error($linkid));
+        }
+	elseif(mysql_num_rows($rslt)==0)
+	{
+	    $this->print_error("No records found");
+	}
+        else
+        {
+            $data_array=array();
+            while ($row=mysql_fetch_assoc($rslt)) {
+                $data_array['member_id'] = $row['member_id'];
+                $data_array['uid'] = $row['uid'];
+                $data_array['member_name'] = $this->format_text($row['member_name']);
+                $data_array['member_img_file_id'] = $row['member_img_file_id'];
+                $data_array['member_email'] = $row['member_email'];
+                $data_array['member_phone'] = $row['member_phone'];
+                $data_array['member_role'] = $row['member_role'];
+                $data_array['managed_by_uid_1'] = $row['managed_by_uid_1'];
+                $data_array['managed_by_uid_2'] = $row['managed_by_uid_2'];
+                //$data_array['permissions']['permission_group'] = $row['permission_group'];
+                $data_array['group_id'] = $row['group_id'];
+                $data_array['created_on'] = $row['created_on'];
+            }
+            $rslt_arr['status'] = "success";
+            $rslt_arr['members'] = $data_array;
+            //$rslt_arr['member_permission'] = $this->get_permissions_bymid($linkid,$group_id,$branch_id);
+        }
+        return $rslt_arr;
+    }
+    
+    
+    function _list_groups($get)
+    {
+        $linkid=$this->db_conn();
+//        if(!isset($get['group_id'])) $this->print_error(array("status"=>"error","response"=>"Undefined group id."));
+//        $group_id = mysql_real_escape_string(urldecode($get['group_id']));//$group_id = trim($group_id,',');
+        if(!isset($get['uid'])) $this->print_error(array("status"=>"error","response"=>"Undefined uid."));
+	$page = $lat=(!isset($get['page']))? '0' : mysql_real_escape_string(urldecode($get['page']))-1;
+	$limit = $lat=(!isset($get['limit']))? '35' : mysql_real_escape_string(urldecode($get['limit']));
+		
+        $uid = mysql_real_escape_string(urldecode($get['uid']));
+	
+         //find_in_set(`group_id`,'$group_ids')
+            $rslt=mysql_query("SELECT * FROM m_groups WHERE group_owner_uid='$uid' ",$linkid) or $this->print_error(mysql_error($linkid));
+
+            if(mysql_errno($linkid)) {
+                $rslt_arr=array("status"=>"error","response"=>mysql_error($linkid));
+            }
+	    elseif(mysql_num_rows($rslt)==0)
+	    {
+		$this->print_error("No records found");
+	    }
+            else {
+		$num_rows=mysql_num_rows($rslt);
+                $i=0;$data_array=array();
+                while ($row=mysql_fetch_assoc($rslt))
+                {
+		    $mems_count_qry = mysql_query("select count(*) as ttl_members from m_member where group_id=".$row['group_id']);
+                    $member = mysql_fetch_array($mems_count_qry);
+                    $group_member_ctr = $member['ttl_members'];
+		    
+                    //$data_array[$i]['group_id'] = $row['group_id'];
+                    $data_array[$i]['group_id'] = $row['group_id'];
+                    $data_array[$i]['group_type'] = ucfirst($row['group_type']);
+                    $data_array[$i]['group_name'] = ucfirst($this->format_text($row['group_name']));
+                    $data_array[$i]['group_description'] = $this->format_text($row['group_description']);
+                    $data_array[$i]['group_owner_uid'] = $row['group_owner_uid'];
+                    $data_array[$i]['group_member_ctr'] = $group_member_ctr; //$row['group_member_ctr'];
+                    $data_array[$i]['file_id'] = $row['file_id'];
+                    $data_array[$i]['group_addr_line_1'] = $row['group_addr_line_1'];
+                    $data_array[$i]['group_addr_line_2'] = $row['group_addr_line_2'];
+                    $data_array[$i]['group_addr_line_3'] = $row['group_addr_line_3'];
+                    $data_array[$i]['group_addr_city'] = $row['group_addr_city'];
+                    $data_array[$i]['group_addr_state'] = $row['group_addr_state'];
+                    $data_array[$i]['group_addr_country'] = $row['group_addr_country'];
+                    $data_array[$i]['group_addr_zip'] = $row['group_addr_zip'];
+                    $data_array[$i]['group_addr_zip'] = $row['group_addr_zip'];
+                    $data_array[$i]['entity_id'] = $row['entity_id'];
+                    $data_array[$i]['created_on'] = $row['created_on'];
+
+                    //$data_array[$i]['branch'] =  $this->get_group_branch_info($linkid,$row['group_id']);//$data_array2;
+                    $i++;
+                }
+                $rslt_arr = array("status"=>"success","results"=>$data_array,'num_rows'=>$num_rows);
+        }
+        return $rslt_arr;
+    }
+
+    function _list_members($get)
+    {
+        $linkid=$this->db_conn();
+//        if(!isset($get['member_id'])) $this->print_error(array("status"=>"error","response"=>"Undefined Member id."));
+	if(!isset($get['group_id'])) $this->print_error(array("status"=>"error","response"=>"Undefined Group id."));
+        $group_id = mysql_real_escape_string(urldecode($get['group_id']));
+//        $member_id = mysql_real_escape_string(urldecode($get['member_id']));
+        
+        $rslt = mysql_query("select * from m_member where group_id=".$group_id."",$linkid) or $this->print_error(mysql_error($linkid));
+        if(mysql_errno($linkid)) {
+            $rslt_arr=array("status"=>"error","response"=>mysql_error($linkid));
+        }
+	elseif(mysql_num_rows($rslt)==0)
+	{
+	    $this->print_error("No records found");
+	}
+        else
+        {
+            $i=0;$data_array=array();
+	    $num_rows=mysql_num_rows($rslt);
+            while ($row=mysql_fetch_assoc($rslt)) {
+                $data_array[$i]['member_id'] = $row['member_id'];
+                $data_array[$i]['uid'] = $row['uid'];
+                $data_array[$i]['member_name'] = $this->format_text($row['member_name']);
+                $data_array[$i]['member_img_file_id'] = $row['member_img_file_id'];
+                $data_array[$i]['member_email'] = $row['member_email'];
+                $data_array[$i]['member_phone'] = $row['member_phone'];
+                $data_array[$i]['member_role'] = $row['member_role'];
+                $data_array[$i]['managed_by_uid_1'] = $row['managed_by_uid_1'];
+                $data_array[$i]['managed_by_uid_2'] = $row['managed_by_uid_2'];
+                //$data_array[$i]['permissions']['permission_group'] = $row['permission_group'];
+                $data_array[$i]['group_id'] = $row['group_id'];
+                $data_array[$i]['created_on'] = $row['created_on'];
+		$i++;
+            }
+            $rslt_arr = array('status'=>"success",'num_rows'=>$num_rows,'members'=>$data_array);
+            //$rslt_arr['member_permission'] = $this->get_permissions_bymid($linkid,$group_id,$branch_id);
+        }
+        return $rslt_arr;
+    }
+    
+    function _list_category($get)
+    {
+        $linkid=$this->db_conn();
+//        if(!isset($get['group_id'])) $this->print_error(array("status"=>"error","response"=>"Undefined group id."));
+//        $group_id = mysql_real_escape_string(urldecode($get['group_id']));//$group_id = trim($group_id,',');
+//        if(!isset($get['uid'])) $this->print_error(array("status"=>"error","response"=>"Undefined uid."));
+//	$page = $lat=(!isset($get['page']))? '0' : mysql_real_escape_string(urldecode($get['page']))-1;
+//	$limit = $lat=(!isset($get['limit']))? '35' : mysql_real_escape_string(urldecode($get['limit']));
+		
+//        $uid = mysql_real_escape_string(urldecode($get['uid']));
+	
+         //find_in_set(`group_id`,'$group_ids')
+	    $rslt=mysql_query("SELECT * FROM m_categories ORDER BY category_name ASC",$linkid) or $this->print_error(mysql_error($linkid));
+
+	    if(mysql_errno($linkid)) {
+		$rslt_arr=array("status"=>"error","response"=>mysql_error($linkid));
+	    }
+	    elseif(mysql_num_rows($rslt)==0)
+	    {
+		$this->print_error("No records found");
+	    }
+	    else {
+		$num_rows=mysql_num_rows($rslt);
+		$i=0;$data_array=array();
+		while ($row=mysql_fetch_assoc($rslt))
+		{
+		    $data_array[$i]['category_id'] = $row['category_id'];
+		    $data_array[$i]['category_name'] = ucfirst($row['category_name']);
+		    $i++;
+		}
+		$rslt_arr = array("status"=>"success","results"=>$data_array,'num_rows'=>$num_rows);
+	    }
+	    return $rslt_arr;
+    }
+    
+    function _social_contacts($get)
+    {
+	$linkid=$this->db_conn();
+//	if(!isset($get['group_id'])) $this->print_error(array("status"=>"error","response"=>"Undefined group id."));
+//	$group_id = mysql_real_escape_string(urldecode($get['group_id']));//$group_id = trim($group_id,',');
+//	$page = $lat=(!isset($get['page']))? '0' : mysql_real_escape_string(urldecode($get['page']))-1;
+//	$limit = $lat=(!isset($get['limit']))? '35' : mysql_real_escape_string(urldecode($get['limit']));
+
+	if(!isset($get['uid'])) $this->print_error(array("status"=>"error","response"=>"Undefined uid."));
+	
+        $uid = mysql_real_escape_string(urldecode($get['uid']));
+	
+
+	$rslt=mysql_query("SELECT * FROM m_social_contacts WHERE uid='".$uid."' ORDER BY following_name ASC",$linkid) or $this->print_error(mysql_error($linkid));
+
+	if(mysql_errno($linkid)) {
+	    $rslt_arr=array("status"=>"error","response"=>mysql_error($linkid));
+	}
+	elseif(mysql_num_rows($rslt)==0)
+	{
+	    $this->print_error("No records found");
+	}
+	else {
+	    $num_rows=mysql_num_rows($rslt);
+	    $i=0;$data_array=array();
+	    while ($row=mysql_fetch_assoc($rslt))
+	    {
+		$data_array[$i]['sno'] = $row['sno'];
+		$data_array[$i]['following_uid'] = $row['following_uid'];
+		$data_array[$i]['following_uname'] = ucfirst($row['following_uname']);
+		$data_array[$i]['following_name'] = ucfirst($row['following_name']);
+		$i++;
+	    }
+	    $rslt_arr = array("status"=>"success","results"=>$data_array,'num_rows'=>$num_rows);
+	}
+        return $rslt_arr;
+    }
+    
     /********************************************************************************************/
     /**
      * Get single content api
@@ -18,75 +328,118 @@ class Search extends Baseclass {
     function get_single_content_info($get) {
         $linkid=$this->db_conn();
         
-        $output=array(); $con='';
+        $output=array(); $cond='';
         //$uid=mysql_real_escape_string($get['uid']);
-        $content_id=mysql_real_escape_string($get['content_id']);
+//        $content_id=mysql_real_escape_string($get['content_id']);
         $module=mysql_real_escape_string($get['module']);
         //uid,content_id,file_id,visibility
-        if($module == 'note') {
-            //Notes
-            $rslt = mysql_query("select c.uid,c.content_id,n.visibility,c.timestamp,n.note_id,n.note_text,n.visibility,fl.file_url,fl.file_type
-					from tbl_notes n
-					join m_content c on c.content_id=n.content_id
-					left join tbl_files fl on fl.file_id = n.file_id
-                                where n.`content_id`=$content_id
-                                order by c.timestamp desc",$linkid) or $this->print_error(mysql_error($linkid));
-            $i=0;$data_array=array();
-            while ($row=mysql_fetch_array($rslt)) {
+	if($module == 'profile')
+	{
+	    $output= $this->_view_profile($get); 
+	}
+	elseif($module == 'group') 
+	{
+	    $output= $this->_group_info($get);
+	}
+	elseif($module == 'member') 
+	{
+	    $output= $this->_member_info($get);
+	}
+	elseif($module == 'member') 
+	{
+	    $output= $this->_member_info($get);
+	}
+	elseif($module == 'contacts') 
+	{
+	    $output= $this->_social_contacts($get);
+	}
+	else
+	{
+		if(!isset($get['uid'])) $ob->print_error(array("status"=>"error","response"=>"Undefined uid."));
+		$uid=mysql_real_escape_string($get['uid']);
+		
+		if($module == 'note') {
+		    //Notes
+		    $rslt = mysql_query("select c.uid,c.content_id,n.visibility,c.timestamp,n.note_id,n.note_text,n.visibility,fl.file_url,fl.file_type
+						from tbl_notes n
+						join m_content c on c.content_id=n.content_id
+						left join tbl_files fl on fl.file_id = n.file_id
+					where n.`content_id`=$content_id
+					order by c.timestamp desc",$linkid) or $this->print_error(mysql_error($linkid));
+		    $i=0;$data_array=array();
+		    while ($row=mysql_fetch_array($rslt)) {
 
-                $data_array[$i]['uid'] = $row['uid'];
-                $data_array[$i]['content_id'] = $row['content_id'];
-                $data_array[$i]['note_id'] = $row['note_id'];
-                $data_array[$i]['note_text'] = $this->format_text($row['note_text']);
-                $data_array[$i]['visibility'] = $row['visibility'];
-                $data_array[$i]['timestamp'] = date("Y-m-d H:i:s",$row['timestamp']);
-		//$size=300;$crop=TRUE;
-		$data_array[$i]['file_url'] = $row['file_url'];//$this->image_serving_url($row['file_url'],$size,$crop,$row['file_type']);
-		$data_array[$i]['media_type'] =  $this->get_file_type($row['file_type']);
-                $i++;
-            }
-            $output['notes'] = $data_array;
-        }
-        elseif($module == 'money') {
-                $rslt = mysql_query("select e.content_id,e.expense_id,e.expense_title,e.expense_amount,e.visibility from m_money e
-                join m_content c on c.content_id=e.content_id
-                where e.content_id=$content_id $con
-                order by c.timestamp desc",$linkid) or $this->print_error(mysql_error($linkid));
+			$data_array[$i]['uid'] = $row['uid'];
+			$data_array[$i]['content_id'] = $row['content_id'];
+			$data_array[$i]['note_id'] = $row['note_id'];
+			$data_array[$i]['note_text'] = $this->format_text($row['note_text']);
+			$data_array[$i]['visibility'] = $row['visibility'];
+			$data_array[$i]['timestamp'] = date("Y-m-d H:i:s",$row['timestamp']);
+			//$size=300;$crop=TRUE;
+			$data_array[$i]['file_url'] = $row['file_url'];//$this->image_serving_url($row['file_url'],$size,$crop,$row['file_type']);
+			$data_array[$i]['media_type'] =  $this->get_file_type($row['file_type']);
+			$i++;
+		    }
+		    $output['notes'] = $data_array;
+		}
+		elseif($module == 'money') {
+			if(!isset($get['money_id'])) $this->print_error(array("status"=>"error","response"=>"Undefined Money id."));
+			$money_id = mysql_real_escape_string(urldecode($get['money_id']));
+			
+			//$rslt = mysql_query("select e.content_id,e.expense_id,e.expense_title,e.expense_amount,e.visibility  from m_money e join m_content c on c.content_id=e.content_id where e.content_id=$content_id $cond order by c.timestamp desc",$linkid) or $this->print_error(mysql_error($linkid));
+			
+			$rslt=mysql_query("SELECT * FROM m_money WHERE money_id='".$money_id."' AND uid='".$uid."' ");
+			if(mysql_errno($linkid)) {
+			    $this->print_error(mysql_error($linkid));
+			}
+			elseif(mysql_num_rows($rslt)==0)
+			{
+			    $this->print_error("No matching record found or item not created by you");
+			}
+			else {
+			    $i=0;$data_array=array();
+			    while($row = mysql_fetch_assoc($rslt))
+			    {
+				//$data_array[$i]['money_id']=$row['money_id'];
+				$data_array['money_id']=$row['money_id'];
+				$data_array['uid']=$row['uid'];
+				$data_array['timestamp']=$row['timestamp'];
+				$data_array['lat']=$row['lat'];
+				$data_array['long']=$row['long'];
+				$data_array['visibility']=$row['visibility'];
+				$data_array['money_title']= $this->format_text($row['money_title']);
+				$data_array['money_amount']=$row['money_amount'];
+				$data_array['item_unit_price']=$row['item_unit_price'];
+				$data_array['item_units']=$row['item_units'];
+				$data_array['item_qty']=$row['item_qty'];
+				$data_array['total_price']=$row['total_price'];
+				$data_array['money_flow_direction']=$row['money_flow_direction'];
+				$data_array['file_id']=$row['file_id'];
+				$data_array['category_id']=$row['category_id'];
+				$data_array['modified_on']=$row['modified_on'];
+				//$i++;
+			    }
+			    $output['money'] = $data_array;
+			}
+		}
+		elseif($module == 'reminder') {
+		    $rslt = mysql_query("select c.content_id,reminder_id,remind_time,reminder_name,visibility
+			from tbl_reminders where `content_id`=$content_id
+			order by remind_time asc",$linkid) or $this->print_error(mysql_error($linkid));
+			$i=0;
+			while ($row=mysql_fetch_array($rslt)) {
 
-                if(mysql_errno($linkid)) {
-                    $this->print_error(mysql_error($linkid));
-                }
-                else {
-                    $i=0;$data_array=array();
-                    while($row = mysql_fetch_assoc($rslt)) {
-
-                        $data_array[$i]['expense_id']=$row['expense_id'];
-                        $data_array[$i]['content_id']=$row['content_id'];
-                        $data_array[$i]['expense_title']= $this->format_text($row['title']);
-                        $data_array[$i]['expense_amount']=$row['amount'];
-                        $data_array[$i]['visibility']=$row['visibility'];
-                        $i++;
-                    }
-                    $output['expenses'] = $data_array;
-                }
-        }
-        elseif($module == 'reminder') {
-            $rslt = mysql_query("select c.content_id,reminder_id,remind_time,reminder_name,visibility
-                from tbl_reminders where `content_id`=$content_id
-                order by remind_time asc",$linkid) or $this->print_error(mysql_error($linkid));
-                $i=0;
-                while ($row=mysql_fetch_array($rslt)) {
-
-                    $data_array[$i]['reminder_id'] = $row['reminder_id'];
-                    $data_array[$i]['content_id'] = $row['content_id'];
-                    $data_array[$i]['reminder_name'] = $this->format_text($row['reminder_name']);
-                    $data_array[$i]['visibility'] = $row['visibility'];
-                    $data_array[$i]['remind_time'] = date("Y-m-d H:i:s",$row['remind_time']);
-                    $i++;
-                }
-                $output['reminders'] = $data_array;
-        }
-        else { $output = $this->unknown(); }
+			    $data_array[$i]['reminder_id'] = $row['reminder_id'];
+			    $data_array[$i]['content_id'] = $row['content_id'];
+			    $data_array[$i]['reminder_name'] = $this->format_text($row['reminder_name']);
+			    $data_array[$i]['visibility'] = $row['visibility'];
+			    $data_array[$i]['remind_time'] = date("Y-m-d H:i:s",$row['remind_time']);
+			    $i++;
+			}
+			$output['reminders'] = $data_array;
+		}
+		else { $output = $this->unknown(); }
+	}
         return $output;
     }
     
@@ -97,208 +450,449 @@ class Search extends Baseclass {
      */
     function get_list_content_info($get) {
         $linkid=$this->db_conn();
-        $output=array(); $con='';
-        $uid=mysql_real_escape_string($get['uid']);
-        $limit_start = $lat=(!isset($get['limit_start']))? '0' : mysql_real_escape_string(urldecode($get['limit_start']))-1;
-        $limit_end = $lat=(!isset($get['limit_end']))? '35' : mysql_real_escape_string(urldecode($get['limit_end']));
+        $output=array(); $cond='';
+        
+        $module=mysql_real_escape_string($get['module']);
+        
 
+	if($module == 'profile')
+	{
+	    $output= $this->_list_profiles($get); 
+	}
+	elseif($module == 'group') 
+	{
+	    $output= $this->_list_groups($get);
+	}
+	elseif($module == 'member') 
+	{
+	    $output= $this->_list_members($get);
+	}
+	elseif($module == 'category') 
+	{
+	    $output= $this->_list_category($get);
+	}
+	else
+	{
+		if(!isset($get['uid'])) $this->print_error(array("status"=>"error","response"=>"Undefined uid."));
+		$uid=mysql_real_escape_string($get['uid']);
+		
+		$page = (!isset($get['page']) || $get['page']< 0)? 1 : mysql_real_escape_string(urldecode($get['page']));
+		$limit = (!isset($get['limit']) || $get['limit']< 0)? 3 : mysql_real_escape_string(urldecode($get['limit']));
+		
+		/*if($get['module'] == 'all') {
+		    //money total
+			$sql="select sum(amount) as ttl_expense from m_money e
+			    where e.`uid`=$uid limit $page,$limit";
+			$rslt = mysql_query($sql,$linkid) or $this->print_error(mysql_error($linkid));
+			$row = mysql_fetch_array($rslt);
+			$output['expense_total'] = $row['ttl_expense'];
 
-        if($get['module'] == 'all') {
-            //money total
-                $sql="select sum(amount) as ttl_expense from m_money e
-                    where e.`uid`=$uid limit $limit_start,$limit_end";
-                $rslt = mysql_query($sql,$linkid) or $this->print_error(mysql_error($linkid));
-                $row = mysql_fetch_array($rslt);
-                $output['expense_total'] = $row['ttl_expense'];
+			//reminders
+			//===============
+			$time = time();
+			$cond = ' AND r.remind_time > '.$time;
+			//===============
+			$sql = "select c.content_id,r.reminder_id,r.remind_time,r.reminder_name,r.visibility from tbl_reminders r
+					    join m_content c on c.content_id=r.content_id
+					    WHERE r.`uid`='$uid' $cond order by r.remind_time ASC limit $page,$limit";
+			$rslt = mysql_query($sql,$linkid) or $this->print_error(mysql_error($linkid));
+			$i=0;
+			while ($row=mysql_fetch_array($rslt)) {
 
-                //reminders
-		//===============
-		$time = time();
-		$cond = ' AND r.remind_time > '.$time;
-		//===============
-                $sql = "select c.content_id,r.reminder_id,r.remind_time,r.reminder_name,r.visibility from tbl_reminders r
-                                    join m_content c on c.content_id=r.content_id
-                                    WHERE r.`uid`='$uid' $cond order by r.remind_time ASC limit $limit_start,$limit_end";
-                $rslt = mysql_query($sql,$linkid) or $this->print_error(mysql_error($linkid));
-                $i=0;
-                while ($row=mysql_fetch_array($rslt)) {
+			    $data_array[$i]['content_id'] = $row['content_id'];
+			    $data_array[$i]['reminder_id'] = $row['reminder_id'];
+			    $data_array[$i]['reminder_name'] = $this->format_text($row['reminder_name']);
+			    $data_array[$i]['visibility'] = $row['visibility'];
+			    $data_array[$i]['remind_time'] = date("Y-m-d H:i:s",$row['remind_time']);
+			    $i++;
+			}
+			$output['reminders'] = $data_array;
 
-                    $data_array[$i]['content_id'] = $row['content_id'];
-                    $data_array[$i]['reminder_id'] = $row['reminder_id'];
-                    $data_array[$i]['reminder_name'] = $this->format_text($row['reminder_name']);
-                    $data_array[$i]['visibility'] = $row['visibility'];
-                    $data_array[$i]['remind_time'] = date("Y-m-d H:i:s",$row['remind_time']);
-                    $i++;
-                }
-                $output['reminders'] = $data_array;
+			//Notes
+			$sql="select c.content_id,n.note_id,n.note_text,n.visibility,date_format(from_unixtime(c.timestamp),'%b %d, %Y at %h:%i %p') as created_on,fl.file_url,fl.file_type,gp.name,gp.img_url
+					    from tbl_notes n
+					    join m_content c on c.content_id=n.content_id
+					    left join tbl_files fl on fl.file_id = n.file_id
+					    join generic_profile gp on gp.uid = c.uid
+					    where n.`uid`='$uid' order by n.note_id desc limit $page,$limit";
+			$rslt = mysql_query($sql,$linkid) or $this->print_error(mysql_error($linkid));
+			$i=0;$data_array=array();
+			while ($row=mysql_fetch_array($rslt)) {
 
-                //Notes
-                $sql="select c.content_id,n.note_id,n.note_text,n.visibility,date_format(from_unixtime(c.timestamp),'%b %d, %Y at %h:%i %p') as created_on,fl.file_url,fl.file_type,gp.name,gp.img_url
-				    from tbl_notes n
-                                    join m_content c on c.content_id=n.content_id
-				    left join tbl_files fl on fl.file_id = n.file_id
-				    join generic_profile gp on gp.uid = c.uid
-                                    where n.`uid`='$uid' order by n.note_id desc limit $limit_start,$limit_end";
-                $rslt = mysql_query($sql,$linkid) or $this->print_error(mysql_error($linkid));
-                $i=0;$data_array=array();
-                while ($row=mysql_fetch_array($rslt)) {
+			    $data_array[$i]['content_id'] = $row['content_id'];
+			    $data_array[$i]['note_id'] = $row['note_id'];
+			    $data_array[$i]['note_text'] = $this->format_text($row['note_text']);
+			    $data_array[$i]['visibility'] = $row['visibility'];
+			    //$data_array[$i]['timestamp'] = date("Y-m-d H:i:s",$row['timestamp']);
 
-                    $data_array[$i]['content_id'] = $row['content_id'];
-                    $data_array[$i]['note_id'] = $row['note_id'];
-                    $data_array[$i]['note_text'] = $this->format_text($row['note_text']);
-                    $data_array[$i]['visibility'] = $row['visibility'];
-                    //$data_array[$i]['timestamp'] = date("Y-m-d H:i:s",$row['timestamp']);
-                    
-		    $data_array[$i]['author_name'] = $row['name'];
-                    $data_array[$i]['author_img_url'] = $row['img_url'];
-                    $data_array[$i]['author_created_on'] = $row['created_on'];
-		    
-		    //$size=300;$crop=TRUE;
-		    $data_array[$i]['file_url'] = $row['file_url'];//$this->image_serving_url($row['file_url'],$size,$crop,$row['file_type']);
-                    $data_array[$i]['media_type'] =  $this->get_file_type($row['file_type']);
-                    $i++;
-                }
-                $output['notes'] = $data_array;
+			    $data_array[$i]['author_name'] = $row['name'];
+			    $data_array[$i]['author_img_url'] = $row['img_url'];
+			    $data_array[$i]['author_created_on'] = $row['created_on'];
 
-                // Shoppinglist
-                $sql = "select c.content_id,sl.shop_list_item_id,sl.item_name,sl.item_qty,sl.shopping_status,sl.units,c.visibility,c.timestamp
-				    from tbl_shoppinglist sl
-                                    join m_content c on c.content_id=sl.content_id
-                                    where sl.`uid`='$uid' order by sl.shop_list_item_id desc limit $limit_start,$limit_end";
-                $rslt = mysql_query($sql,$linkid) or $this->print_error(mysql_error($linkid));
-                $i=0;$data_array=array();
-                while ($row=mysql_fetch_array($rslt)) {
+			    //$size=300;$crop=TRUE;
+			    $data_array[$i]['file_url'] = $row['file_url'];//$this->image_serving_url($row['file_url'],$size,$crop,$row['file_type']);
+			    $data_array[$i]['media_type'] =  $this->get_file_type($row['file_type']);
+			    $i++;
+			}
+			$output['notes'] = $data_array;
 
-                    $data_array[$i]['content_id'] = $row['content_id'];
-                    $data_array[$i]['shop_list_item_id'] = $row['shop_list_item_id'];
-                    $data_array[$i]['item_name'] = $this->format_text($row['item_name']);
-                    $data_array[$i]['visibility'] = $row['visibility'];
-                    $data_array[$i]['timestamp'] = date("Y-m-d H:i:s",$row['timestamp']);
-                    $data_array[$i]['item_qty'] = $this->format_text($row['item_qty']);
-                    $data_array[$i]['shopping_status'] = $this->format_text($row['shopping_status']);
-                    $data_array[$i]['units'] = $this->format_text($row['units']);
-                    $i++;
-                }
-                $output['shoppinglist'] = $data_array;
-        }
-        elseif($get['module'] == 'note') {
+			// Shoppinglist
+			$sql = "select c.content_id,sl.shop_list_item_id,sl.item_name,sl.item_qty,sl.shopping_status,sl.units,c.visibility,c.timestamp
+					    from tbl_shoppinglist sl
+					    join m_content c on c.content_id=sl.content_id
+					    where sl.`uid`='$uid' order by sl.shop_list_item_id desc limit $page,$limit";
+			$rslt = mysql_query($sql,$linkid) or $this->print_error(mysql_error($linkid));
+			$i=0;$data_array=array();
+			while ($row=mysql_fetch_array($rslt)) {
 
-                $rslt = mysql_query("select c.content_id,n.note_id,n.note_text,n.visibility,c.timestamp from tbl_notes n
-                                    join m_content c on c.content_id=n.content_id
-                                    where n.`uid`='$uid' order by n.note_id desc limit $limit_start,$limit_end",$linkid) or $this->print_error(mysql_error($linkid));
+			    $data_array[$i]['content_id'] = $row['content_id'];
+			    $data_array[$i]['shop_list_item_id'] = $row['shop_list_item_id'];
+			    $data_array[$i]['item_name'] = $this->format_text($row['item_name']);
+			    $data_array[$i]['visibility'] = $row['visibility'];
+			    $data_array[$i]['timestamp'] = date("Y-m-d H:i:s",$row['timestamp']);
+			    $data_array[$i]['item_qty'] = $this->format_text($row['item_qty']);
+			    $data_array[$i]['shopping_status'] = $this->format_text($row['shopping_status']);
+			    $data_array[$i]['units'] = $this->format_text($row['units']);
+			    $i++;
+			}
+			$output['shoppinglist'] = $data_array;
+		}
+		else*/ if($get['module'] == 'note') {
 
-                $i=0;$data_array=array();
-                while ($row=mysql_fetch_array($rslt)) {
+			$rslt = mysql_query("select c.content_id,n.note_id,n.note_text,n.visibility,c.timestamp from tbl_notes n
+					    join m_content c on c.content_id=n.content_id
+					    where n.`uid`='$uid' order by n.note_id desc limit $page,$limit",$linkid) or $this->print_error(mysql_error($linkid));
 
-                    $data_array[$i]['content_id'] = $row['content_id'];
-                    $data_array[$i]['note_id'] = $row['note_id'];
-                    $data_array[$i]['note_text'] = $this->format_text($row['note_text']);
-                    $data_array[$i]['visibility'] = $row['visibility'];
-                    $data_array[$i]['timestamp'] = date("Y-m-d H:i:s",$row['timestamp']);
-                    $i++;
-                }
-                $output['notes'] = $data_array;
+			$i=0;$data_array=array();
+			while ($row=mysql_fetch_array($rslt)) {
 
-        }
-        elseif($get['module'] == 'money') {
+			    $data_array[$i]['content_id'] = $row['content_id'];
+			    $data_array[$i]['note_id'] = $row['note_id'];
+			    $data_array[$i]['note_text'] = $this->format_text($row['note_text']);
+			    $data_array[$i]['visibility'] = $row['visibility'];
+			    $data_array[$i]['timestamp'] = date("Y-m-d H:i:s",$row['timestamp']);
+			    $i++;
+			}
+			$output['notes'] = $data_array;
 
-                //money total
-                $rslt = mysql_query("select sum(amount) as ttl_expense from m_money 
-                    where `uid`=$uid limit $limit_start,$limit_end",$linkid) or $this->print_error(mysql_error($linkid));
-                $row = mysql_fetch_array($rslt);
-                $output['expense_total'] = $row['ttl_expense'];
-    //            $output['currency'] = $row['currency'];
+		}
+		elseif($get['module'] == 'money') {
 
-                if($get['filter_type']=='time') {
-                    if(!isset($get['filter_from'])) $this->print_error(array("status"=>"fail","response"=>"Please specify filter from."));
-                    //if(!isset($get['filter_to'])) $this->print_error(array("status"=>"fail","response"=>"Please specify filter to."));
-                    $from= strtotime(urldecode($get['filter_from']));
-                    $to= isset($get['filter_to'])? strtotime(urldecode($get['filter_to'])) : time();
-                    $con .= ' and c.timestamp between '.$from.' and '.$to.' ';
-                }
-                /*$filter_from_str = urlencode(strtolower($get['filter_from']));
-                if($get['filter_type']=='value') {
-                    $con = ' and e.title like "%'.$filter_from_str.'%" or e.desc like "%'.$filter_from_str.'%" ';
-                }*/
-                $sql="select * from m_money e
-                        join m_content c on c.content_id=e.content_id
-                        where e.uid='$uid' $con 
-                        order by c.timestamp asc
-                        limit $limit_start,$limit_end";
-                $rslt = mysql_query($sql,$linkid) or $this->print_error($sql.''.mysql_error($linkid));
+			//money total
+			/*$rslt = mysql_query("select sum(money_amount) as ttl_expense from m_money 
+			    where `uid`=$uid limit $page,$limit",$linkid) or $this->print_error(mysql_error($linkid));
+			$row = mysql_fetch_array($rslt);
+			$output['expense_total'] = $row['ttl_expense'];
+	    //            $output['currency'] = $row['currency'];
 
-                if(mysql_errno($linkid)) {
-                    $this->print_error(mysql_error($linkid));
-                }
-                else {
+			if($get['filter_type']=='time') {
+			    if(!isset($get['filter_from'])) $this->print_error(array("status"=>"error","response"=>"Please specify filter from."));
+			    //if(!isset($get['filter_to'])) $this->print_error(array("status"=>"error","response"=>"Please specify filter to."));
+			    $from= strtotime(urldecode($get['filter_from']));
+			    $to= isset($get['filter_to'])? strtotime(urldecode($get['filter_to'])) : time();
+			    $cond .= ' and c.timestamp between '.$from.' and '.$to.' ';
+			}*/
+			/*$filter_from_str = urlencode(strtolower($get['filter_from']));
+			if($get['filter_type']=='value') {
+			    $cond = ' and e.title like "%'.$filter_from_str.'%" or e.desc like "%'.$filter_from_str.'%" ';
+			}*/
+			/*$sql="select * from m_money e
+				join m_content c on c.content_id=e.content_id
+				where e.uid='$uid' $cond 
+				order by c.timestamp asc
+				limit $page,$limit";
+			$rslt = mysql_query($sql,$linkid) or $this->print_error($sql.''.mysql_error($linkid));
 
-                    $i=0;$data_array=array();
-                    while($row = mysql_fetch_assoc($rslt)) {
-                        /*****/
-                        $month=date("M",$row['timestamp']);
-                        /*$data_array[$month][$i]['expense_id']=$row['expense_id'];
-                        $data_array[$month][$i]['content_id']=$row['content_id'];
-                        $data_array[$month][$i]['expense_title']=$row['title'];
-                        $data_array[$month][$i]['expense_amount']=$row['amount'];*/
-    //                    $data_array[$month]['month_total']+=$row['amount'];
+			if(mysql_errno($linkid)) {
+			    $this->print_error(mysql_error($linkid));
+			}
+			else {
 
+			    $i=0;$data_array=array();
+			    while($row = mysql_fetch_assoc($rslt)) {
+				$month=date("M",$row['timestamp']);
+//				$data_array[$month][$i]['expense_id']=$row['expense_id'];
+//				$data_array[$month][$i]['content_id']=$row['content_id'];
+//				$data_array[$month][$i]['expense_title']=$row['title'];
+//				$data_array[$month][$i]['expense_amount']=$row['amount'];
+	    //                    $data_array[$month]['month_total']+=$row['amount'];
+				$data_array[$i]['expense_id']=$row['expense_id'];
+				$data_array[$i]['content_id']=$row['content_id'];
+				$data_array[$i]['expense_title']=$row['title'];
+				$data_array[$i]['expense_amount']=$row['amount'];
+				$data_array[$i]['month']=date("M",$row['timestamp']);;
+//				$data_array[$i]['visibility']=$row['visibility'];
+	    //                    $data_array[$i]['currency']=$row['currency'];
+	    //                    $data_array[$month]['month_total']+=$row['amount'];
+				$i++;
+			    }
+			    $output['expenses'] = $data_array;
+			}*/
+			///======================
+			$cond='';
+			if(!isset($get['uid'])) $this->print_error(array("status"=>"error","response"=>"Undefined uid."));
+			if(!isset($get['tff'])) $this->print_error(array("status"=>"error","response"=>"Please specify time filter from."));
+			if(!isset($get['tft'])) $this->print_error(array("status"=>"error","response"=>"Please specify time filter to."));
+			
+			$uid = mysql_real_escape_string(urldecode($get['uid']));
+			$q = mysql_real_escape_string(urldecode($get['q']));
+			
+			if($q!='')
+			    $cond.= " AND (money_title LIKE '%".$q."%')";
+			
+			$dt_from=$this->validate_datetime(urldecode($get['tff']),'from');
+			$dt_to=$this->validate_datetime(urldecode($get['tft']),'to');
+			
+			$tff= isset($get['tff'])? ($dt_from) : date("Y-m-d",time()-(60*60*24*30));//strtotime
+			$tft= isset($get['tft'])? ($dt_to) : date("Y-m-d",time());
+			$cond .= " and (m.timestamp) between '".$tff."' and '".$tft."' ";
+			
+			//========TOTAL QRY======
+			$sql="SELECT * FROM m_money m
+					    WHERE m.uid='".$uid."' $cond
+					    ORDER BY m.sno DESC";//ORDER BY m.timestamp desc
+			
+			$ttl_rslt=mysql_query($sql,$linkid) or $this->print_error(mysql_error($linkid));
+			$num_rows=mysql_num_rows($ttl_rslt);
+			$output['total_rows'] = $num_rows;
+			
+			//==============
+			$start_row=0;
+			if($num_rows > $limit)
+			{
+			    
+			   //=============< Pagination Class>==============
+			    $paginacion = new Paginacion($limit);//MAX_RECORDS_X_PAGE
+			    $paginacion->setTotalRegs($num_rows); //count($data)
+			    $paginacion->setCurrentPage($page-1);// SET THE CURRENT PAGE
+			    //=============< Pagination Class>==============
+//			    $output['getTotalRegs']=$paginacion->getTotalRegs();
+			    $getTotalPages=$output['pages']=$paginacion->getTotalPages();
 
-                        $data_array[$i]['expense_id']=$row['expense_id'];
-                        $data_array[$i]['content_id']=$row['content_id'];
-                        $data_array[$i]['expense_title']=$row['title'];
-                        $data_array[$i]['expense_amount']=$row['amount'];
-                        $data_array[$i]['month']=date("M",$row['timestamp']);;
-                        $data_array[$i]['visibility']=$row['visibility'];
-    //                    $data_array[$i]['currency']=$row['currency'];
-    //                    $data_array[$month]['month_total']+=$row['amount'];
-                        $i++;
-                    }
-                    $output['expenses'] = $data_array;
-                }
-        }
-        elseif($get['module'] == 'reminder') {
+			    $start_row=$output['start_row']=$paginacion->getStartRow();
+			    //$output['end_row']=$paginacion->getLastRow();
+			    
+			    $output['current_page']=$paginacion->getCurrentPage()+1;
+			    
+			    if($paginacion->getCurrentPage()-1 > -1)
+				$output['prev_page']=$paginacion->getCurrentPage();
+			    
+			    $p_next=$paginacion->getCurrentPage()+2;
+			    if($getTotalPages >= $p_next )
+				$output['next_page']=$p_next;
+			}
+			
+			$sql=$sql." LIMIT $start_row,$limit";
+//			echo '<pre>'.$sql;
+			$rslt=mysql_query($sql,$linkid) or $this->print_error(mysql_error($linkid));
+			if(mysql_errno($linkid)) {
+			    $this->print_error(mysql_error($linkid));
+			}
+			elseif(mysql_num_rows($rslt)==0)
+			{
+			    $output['response'] = "No matching record found or item may not belongs to you";
+			    $this->print_error($output);
+			}
+			else {
+			    $i=0;$data_array=array();
+			    while($row = mysql_fetch_assoc($rslt))
+			    {
+				$month=date("M",strtotime($row['timestamp']));
+				$tmstmp=strtotime(date("Y-m-d",strtotime($row['timestamp']) ));
+				$quarter_start_dt=$this->this_quarter();
+				if( strtotime('today' ) == $tmstmp)
+				{
+				    $data_array['today'][$i]['sno']=$page+$i;
+				    $data_array['today'][$i]['money_id']=$row['money_id'];
+				    $data_array['today'][$i]['uid']=$row['uid'];
+				    $data_array['today'][$i]['lat']=$row['lat'];
+				    $data_array['today'][$i]['long']=$row['long'];
+				    $data_array['today'][$i]['visibility']=$row['visibility'];
+				    $data_array['today'][$i]['money_title']= $this->format_text($row['money_title']);
+				    $data_array['today'][$i]['money_amount']=$row['money_amount'];
+				    $data_array['today'][$i]['item_unit_price']=$row['item_unit_price'];
+				    $data_array['today'][$i]['item_units']=$row['item_units'];
+				    $data_array['today'][$i]['item_qty']=$row['item_qty'];
+				    $data_array['today'][$i]['total_price']=$row['total_price'];
+				    $data_array['today'][$i]['money_flow_direction']=$row['money_flow_direction'];
+				    $data_array['today'][$i]['file_id']=$row['file_id'];
+				    $data_array['today'][$i]['category_id']=$row['category_id'];
+				    $data_array['today'][$i]['modified_on']=$row['modified_on'];
+				    $data_array['today'][$i]['timestamp']=$row['timestamp'];
+				}
+				elseif( strtotime('yesterday' ) == $tmstmp )
+				{
+				    $data_array['yesterday'][$i]['sno']=$page+$i;
+				    $data_array['yesterday'][$i]['money_id']=$row['money_id'];
+				    $data_array['yesterday'][$i]['uid']=$row['uid'];
+				    $data_array['yesterday'][$i]['lat']=$row['lat'];
+				    $data_array['yesterday'][$i]['long']=$row['long'];
+				    $data_array['yesterday'][$i]['visibility']=$row['visibility'];
+				    $data_array['yesterday'][$i]['money_title']= $this->format_text($row['money_title']);
+				    $data_array['yesterday'][$i]['money_amount']=$row['money_amount'];
+				    $data_array['yesterday'][$i]['item_unit_price']=$row['item_unit_price'];
+				    $data_array['yesterday'][$i]['item_units']=$row['item_units'];
+				    $data_array['yesterday'][$i]['item_qty']=$row['item_qty'];
+				    $data_array['yesterday'][$i]['total_price']=$row['total_price'];
+				    $data_array['yesterday'][$i]['money_flow_direction']=$row['money_flow_direction'];
+				    $data_array['yesterday'][$i]['file_id']=$row['file_id'];
+				    $data_array['yesterday'][$i]['category_id']=$row['category_id'];
+				    $data_array['yesterday'][$i]['modified_on']=$row['modified_on'];
+				    $data_array['yesterday'][$i]['timestamp']=$row['timestamp'];
+				}
+				elseif( strtotime('-1 week' ) <= $tmstmp )
+				{
+				    $data_array['this_week'][$i]['sno']=$page+$i;
+				    $data_array['this_week'][$i]['money_id']=$row['money_id'];
+				    $data_array['this_week'][$i]['uid']=$row['uid'];
+				    $data_array['this_week'][$i]['lat']=$row['lat'];
+				    $data_array['this_week'][$i]['long']=$row['long'];
+				    $data_array['this_week'][$i]['visibility']=$row['visibility'];
+				    $data_array['this_week'][$i]['money_title']= $this->format_text($row['money_title']);
+				    $data_array['this_week'][$i]['money_amount']=$row['money_amount'];
+				    $data_array['this_week'][$i]['item_unit_price']=$row['item_unit_price'];
+				    $data_array['this_week'][$i]['item_units']=$row['item_units'];
+				    $data_array['this_week'][$i]['item_qty']=$row['item_qty'];
+				    $data_array['this_week'][$i]['total_price']=$row['total_price'];
+				    $data_array['this_week'][$i]['money_flow_direction']=$row['money_flow_direction'];
+				    $data_array['this_week'][$i]['file_id']=$row['file_id'];
+				    $data_array['this_week'][$i]['category_id']=$row['category_id'];
+				    $data_array['this_week'][$i]['modified_on']=$row['modified_on'];
+				    $data_array['this_week'][$i]['timestamp']=$row['timestamp'];
+				}
+				elseif(strtotime(date("Y-m-1",time())) < $tmstmp )
+				{
+				    $data_array['this_month'][$i]['sno']=$page+$i;
+				    $data_array['this_month'][$i]['money_id']=$row['money_id'];
+				    $data_array['this_month'][$i]['uid']=$row['uid'];
+				    $data_array['this_month'][$i]['lat']=$row['lat'];
+				    $data_array['this_month'][$i]['long']=$row['long'];
+				    $data_array['this_month'][$i]['visibility']=$row['visibility'];
+				    $data_array['this_month'][$i]['money_title']= $this->format_text($row['money_title']);
+				    $data_array['this_month'][$i]['money_amount']=$row['money_amount'];
+				    $data_array['this_month'][$i]['item_unit_price']=$row['item_unit_price'];
+				    $data_array['this_month'][$i]['item_units']=$row['item_units'];
+				    $data_array['this_month'][$i]['item_qty']=$row['item_qty'];
+				    $data_array['this_month'][$i]['total_price']=$row['total_price'];
+				    $data_array['this_month'][$i]['money_flow_direction']=$row['money_flow_direction'];
+				    $data_array['this_month'][$i]['file_id']=$row['file_id'];
+				    $data_array['this_month'][$i]['category_id']=$row['category_id'];
+				    $data_array['this_month'][$i]['modified_on']=$row['modified_on'];
+				    $data_array['this_month'][$i]['timestamp']=$row['timestamp'];
+				}
+				elseif($quarter_start_dt < $tmstmp )
+				{
+				    $data_array['this_quarter'][$i]['sno']=$page+$i;
+				    $data_array['this_quarter'][$i]['money_id']=$row['money_id'];
+				    $data_array['this_quarter'][$i]['uid']=$row['uid'];
+				    $data_array['this_quarter'][$i]['lat']=$row['lat'];
+				    $data_array['this_quarter'][$i]['long']=$row['long'];
+				    $data_array['this_quarter'][$i]['visibility']=$row['visibility'];
+				    $data_array['this_quarter'][$i]['money_title']= $this->format_text($row['money_title']);
+				    $data_array['this_quarter'][$i]['money_amount']=$row['money_amount'];
+				    $data_array['this_quarter'][$i]['item_unit_price']=$row['item_unit_price'];
+				    $data_array['this_quarter'][$i]['item_units']=$row['item_units'];
+				    $data_array['this_quarter'][$i]['item_qty']=$row['item_qty'];
+				    $data_array['this_quarter'][$i]['total_price']=$row['total_price'];
+				    $data_array['this_quarter'][$i]['money_flow_direction']=$row['money_flow_direction'];
+				    $data_array['this_quarter'][$i]['file_id']=$row['file_id'];
+				    $data_array['this_quarter'][$i]['category_id']=$row['category_id'];
+				    $data_array['this_quarter'][$i]['modified_on']=$row['modified_on'];
+				    $data_array['this_quarter'][$i]['timestamp']=$row['timestamp'];
+				}
+				elseif(strtotime(date("Y-01-01",time())) < $tmstmp )
+				{
+				    $data_array['this_year'][$i]['sno']=$page+$i;
+				    $data_array['this_year'][$i]['money_id']=$row['money_id'];
+				    $data_array['this_year'][$i]['uid']=$row['uid'];
+				    $data_array['this_year'][$i]['lat']=$row['lat'];
+				    $data_array['this_year'][$i]['long']=$row['long'];
+				    $data_array['this_year'][$i]['visibility']=$row['visibility'];
+				    $data_array['this_year'][$i]['money_title']= $this->format_text($row['money_title']);
+				    $data_array['this_year'][$i]['money_amount']=$row['money_amount'];
+				    $data_array['this_year'][$i]['item_unit_price']=$row['item_unit_price'];
+				    $data_array['this_year'][$i]['item_units']=$row['item_units'];
+				    $data_array['this_year'][$i]['item_qty']=$row['item_qty'];
+				    $data_array['this_year'][$i]['total_price']=$row['total_price'];
+				    $data_array['this_year'][$i]['money_flow_direction']=$row['money_flow_direction'];
+				    $data_array['this_year'][$i]['file_id']=$row['file_id'];
+				    $data_array['this_year'][$i]['category_id']=$row['category_id'];
+				    $data_array['this_year'][$i]['modified_on']=$row['modified_on'];
+				    $data_array['this_year'][$i]['timestamp']=$row['timestamp'];
+				}
+				else
+				{
+				    $data_array['last_year'][$i]['sno']=$page+$i;
+				    $data_array['last_year'][$i]['money_id']=$row['money_id'];
+				    $data_array['last_year'][$i]['uid']=$row['uid'];
+				    $data_array['last_year'][$i]['lat']=$row['lat'];
+				    $data_array['last_year'][$i]['long']=$row['long'];
+				    $data_array['last_year'][$i]['visibility']=$row['visibility'];
+				    $data_array['last_year'][$i]['money_title']= $this->format_text($row['money_title']);
+				    $data_array['last_year'][$i]['money_amount']=$row['money_amount'];
+				    $data_array['last_year'][$i]['item_unit_price']=$row['item_unit_price'];
+				    $data_array['last_year'][$i]['item_units']=$row['item_units'];
+				    $data_array['last_year'][$i]['item_qty']=$row['item_qty'];
+				    $data_array['last_year'][$i]['total_price']=$row['total_price'];
+				    $data_array['last_year'][$i]['money_flow_direction']=$row['money_flow_direction'];
+				    $data_array['last_year'][$i]['file_id']=$row['file_id'];
+				    $data_array['last_year'][$i]['category_id']=$row['category_id'];
+				    $data_array['last_year'][$i]['modified_on']=$row['modified_on'];
+				    $data_array['last_year'][$i]['timestamp']=$row['timestamp'];
+				}
 
-                $rslt = mysql_query("select c.content_id,r.reminder_id,r.remind_time,r.reminder_name,r.visibility from tbl_reminders r
-                    join m_content c on c.content_id=r.content_id
-                    where r.`uid`='$uid' order by r.remind_time ASC limit $limit_start,$limit_end",$linkid) or $this->print_error(mysql_error($linkid));
-                $i=0;
-                while ($row=mysql_fetch_array($rslt)) {
+//				$data_array[$i]['month']=$month;
+//				$data_array[$month]['month_total']+=$row['money_amount'];
+				$i++;
+			    }
+			    $output['money'] = $data_array;
+			}
+			///========================
+		}
+		elseif($get['module'] == 'reminder') {
 
-                    $data_array[$i]['content_id'] = $row['content_id'];
-                    $data_array[$i]['reminder_id'] = $row['reminder_id'];
-                    $data_array[$i]['reminder_name'] = $this->format_text($row['reminder_name']);
-                    $data_array[$i]['visibility'] = $row['visibility'];
-                    $data_array[$i]['remind_time'] = date("Y-m-d H:i:s",$row['remind_time']);
-                    $i++;
-                }
-                $output['reminders'] = $data_array;
+			$rslt = mysql_query("select c.content_id,r.reminder_id,r.remind_time,r.reminder_name,r.visibility from tbl_reminders r
+			    join m_content c on c.content_id=r.content_id
+			    where r.`uid`='$uid' order by r.remind_time ASC limit $page,$limit",$linkid) or $this->print_error(mysql_error($linkid));
+			$i=0;
+			while ($row=mysql_fetch_array($rslt)) {
 
-        }
-        elseif($get['module'] == 'shoppinglist') {
-                // Shoppinglist
-                $sql="select c.content_id,sl.shop_list_item_id,sl.item_name,sl.item_qty,sl.units,sl.shopping_status,c.visibility,c.timestamp
-				    from tbl_shoppinglist sl
-                                    join m_content c on c.content_id=sl.content_id
-                                    where sl.`uid`='$uid' order by sl.shop_list_item_id desc limit $limit_start,$limit_end";
-                $rslt = mysql_query($sql,$linkid) or $this->print_error(mysql_error($linkid));
-                $i=0;$data_array=array();
-                while ($row=mysql_fetch_array($rslt)) {
+			    $data_array[$i]['content_id'] = $row['content_id'];
+			    $data_array[$i]['reminder_id'] = $row['reminder_id'];
+			    $data_array[$i]['reminder_name'] = $this->format_text($row['reminder_name']);
+			    $data_array[$i]['visibility'] = $row['visibility'];
+			    $data_array[$i]['remind_time'] = date("Y-m-d H:i:s",$row['remind_time']);
+			    $i++;
+			}
+			$output['reminders'] = $data_array;
 
-                    $data_array[$i]['content_id'] = $row['content_id'];
-                    $data_array[$i]['shop_list_item_id'] = $row['shop_list_item_id'];
-                    $data_array[$i]['item_name'] = $this->format_text($row['item_name']);
-                    $data_array[$i]['visibility'] = $row['visibility'];
-                    $data_array[$i]['timestamp'] = date("Y-m-d H:i:s",$row['timestamp']);
-		    $data_array[$i]['item_qty'] = $this->format_text($row['item_qty']);
-                    $data_array[$i]['shopping_status'] = $this->format_text($row['shopping_status']);
-                    $data_array[$i]['units'] = $this->format_text($row['units']);
-                    $i++;
-                }
-                //$output['lst_qry'] = $sql;
-                $output['shoppinglist'] = $data_array;
+		}
+		elseif($get['module'] == 'shoppinglist') {
+			// Shoppinglist
+			$sql="select c.content_id,sl.shop_list_item_id,sl.item_name,sl.item_qty,sl.units,sl.shopping_status,c.visibility,c.timestamp
+					    from tbl_shoppinglist sl
+					    join m_content c on c.content_id=sl.content_id
+					    where sl.`uid`='$uid' order by sl.shop_list_item_id desc limit $page,$limit";
+			$rslt = mysql_query($sql,$linkid) or $this->print_error(mysql_error($linkid));
+			$i=0;$data_array=array();
+			while ($row=mysql_fetch_array($rslt)) {
 
-        }
-        else { $output = $this->unknown(); }
+			    $data_array[$i]['content_id'] = $row['content_id'];
+			    $data_array[$i]['shop_list_item_id'] = $row['shop_list_item_id'];
+			    $data_array[$i]['item_name'] = $this->format_text($row['item_name']);
+			    $data_array[$i]['visibility'] = $row['visibility'];
+			    $data_array[$i]['timestamp'] = date("Y-m-d H:i:s",$row['timestamp']);
+			    $data_array[$i]['item_qty'] = $this->format_text($row['item_qty']);
+			    $data_array[$i]['shopping_status'] = $this->format_text($row['shopping_status']);
+			    $data_array[$i]['units'] = $this->format_text($row['units']);
+			    $i++;
+			}
+			//$output['lst_qry'] = $sql;
+			$output['shoppinglist'] = $data_array;
+
+		}
+		else { $output = $this->unknown(); }
+	}
         return $output;
     }
     
@@ -317,7 +911,7 @@ class Search extends Baseclass {
      */
     function get_tag_content_info($get) {
         $linkid=$this->db_conn();
-        $output=array(); $con='';
+        $output=array(); $cond='';
 
         $tag_str = mysql_real_escape_string(urldecode($get['tag']));
         $requesting_uid = mysql_real_escape_string(urldecode($get['requesting_uid']));
@@ -341,7 +935,7 @@ class Search extends Baseclass {
         // search core query
         $list_content_info =  $this->get_srch_tags_data($tag_str,$requesting_uid,$uid,$module,$privacy);
 //        echo '<pre>';print_r($list_content_info); die();
-        if($list_content_info['status']=='fail') {
+        if($list_content_info['status']=='error') {
             $this->print_error($list_content_info);
         }
          else {
@@ -371,7 +965,7 @@ class Search extends Baseclass {
      */
     function get_srch_tag_content_info($get) {
         $linkid=$this->db_conn();
-        $output=array(); $con='';
+        $output=array(); $cond='';
 
         $tag_str = mysql_real_escape_string(urldecode($get['tag']));
         $requesting_uid = mysql_real_escape_string(urldecode($get['requesting_uid']));
@@ -395,7 +989,7 @@ class Search extends Baseclass {
         // search core query
         $list_content_info =  $this->get_srch_tags_data($tag_str,$requesting_uid,$uid,$module,$privacy);
 //        echo '<pre>';print_r($list_content_info); die();
-        if($list_content_info['status']=='fail') {
+        if($list_content_info['status']=='error') {
             $this->print_error($list_content_info);
         }
          else {
@@ -449,7 +1043,7 @@ class Search extends Baseclass {
                     }
                     
                     if($module == 'note' || $module == 'all') {
-                            //limit $limit_start,$limit_end
+                            //limit $page,$limit
                             $sql = "select * from tbl_tag_content tc
                                     join tbl_notes n on n.content_id = tc.content_id
                                                 where tc.tag_string like '%$query_str%' $cond ";
@@ -474,7 +1068,7 @@ class Search extends Baseclass {
                             $output['notes'] = $data_array;
                     }
                     if($module == 'money' || $module == 'all') {
-                            //limit $limit_start,$limit_end
+                            //limit $page,$limit
                             $sql = "select * from tbl_tag_content tc
                                     join m_money e on e.content_id = tc.content_id
                                                 where tc.tag_string like '%$query_str%' $cond ";
@@ -504,7 +1098,7 @@ class Search extends Baseclass {
                             $output['expenses'] = $data_array;
                     }
                     if($module == 'reminder' || $module == 'all') {
-                            //limit $limit_start,$limit_end
+                            //limit $page,$limit
                             $sql = "select * from tbl_tag_content tc
                                     join tbl_reminders r on r.content_id = tc.content_id
                                                 where tc.tag_string like '%$query_str%' $cond ";
@@ -559,7 +1153,7 @@ class Search extends Baseclass {
      */
     function get_srch_content_info($get) {
         $linkid=$this->db_conn();
-        $output=array(); $con='';
+        $output=array(); $cond='';
 
         $requesting_uid = mysql_real_escape_string(urldecode($get['requesting_uid']));
         $query_str = mysql_real_escape_string(urldecode($get['query']));
@@ -582,7 +1176,7 @@ class Search extends Baseclass {
         // search core query
         $list_content_info =  $this->get_query_content($query_str,$requesting_uid,$module);
         
-        if($list_content_info['status']=='fail') {
+        if($list_content_info['status']=='error') {
             $this->print_error($list_content_info);
         }
          else {
@@ -667,7 +1261,7 @@ class Search extends Baseclass {
     function get_srch_expense($query_str,$cond) {      
         $linkid=$this->db_conn();
 
-        // limit $limit_start,$limit_end
+        // limit $page,$limit
         $sql="select * from m_money e 
             join m_content c on c.content_id=e.content_id
             where (e.title like '%$query_str%' or e.desc like '%$query_str%') 
@@ -698,7 +1292,7 @@ class Search extends Baseclass {
     function get_srch_reminder($query_str,$cond) {
             $linkid=$this->db_conn();
         
-            //reminders limit $limit_start,$limit_end
+            //reminders limit $page,$limit
             $rslt = mysql_query("select c.uid,c.content_id,r.reminder_id,r.remind_time,r.reminder_name,r.visibility from tbl_reminders r
                                 join m_content c on c.content_id=r.content_id
                                 where r.reminder_name like '%$query_str%'  
@@ -742,7 +1336,7 @@ class Search extends Baseclass {
     
     function get_srch_note($query_str,$cond) {
         $linkid=$this->db_conn();
-        //Notes limit $limit_start,$limit_end
+        //Notes limit $page,$limit
         $rslt = mysql_query("select c.uid,c.content_id,n.note_id,n.note_text,n.visibility,c.timestamp,fl.file_url,fl.file_type
 			    from tbl_notes n
                             join m_content c on c.content_id=n.content_id
@@ -830,48 +1424,12 @@ class Search extends Baseclass {
             return $output;
     }
 
-    /**
-     * Get user profile by uid
-     * @param type $uid int
-     * @return type array
-     */
-    function get_user_profile($uid) {
-        $linkid=$this->db_conn();
-	
-	$sql = "SELECT * FROM `generic_profile` WHERE `uid`='$uid'";
-        $rslt = mysql_query($sql,$linkid);
-        if(mysql_errno($linkid)) {
-            $rslt_arr=array("status"=>"fail","response"=>mysql_error($linkid));
-        }
-        else {
-            if(mysql_affected_rows($linkid) > 0) {
-                while($row = mysql_fetch_assoc($rslt)) {
-                    $result['uid']=$row['uid'];
-                    $result['gid']=$row['gid'];
-                    $result['fname']=$row['fname'];
-                    $result['lname']=$row['lname'];
-                    $result['name']=$row['name'];
-                    $result['img_url']=$row['img_url'];
-                    $result['currency']=$row['currency'];
-		    $result['status']="success";
-                }
-            }
-            else {
-                $result['fail']="No Records found.";
-            }
-            //$result['rows']=mysql_affected_rows($linkid);
-
-            $rslt_arr = $result;
-        }
-        return $rslt_arr;
-    }
-    
     function get_list_groups($get)
     {
         $linkid=$this->db_conn();
-        if(!isset($get['uid'])) $this->print_error(array("status"=>"fail","response"=>"Undefined uid."));
+        if(!isset($get['uid'])) $this->print_error(array("status"=>"error","response"=>"Undefined uid."));
         $uid = mysql_real_escape_string(urldecode($get['uid']));
-        $rslt=mysql_query("SELECT * FROM `tbl_members` as m WHERE m.`uid`='$uid' ",$linkid) or $this->print_error(mysql_error($linkid));
+        $rslt=mysql_query("SELECT * FROM `m_member` as m WHERE m.`uid`='$uid' ",$linkid) or $this->print_error(mysql_error($linkid));
 
         $i=0;$data_array=array();
         while ($row=mysql_fetch_assoc($rslt)) {
@@ -886,48 +1444,12 @@ class Search extends Baseclass {
         return $rslt_arr;
     }
 
-    function get_groups_info($get)
-    {
-        $linkid=$this->db_conn();
-        if(!isset($get['group_ids'])) $this->print_error(array("status"=>"fail","response"=>"Undefined group ids."));
-        $group_ids = mysql_real_escape_string(urldecode($get['group_ids']));$group_ids = trim($group_ids,',');
-        
-            $rslt=mysql_query("SELECT * FROM tbl_groups WHERE find_in_set(`group_id`,'$group_ids')",$linkid) or $this->print_error(mysql_error($linkid));
-
-            if(mysql_errno($linkid)) {
-                $rslt_arr=array("status"=>"fail","response"=>mysql_error($linkid));
-            }
-            else {
-                $i=0;$data_array=array();
-                while ($row=mysql_fetch_assoc($rslt))
-                {
-
-                    $data_array[$i]['group_id'] = $row['group_id'];
-                    $data_array[$i]['group_type'] = ucfirst($row['group_type']);
-                    $data_array[$i]['group_name'] = ucfirst($this->format_text($row['group_name']));
-                    $data_array[$i]['group_description'] = $this->format_text($row['group_description']);
-                    $data_array[$i]['common_prod_flag'] = $row['common_prod_flag'];
-                    $mems_count_qry = mysql_query("select count(*) as members from tbl_members where group_id=".$row['group_id']);
-                    $member = mysql_fetch_array($mems_count_qry);
-                    $group_member_ctr = $member['members'];
-                    $data_array[$i]['group_member_ctr'] = $group_member_ctr;
-                    $data_array[$i]['eid'] = $row['eid'];
-                    $data_array[$i]['created_on'] = date("Y-m-d H:i:s",$row['created_on']);
-
-                    $data_array[$i]['branch'] =  $this->get_group_branch_info($linkid,$row['group_id']);//$data_array2;
-                    $i++;
-                }
-                $rslt_arr = array("status"=>"success","results"=>$data_array);
-        }
-        return $rslt_arr;
-    }
-
     function get_group_members_info($linkid,$group_id)
     {
-            $rslt=mysql_query("SELECT * FROM `tbl_members` WHERE group_id='$group_id' ",$linkid) or $this->print_error(mysql_error($linkid));
+            $rslt=mysql_query("SELECT * FROM `m_member` WHERE group_id='$group_id' ",$linkid) or $this->print_error(mysql_error($linkid));
             $data_array=array();
             if(mysql_errno($linkid)) {
-                $data_array=array("status"=>"fail","response"=>mysql_error($linkid));
+                $data_array=array("status"=>"error","response"=>mysql_error($linkid));
             }
             else {
                 $i=0;
@@ -945,12 +1467,12 @@ class Search extends Baseclass {
             return $data_array;
     }
     
-    function get_group_branch_info($linkid,$group_id)
+    /*function get_group_branch_info($linkid,$group_id)
     {
         $rslt=mysql_query("SELECT * FROM `tbl_branch` WHERE group_id='$group_id'",$linkid) or $this->print_error(mysql_error($linkid));
             $data_array=array();
             if(mysql_errno($linkid)) {
-                $data_array=array("status"=>"fail","response"=>mysql_error($linkid));
+                $data_array=array("status"=>"error","response"=>mysql_error($linkid));
             }
             else {
                 $i=0;
@@ -960,7 +1482,7 @@ class Search extends Baseclass {
                     $data_array[$i]['branch_name'] = $this->format_text($row['branch_name']);
                     $data_array[$i]['branch_desc'] = $this->format_text($row['branch_desc']);
                     
-                    $mems_count_qry = mysql_query("select count(*) as mem_cnt from tbl_members where branch_id=".$row['branch_id']);
+                    $mems_count_qry = mysql_query("select count(*) as mem_cnt from m_member where branch_id=".$row['branch_id']);
                     $member = mysql_fetch_array($mems_count_qry);
                     $data_array[$i]['branch_member_ctr'] = $member['mem_cnt'];
                     $data_array[$i]['created_on'] = date("Y-m-d H:i:s",$row['created_on']);
@@ -978,7 +1500,7 @@ class Search extends Baseclass {
             $rslt=mysql_query($sql,$linkid) or $this->print_error(mysql_error($linkid));
             $data_array=array();
             if(mysql_errno($linkid)) {
-                $data_array=array("status"=>"fail","response"=>mysql_error($linkid));
+                $data_array=array("status"=>"error","response"=>mysql_error($linkid));
             }
             else {
 
@@ -993,13 +1515,13 @@ class Search extends Baseclass {
                 }
             }
             return $data_array;
-    }
+    }*/
     
     function get_branch_member_by_groupid($get)
     {
         $linkid=$this->db_conn();
-        if(!isset($get['group_id'])) $this->print_error(array("status"=>"fail","response"=>"Undefined group_id."));
-        if(!isset($get['uid'])) $this->print_error(array("status"=>"fail","response"=>"Undefined UID."));
+        if(!isset($get['group_id'])) $this->print_error(array("status"=>"error","response"=>"Undefined group_id."));
+        if(!isset($get['uid'])) $this->print_error(array("status"=>"error","response"=>"Undefined UID."));
         $group_id = mysql_real_escape_string(urldecode($get['group_id']));
         $uid = mysql_real_escape_string(urldecode($get['uid']));
         
@@ -1015,14 +1537,14 @@ class Search extends Baseclass {
     function get_members_by_branchid($get)
     {
         $linkid=$this->db_conn();
-        if(!isset($get['branch_id'])) $this->print_error(array("status"=>"fail","response"=>"Undefined branch id."));
-        if(!isset($get['uid'])) $this->print_error(array("status"=>"fail","response"=>"Undefined UID."));
+        if(!isset($get['branch_id'])) $this->print_error(array("status"=>"error","response"=>"Undefined branch id."));
+        if(!isset($get['uid'])) $this->print_error(array("status"=>"error","response"=>"Undefined UID."));
         $branch_id = mysql_real_escape_string(urldecode($get['branch_id']));
         $uid = mysql_real_escape_string(urldecode($get['uid']));
         
-        $rslt = mysql_query("select * from tbl_members where branch_id=".$branch_id,$linkid) or $this->print_error(mysql_error($linkid));
+        $rslt = mysql_query("select * from m_member where branch_id=".$branch_id,$linkid) or $this->print_error(mysql_error($linkid));
         if(mysql_errno($linkid)) {
-            $rslt_arr=array("status"=>"fail","response"=>mysql_error($linkid));
+            $rslt_arr=array("status"=>"error","response"=>mysql_error($linkid));
         }
         else
         {
@@ -1052,7 +1574,7 @@ class Search extends Baseclass {
      * @param type $branch_id
      * @return type
      */
-    function get_branch_info($linkid,$branch_id)
+    /*function get_branch_info($linkid,$branch_id)
     {
         $rslt=mysql_query("SELECT * FROM tbl_branch  where branch_id = '$branch_id' ",$linkid) or $this->print_error(mysql_error($linkid));
         $data_array=array();
@@ -1064,53 +1586,12 @@ class Search extends Baseclass {
             $data_array['created_on'] = date("Y-m-d H:i:s",$row['created_on']);
         }
         return $data_array;
-    }
+    }*/
 
-    /**
-     * 
-     * @param type $get array
-     */
-    function get_member_by_memid($get)
-    {
-        $linkid=$this->db_conn();
-        if(!isset($get['member_id'])) $this->print_error(array("status"=>"fail","response"=>"Undefined Member id."));
-//        $group_id = mysql_real_escape_string(urldecode($get['group_id']));
-//        $branch_id = mysql_real_escape_string(urldecode($get['branch_id']));
-        $member_id = mysql_real_escape_string(urldecode($get['member_id']));
-        
-        $rslt = mysql_query("select * from tbl_members where member_id=".$member_id."",$linkid) or $this->print_error(mysql_error($linkid));
-        if(mysql_errno($linkid)) {
-            $rslt_arr=array("status"=>"fail","response"=>mysql_error($linkid));
-        }
-        else
-        {
-            $data_array=array();
-            while ($row=mysql_fetch_assoc($rslt)) {
-                $data_array['member_id'] = $row['member_id'];
-                $data_array['uid'] = $row['uid'];
-                $data_array['member_name'] = $this->format_text($row['member_name']);
-                $data_array['member_email'] = $row['member_email'];
-                $data_array['member_phone'] = $row['member_phone'];
-                $data_array['member_role'] = $row['member_role'];
-                $data_array['permissions']['permission_team'] = $row['permission_team'];
-                $data_array['permissions']['permission_content'] = $row['permission_content'];
-                $data_array['permissions']['permission_branch'] = $row['permission_branch'];
-                $data_array['permissions']['permission_group'] = $row['permission_group'];
-                $data_array['permissions']['permission_money'] = $row['permission_money'];
-                $data_array['branch_id'] = $row['branch_id'];
-                $data_array['group_id'] = $row['group_id'];
-                $data_array['created_on'] = date("Y-m-d H:i:s",$row['created_on']);
-            }
-            $rslt_arr['status'] = "success";
-            $rslt_arr['members'] = $data_array;
-            //$rslt_arr['member_permission'] = $this->get_permissions_bymid($linkid,$group_id,$branch_id);
-        }
-        return $rslt_arr;
-    }
-    
+    /*
     function get_permissions_bygid($linkid,$group_id,$uid)
     {
-        $rslt = mysql_query("select * from tbl_members where uid=".$uid." and group_id=".$group_id."",$linkid) or $this->print_error(mysql_error($linkid));
+        $rslt = mysql_query("select * from m_member where uid=".$uid." and group_id=".$group_id."",$linkid) or $this->print_error(mysql_error($linkid));
             $data_array=array();
             while ($row=mysql_fetch_assoc($rslt)) {
                 $data_array['permission_team'] = $row['permission_team'];
@@ -1125,7 +1606,7 @@ class Search extends Baseclass {
     
     function get_permissions_bybid($linkid,$branch_id,$uid)
     {
-        $rslt = mysql_query("select * from tbl_members where uid=".$uid." or branch_id=".$branch_id." ",$linkid) or $this->print_error(mysql_error($linkid));
+        $rslt = mysql_query("select * from m_member where uid=".$uid." or branch_id=".$branch_id." ",$linkid) or $this->print_error(mysql_error($linkid));
         $data_array=array();
         while ($row=mysql_fetch_assoc($rslt)) {
             $data_array['permission_team'] = $row['permission_team'];
@@ -1136,7 +1617,7 @@ class Search extends Baseclass {
             $data_array['uid'] = $row['uid'];
         }
         return $data_array;
-    }
+    }*/
     
     /**
      * Function to get branch details by branchid(bid)
@@ -1146,15 +1627,15 @@ class Search extends Baseclass {
     function get_branch_by_bid($get)
     {
         $linkid=$this->db_conn();
-        if(!isset($get['branch_id'])) $this->print_error(array("status"=>"fail","response"=>"Undefined branch_id."));
-        if(!isset($get['group_id'])) $this->print_error(array("status"=>"fail","response"=>"Undefined group_id."));
+        if(!isset($get['branch_id'])) $this->print_error(array("status"=>"error","response"=>"Undefined branch_id."));
+        if(!isset($get['group_id'])) $this->print_error(array("status"=>"error","response"=>"Undefined group_id."));
         $group_id = mysql_real_escape_string(urldecode($get['group_id']));
         $branch_id = mysql_real_escape_string(urldecode($get['branch_id']));
 //        $member_id = mysql_real_escape_string(urldecode($get['member_id']));
         
         $rslt = mysql_query("select * from tbl_branch where branch_id='".$branch_id."' and group_id='".$group_id."' ",$linkid) or $this->print_error(mysql_error($linkid));
         if(mysql_errno($linkid)) {
-            $rslt_arr=array("status"=>"fail","response"=>mysql_error($linkid));
+            $rslt_arr=array("status"=>"error","response"=>mysql_error($linkid));
         }
         else
         {
@@ -1189,15 +1670,15 @@ class Search extends Baseclass {
     function get_group_by_gid($get)
     {
         $linkid=$this->db_conn();
-        if(!isset($get['uid'])) $this->print_error(array("status"=>"fail","response"=>"Undefined uid."));
-        if(!isset($get['group_id'])) $this->print_error(array("status"=>"fail","response"=>"Undefined group_id."));
+        if(!isset($get['uid'])) $this->print_error(array("status"=>"error","response"=>"Undefined uid."));
+        if(!isset($get['group_id'])) $this->print_error(array("status"=>"error","response"=>"Undefined group_id."));
         
         $group_id = mysql_real_escape_string(urldecode($get['group_id']));
         $uid = mysql_real_escape_string(urldecode($get['uid']));
         
         $rslt = mysql_query("select * from tbl_groups where group_id='".$group_id."' and group_owner_uid='".$uid."' ",$linkid) or $this->print_error(mysql_error($linkid));
         if(mysql_errno($linkid)) {
-            $rslt_arr=array("status"=>"fail","response"=>mysql_error($linkid));
+            $rslt_arr=array("status"=>"error","response"=>mysql_error($linkid));
         }
         else
         {
@@ -1253,7 +1734,7 @@ class Search extends Baseclass {
             $rslt_arr['rows']=mysql_affected_rows($linkid);
         }
         else {
-            $rslt_arr['status']="fail";
+            $rslt_arr['status']="error";
             $rslt_arr['response']="No Records found.";
         }
         
@@ -1329,7 +1810,7 @@ class Search extends Baseclass {
 	    
         }
         else {
-            $rslt_arr['status']="fail";
+            $rslt_arr['status']="error";
 	    $rslt_arr['total_rows']=$total_rows;
             $rslt_arr['response']="No Records found.";
         }
@@ -1340,16 +1821,16 @@ class Search extends Baseclass {
     function get_search_by_eid($get)
     {
 	    $linkid=$this->db_conn();
-	    $output=array(); $con='';
+	    $output=array(); $cond='';
 	    $eid=mysql_real_escape_string($get['eid']);
-	    $limit_start = $lat=(!isset($get['limit_start']))? '0' : mysql_real_escape_string(urldecode($get['limit_start']))-1;
-	    $limit_end = $lat=(!isset($get['limit_end']))? '35' : mysql_real_escape_string(urldecode($get['limit_end']));
+	    $page = $lat=(!isset($get['page']))? '0' : mysql_real_escape_string(urldecode($get['page']))-1;
+	    $limit = $lat=(!isset($get['limit']))? '35' : mysql_real_escape_string(urldecode($get['limit']));
 
 
 	    //if($get['module'] == 'all') {
 	    //money total
 	    $sql="select sum(amount) as ttl_expense from m_money e
-		where e.`visibility`=$eid limit $limit_start,$limit_end";
+		where e.`visibility`=$eid limit $page,$limit";
 	    $rslt = mysql_query($sql,$linkid) or $this->print_error(mysql_error($linkid));
 	    $row = mysql_fetch_array($rslt);
 	    $output['expense_total'] = $row['ttl_expense'];
@@ -1361,7 +1842,7 @@ class Search extends Baseclass {
 	    //===============
 	    $sql = "select c.content_id,r.reminder_id,r.remind_time,r.reminder_name,r.visibility from tbl_reminders r
 				join m_content c on c.content_id=r.content_id
-				WHERE r.`visibility`='$eid' $cond order by r.remind_time ASC limit $limit_start,$limit_end";
+				WHERE r.`visibility`='$eid' $cond order by r.remind_time ASC limit $page,$limit";
 	    $rslt = mysql_query($sql,$linkid) or $this->print_error(mysql_error($linkid));
 	    $i=0;
 	    while ($row=mysql_fetch_array($rslt)) {
@@ -1381,7 +1862,7 @@ class Search extends Baseclass {
 				join m_content c on c.content_id=n.content_id
 				left join tbl_files fl on fl.file_id = n.file_id
 				join generic_profile gp on gp.uid = c.uid
-				where n.`visibility`='$eid' order by n.note_id desc limit $limit_start,$limit_end";
+				where n.`visibility`='$eid' order by n.note_id desc limit $page,$limit";
 	    $rslt = mysql_query($sql,$linkid) or $this->print_error(mysql_error($linkid));
 	    $i=0;$data_array=array();
 	    while ($row=mysql_fetch_array($rslt)) {
@@ -1407,7 +1888,7 @@ class Search extends Baseclass {
 	    $sql = "select c.content_id,sl.shop_list_item_id,sl.item_name,sl.item_qty,sl.shopping_status,sl.units,c.visibility,c.timestamp
 				from tbl_shoppinglist sl
 				join m_content c on c.content_id=sl.content_id
-				where sl.`visibility`='$eid' order by sl.shop_list_item_id desc limit $limit_start,$limit_end";
+				where sl.`visibility`='$eid' order by sl.shop_list_item_id desc limit $page,$limit";
 	    $rslt = mysql_query($sql,$linkid) or $this->print_error(mysql_error($linkid));
 	    $i=0;$data_array=array();
 	    while ($row=mysql_fetch_array($rslt)) {
@@ -1435,50 +1916,50 @@ if(isset($get['content_style']))
 	
 	case 'single_content': 
 
-			    if(!isset($get['content_id'])) $ob->print_error(array("status"=>"fail","response"=>"Undefined content id."));
-			    if(!isset($get['module'])) $ob->print_error(array("status"=>"fail","response"=>"Undefined module.")); 
+//			    if(!isset($get['content_id'])) $ob->print_error(array("status"=>"error","response"=>"Undefined content id."));
+			    if(!isset($get['module'])) $ob->print_error(array("status"=>"error","response"=>"Undefined module.")); 
 			    $output= $ob->get_single_content_info($get);
 			    break;
 
 	case 'list_content': 
-			    if(!isset($get['uid'])) $ob->print_error(array("status"=>"fail","response"=>"Undefined uid."));
-			    if(!isset($get['module'])) $ob->print_error(array("status"=>"fail","response"=>"Undefined module.")); 
-			    //if(!isset($get['filter_type'])) print_error(array("status"=>"fail","response"=>"Undefined filter type.")); 
+//			    if(!isset($get['uid'])) $ob->print_error(array("status"=>"error","response"=>"Undefined uid."));
+			    if(!isset($get['module'])) $ob->print_error(array("status"=>"error","response"=>"Undefined module.")); 
+			    //if(!isset($get['filter_type'])) print_error(array("status"=>"error","response"=>"Undefined filter type.")); 
 			    $output= $ob->get_list_content_info($get); 
 			    break;
 			    
 			    
 			    
 //	case 'user_profile':
-//			    if(!isset($get['uid'])) $ob->print_error(array("status"=>"fail","response"=>"Undefined uid."));
-//			    $output= $ob->get_user_profile($get['uid']); 
+//			    if(!isset($get['uid'])) $ob->print_error(array("status"=>"error","response"=>"Undefined uid."));
+//			    $output= $ob->_view_profile($get['uid']); 
 //			    break;
 	
 
 //	case 'search_content': 
-//			    if(!isset($get['requesting_uid'])) $ob->print_error(array("status"=>"fail","response"=>"Undefined uid."));
-//			    if(!isset($get['query'])) $ob->print_error(array("status"=>"fail","response"=>"Undefined query.")); 
-//			    if(!isset($get['module'])) $ob->print_error(array("status"=>"fail","response"=>"Undefined module."));
+//			    if(!isset($get['requesting_uid'])) $ob->print_error(array("status"=>"error","response"=>"Undefined uid."));
+//			    if(!isset($get['query'])) $ob->print_error(array("status"=>"error","response"=>"Undefined query.")); 
+//			    if(!isset($get['module'])) $ob->print_error(array("status"=>"error","response"=>"Undefined module."));
 //			    $output= $ob->get_srch_content_info($get);
 //			    break;
 
 //	case 'tag_content': 
-//			    if(!isset($get['requesting_uid'])) $ob->print_error(array("status"=>"fail","response"=>"Undefined uid."));
-//			    if(!isset($get['tag'])) $ob->print_error(array("status"=>"fail","response"=>"Undefined tag.")); 
-//    //                        if(!isset($get['module'])) $ob->print_error(array("status"=>"fail","response"=>"Undefined module."));
+//			    if(!isset($get['requesting_uid'])) $ob->print_error(array("status"=>"error","response"=>"Undefined uid."));
+//			    if(!isset($get['tag'])) $ob->print_error(array("status"=>"error","response"=>"Undefined tag.")); 
+//    //                        if(!isset($get['module'])) $ob->print_error(array("status"=>"error","response"=>"Undefined module."));
 //			    $output= $ob->get_srch_tag_content_info($get); 
 //			    break;
 
 //	case 'list_tag_content': 
-//			    if(!isset($get['requesting_uid'])) $ob->print_error(array("status"=>"fail","response"=>"Undefined uid."));
-//    //                        if(!isset($get['tag'])) $ob->print_error(array("status"=>"fail","response"=>"Undefined tag.")); 
-//    //                        if(!isset($get['module'])) $ob->print_error(array("status"=>"fail","response"=>"Undefined module."));
+//			    if(!isset($get['requesting_uid'])) $ob->print_error(array("status"=>"error","response"=>"Undefined uid."));
+//    //                        if(!isset($get['tag'])) $ob->print_error(array("status"=>"error","response"=>"Undefined tag.")); 
+//    //                        if(!isset($get['module'])) $ob->print_error(array("status"=>"error","response"=>"Undefined module."));
 //			    $output= $ob->get_tag_content_info($get); 
 //			    break;
 
 //	case 'groups':
 //			    //?action_object=groups&uid="+uid+"&module=list_groups
-//			    if(!isset($get['module'])) $ob->print_error(array("status"=>"fail","response"=>"Undefined module.")); 
+//			    if(!isset($get['module'])) $ob->print_error(array("status"=>"error","response"=>"Undefined module.")); 
 //
 //			    elseif($get['module'] == 'list_groups') {
 //				$output = $ob->get_list_groups($get);
@@ -1493,7 +1974,7 @@ if(isset($get['content_style']))
 //				$output = $ob->get_members_by_branchid($get);
 //			    }
 //			    elseif($get['module'] == 'member_by_memid') {
-//				$output = $ob->get_member_by_memid($get);
+//				$output = $ob->_member_info($get);
 //			    }
 //			    elseif($get['module'] == 'branch_by_bid') {
 //				$output = $ob->get_branch_by_bid($get);
@@ -1513,14 +1994,14 @@ if(isset($get['content_style']))
 //			    break;
 
 //	case 'list_profile':
-//			    if(!isset($get['uid'])) $ob->print_error(array("status"=>"fail","response"=>"Undefined uid."));
-//			    if(!isset($get['module'])) $ob->print_error(array("status"=>"fail","response"=>"Undefined module.")); 
+//			    if(!isset($get['uid'])) $ob->print_error(array("status"=>"error","response"=>"Undefined uid."));
+//			    if(!isset($get['module'])) $ob->print_error(array("status"=>"error","response"=>"Undefined module.")); 
 //			    $output= $ob->get_list_profile($get); 
 //			    break;
 
 //	case 'todo_list':
-//			    if(!isset($get['uid'])) $ob->print_error(array("status"=>"fail","response"=>"Undefined uid."));
-//			    if(!isset($get['list_type'])) $ob->print_error(array("status"=>"fail","response"=>"Undefined list type."));
+//			    if(!isset($get['uid'])) $ob->print_error(array("status"=>"error","response"=>"Undefined uid."));
+//			    if(!isset($get['list_type'])) $ob->print_error(array("status"=>"error","response"=>"Undefined list type."));
 //			    $output= $ob->get_todo_list($get); 
 //			    break;
 

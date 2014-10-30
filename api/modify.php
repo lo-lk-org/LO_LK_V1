@@ -20,9 +20,9 @@ class Modify extends Baseclass
 	
 	if($module=='profile')
 	{
-                    if(!isset($get['uid'])) $ob->print_error(array("status"=>"fail","response"=>"Undefined uid."));
-                    if(!isset($get['name'])) $ob->print_error(array("status"=>"fail","response"=>"Undefined name."));
-                    if(!isset($get['email'])) $ob->print_error(array("status"=>"fail","response"=>"Undefined email."));
+                    if(!isset($get['uid'])) $ob->print_error(array("status"=>"error","response"=>"Undefined uid."));
+                    if(!isset($get['name'])) $ob->print_error(array("status"=>"error","response"=>"Undefined name."));
+                    if(!isset($get['email'])) $ob->print_error(array("status"=>"error","response"=>"Undefined email."));
                     $output = $this->modify_profile($get);
 			//session
 //			$get['uid']=$output['uid'];
@@ -42,8 +42,8 @@ class Modify extends Baseclass
 	    $output=$this->modify_stream_content($get);
 //	    $content_id=mysql_real_escape_string(urldecode($get['content_id']));
 	    
-	    /*if(!isset($get['uid'])) $ob->print_error(array("status"=>"fail","response"=>"Undefined uid."));
-//	    if(!isset($get['timestamp'])) $ob->print_error(array("status"=>"fail","response"=>"Undefined timestamp."));
+	    /*if(!isset($get['uid'])) $ob->print_error(array("status"=>"error","response"=>"Undefined uid."));
+//	    if(!isset($get['timestamp'])) $ob->print_error(array("status"=>"error","response"=>"Undefined timestamp."));
 	    
 	    $lat=(!isset($get['lat']))? '' : mysql_real_escape_string(urldecode($get['lat']));
 	    $long=(!isset($get['long']))? '' : mysql_real_escape_string(urldecode($get['long']));
@@ -80,7 +80,7 @@ class Modify extends Baseclass
 		$rslt = mysql_query($sql,$linkid) or $this->print_error(mysql_error($linkid));
 
 		    if(mysql_errno($linkid)) {
-			$this->print_error(array("status"=>"fail","response"=>mysql_error($linkid)));
+			$this->print_error(array("status"=>"error","response"=>mysql_error($linkid)));
 		    }
 		    else {
 			$output = array("status"=>"success","result"=>"Content is Updated.");
@@ -110,7 +110,7 @@ class Modify extends Baseclass
 		    $rslt = mysql_query($sql,$linkid) or $this->print_error(mysql_error($linkid));
 
 		    if(mysql_errno($linkid)) {
-			$this->print_error(array("status"=>"fail","response"=>mysql_error($linkid)));
+			$this->print_error(array("status"=>"error","response"=>mysql_error($linkid)));
 		    }
 		    else {
 			$output = array("status"=>"success","result"=>"Content is Updated.");
@@ -139,7 +139,7 @@ class Modify extends Baseclass
 		$rslt = mysql_query($sql,$linkid) or $this->print_error(mysql_error($linkid));
 
 		if(mysql_errno($linkid)) {
-		    $this->print_error(array("status"=>"fail","response"=>mysql_error($linkid)));
+		    $this->print_error(array("status"=>"error","response"=>mysql_error($linkid)));
 		}
 		else {
 		    $output = array("status"=>"success","result"=>"Content is Updated.");
@@ -182,7 +182,7 @@ class Modify extends Baseclass
 
 
 		if(mysql_errno($linkid)) {
-		    $this->print_error(array("status"=>"fail","response"=>mysql_error($linkid)));
+		    $this->print_error(array("status"=>"error","response"=>mysql_error($linkid)));
 		}
 		else {
 		    $output = array("status"=>"success","result"=>"Content is Updated.");
@@ -200,9 +200,9 @@ class Modify extends Baseclass
     {
 	   $linkid=$this->db_conn();
     	    
-	    if(!isset($get['uid'])) $this->print_error(array("status"=>"fail","response"=>"Undefined uid."));
-	    if(!isset($get['content_id'])) $this->print_error(array("status"=>"fail","response"=>"Undefined Content id."));
-//	    if(!isset($get['timestamp'])) $ob->print_error(array("status"=>"fail","response"=>"Undefined timestamp."));
+	    if(!isset($get['uid'])) $this->print_error(array("status"=>"error","response"=>"Undefined uid."));
+	    if(!isset($get['content_id'])) $this->print_error(array("status"=>"error","response"=>"Undefined Content id."));
+//	    if(!isset($get['timestamp'])) $ob->print_error(array("status"=>"error","response"=>"Undefined timestamp."));
 	    
 	    $content_id=mysql_real_escape_string(urldecode($get['content_id']));
 	    $uid=mysql_real_escape_string(urldecode($get['uid']));
@@ -241,7 +241,7 @@ class Modify extends Baseclass
 		$rslt = mysql_query($sql,$linkid) or $this->print_error(mysql_error($linkid));
 
 		    if(mysql_errno($linkid)) {
-			$this->print_error(array("status"=>"fail","response"=>mysql_error($linkid)));
+			$this->print_error(array("status"=>"error","response"=>mysql_error($linkid)));
 		    }
 		    else {
 			$output = array("status"=>"success","result"=>"Content is Updated.");
@@ -250,14 +250,14 @@ class Modify extends Baseclass
 	    }
 	    elseif($module == 'money')
 	    {
-		    if(!isset($get['money_id'])) $this->print_error(array("status"=>"fail","response"=>"Please specify money id."));
-		    if(!isset($get['money_title'])) $this->print_error(array("status"=>"fail","response"=>"Please specify money title."));
-		    if(!isset($get['money_amount'])) $this->print_error(array("status"=>"fail","response"=>"Please specify amount."));
-		    if(!isset($get['item_unit_price'])) $this->print_error(array("status"=>"fail","response"=>"Please specify item price."));
-		    if(!isset($get['item_units'])) $this->print_error(array("status"=>"fail","response"=>"Please specify item units."));
-		    if(!isset($get['item_qty'])) $this->print_error(array("status"=>"fail","response"=>"Please specify item quantity."));
-		    if(!isset($get['total_price'])) $this->print_error(array("status"=>"fail","response"=>"Please specify item quantity."));
-		    if(!isset($get['money_flow_direction'])) $this->print_error(array("status"=>"fail","response"=>"Please specify money flow direction."));
+		    if(!isset($get['money_id'])) $this->print_error(array("status"=>"error","response"=>"Please specify money id."));
+		    if(!isset($get['money_title'])) $this->print_error(array("status"=>"error","response"=>"Please specify money title."));
+		    if(!isset($get['money_amount'])) $this->print_error(array("status"=>"error","response"=>"Please specify amount."));
+		    if(!isset($get['item_unit_price'])) $this->print_error(array("status"=>"error","response"=>"Please specify item price."));
+		    if(!isset($get['item_units'])) $this->print_error(array("status"=>"error","response"=>"Please specify item units."));
+		    if(!isset($get['item_qty'])) $this->print_error(array("status"=>"error","response"=>"Please specify item quantity."));
+		    if(!isset($get['total_price'])) $this->print_error(array("status"=>"error","response"=>"Please specify item quantity."));
+		    if(!isset($get['money_flow_direction'])) $this->print_error(array("status"=>"error","response"=>"Please specify money flow direction."));
 
 		    $money_id=mysql_real_escape_string(urldecode($get['money_id']));
 		    $money_title=mysql_real_escape_string(urldecode($get['money_title']));
@@ -278,7 +278,7 @@ class Modify extends Baseclass
 				",$linkid) or $this->print_error(mysql_error($linkid));
 		    
 		    if(mysql_errno($linkid)) {
-			$this->print_error(array("status"=>"fail","response"=>mysql_error($linkid)));
+			$this->print_error(array("status"=>"error","response"=>mysql_error($linkid)));
 		    }
 		    else {
 
@@ -312,7 +312,7 @@ class Modify extends Baseclass
 		    //echo '<pre>';die($sql);
 		    $rslt = mysql_query($sql,$linkid) or $this->print_error(mysql_error($linkid));
 		    if(mysql_errno($linkid)) {
-			$this->print_error(array("status"=>"fail","response"=>mysql_error($linkid)));
+			$this->print_error(array("status"=>"error","response"=>mysql_error($linkid)));
 		    }
 		    else {
 			$output = array("status"=>"success","result"=>"Content is Updated.");
@@ -345,7 +345,7 @@ class Modify extends Baseclass
 
 
 		if(mysql_errno($linkid)) {
-		    $this->print_error(array("status"=>"fail","response"=>mysql_error($linkid)));
+		    $this->print_error(array("status"=>"error","response"=>mysql_error($linkid)));
 		}
 		else {
 		    $output = array("status"=>"success","result"=>"Content is Updated.");
@@ -394,7 +394,7 @@ class Modify extends Baseclass
 
 
 		if(mysql_errno($linkid)) {
-		    $this->print_error(array("status"=>"fail","response"=>mysql_error($linkid)));
+		    $this->print_error(array("status"=>"error","response"=>mysql_error($linkid)));
 		}
 		else {
 		    $output = array("status"=>"success","result"=>"Content is Updated.");
@@ -411,11 +411,11 @@ class Modify extends Baseclass
     {
 	$linkid=$this->db_conn();
 	
-	if(!isset($get['group_id'])) $this->print_error(array("status"=>"fail","response"=>"Please enter Group ID."));//group_owner_uid
-	if(!isset($get['group_owner_uid'])) $this->print_error(array("status"=>"fail","response"=>"Please enter Group Owner UID."));
-	if(!isset($get['group_type'])) $this->print_error(array("status"=>"fail","response"=>"Please enter group type."));
-        if(!isset($get['group_name'])) $this->print_error(array("status"=>"fail","response"=>"Please enter group name."));
-        if(!isset($get['group_description'])) $this->print_error(array("status"=>"fail","response"=>"Please enter group description.")); 
+	if(!isset($get['group_id'])) $this->print_error(array("status"=>"error","response"=>"Please enter Group ID."));//group_owner_uid
+	if(!isset($get['group_owner_uid'])) $this->print_error(array("status"=>"error","response"=>"Please enter Group Owner UID."));
+	if(!isset($get['group_type'])) $this->print_error(array("status"=>"error","response"=>"Please enter group type."));
+        if(!isset($get['group_name'])) $this->print_error(array("status"=>"error","response"=>"Please enter group name."));
+        if(!isset($get['group_description'])) $this->print_error(array("status"=>"error","response"=>"Please enter group description.")); 
 	
 	$datetime = date("Y-m-d H:i:s",time());
         $group_id = mysql_real_escape_string(urldecode($get["group_id"]));
@@ -448,7 +448,7 @@ class Modify extends Baseclass
         //====
         
 	if(mysql_errno($linkid)) {
-	    $this->print_error(array("status"=>"fail","response"=>mysql_error($linkid)));
+	    $this->print_error(array("status"=>"error","response"=>mysql_error($linkid)));
 	}
 	else {
 	    $rslt_arr = array("status"=>"success","response"=>"Group Updated.");
@@ -462,13 +462,13 @@ class Modify extends Baseclass
 	$linkid=$this->db_conn();
 	//m_member: member_id,uid,member_name,member_img_file_id,member_email,member_phone,member_role,managed_by_uid_1,managed_by_uid_2,group_id
 	
-        if(!isset($get['member_id'])) $this->print_error(array("status"=>"fail","response"=>"Please enter Member Id."));
-        if(!isset($get['uid'])) $this->print_error(array("status"=>"fail","response"=>"Please enter UID."));
-        if(!isset($get['group_id'])) $this->print_error(array("status"=>"fail","response"=>"Please enter Group ID."));
-        if(!isset($get['member_name'])) $this->print_error(array("status"=>"fail","response"=>"Please enter member name."));
-        if(!isset($get['member_email'])) $this->print_error(array("status"=>"fail","response"=>"Please enter member email."));
-        if(!isset($get['member_role'])) $this->print_error(array("status"=>"fail","response"=>"Please enter member role."));
-        if(!isset($get['member_phone'])) $this->print_error(array("status"=>"fail","response"=>"Please enter member phone."));
+        if(!isset($get['member_id'])) $this->print_error(array("status"=>"error","response"=>"Please enter Member Id."));
+        if(!isset($get['uid'])) $this->print_error(array("status"=>"error","response"=>"Please enter UID."));
+        if(!isset($get['group_id'])) $this->print_error(array("status"=>"error","response"=>"Please enter Group ID."));
+        if(!isset($get['member_name'])) $this->print_error(array("status"=>"error","response"=>"Please enter member name."));
+        if(!isset($get['member_email'])) $this->print_error(array("status"=>"error","response"=>"Please enter member email."));
+        if(!isset($get['member_role'])) $this->print_error(array("status"=>"error","response"=>"Please enter member role."));
+        if(!isset($get['member_phone'])) $this->print_error(array("status"=>"error","response"=>"Please enter member phone."));
 
         $uid = mysql_real_escape_string(urldecode($get["uid"]));
 	$member_id = mysql_real_escape_string(urldecode($get['member_id']));
@@ -491,7 +491,7 @@ class Modify extends Baseclass
 	mysql_query($sql,$linkid) or $this->print_error(mysql_error($linkid));
 
 	if(mysql_errno($linkid)) {
-	    $this->print_error(array("status"=>"fail","response"=>mysql_error($linkid)));
+	    $this->print_error(array("status"=>"error","response"=>mysql_error($linkid)));
 	}
 	else {
 	    $rslt_arr = array("status"=>"success","response"=>"Member updated successfully.");
@@ -517,10 +517,10 @@ class Modify extends Baseclass
         if($row['uid']=='') { $this->print_error("User/uid does not exits."); }
       
         if($module == 'update_member') {
-            if(!isset($get['membername'])) $this->print_error(array("status"=>"fail","response"=>"Please enter member name."));
-            if(!isset($get['memberemail'])) $this->print_error(array("status"=>"fail","response"=>"Please enter member email."));
-            if(!isset($get['memberrole'])) $this->print_error(array("status"=>"fail","response"=>"Please enter member role."));
-            if(!isset($get['memberphone'])) $this->print_error(array("status"=>"fail","response"=>"Please enter member phone."));
+            if(!isset($get['membername'])) $this->print_error(array("status"=>"error","response"=>"Please enter member name."));
+            if(!isset($get['memberemail'])) $this->print_error(array("status"=>"error","response"=>"Please enter member email."));
+            if(!isset($get['memberrole'])) $this->print_error(array("status"=>"error","response"=>"Please enter member role."));
+            if(!isset($get['memberphone'])) $this->print_error(array("status"=>"error","response"=>"Please enter member phone."));
             $uid = mysql_real_escape_string(urldecode($get["uid"]));
             $membername = mysql_real_escape_string(urldecode($get["membername"]));
             $memberemail = mysql_real_escape_string(urldecode($get["memberemail"]));
@@ -550,7 +550,7 @@ class Modify extends Baseclass
             mysql_query($sql,$linkid) or $this->print_error(mysql_error($linkid));
             
             if(mysql_errno($linkid)) {
-                $this->print_error(array("status"=>"fail","response"=>mysql_error($linkid)));
+                $this->print_error(array("status"=>"error","response"=>mysql_error($linkid)));
             }
             else {
                 $rslt_arr = array("status"=>"success","response"=>"Member updated successfully.");
@@ -558,17 +558,17 @@ class Modify extends Baseclass
         }
         elseif($module == 'update_branch') {
             
-            if(!isset($get['group_id'])) $this->print_error(array("status"=>"fail","response"=>"Please group id is missing."));
-            if(!isset($get['branch_id'])) $this->print_error(array("status"=>"fail","response"=>"Please branch id is missing."));
-            if(!isset($get['branchname'])) $this->print_error(array("status"=>"fail","response"=>"Please enter Branch Name."));
-            if(!isset($get['branchdescr'])) $this->print_error(array("status"=>"fail","response"=>"Please enter Branch Description."));
-            if(!isset($get['branch_addr_line_1'])) $this->print_error(array("status"=>"fail","response"=>"Please enter Branch Addressline1."));
-            //if(!isset($get['branch_addr_line_2'])) $this->print_error(array("status"=>"fail","response"=>"Please enter Branch Addressline2."));
-            //if(!isset($get['branch_addr_line_3'])) $this->print_error(array("status"=>"fail","response"=>"Please enter Branch Addressline3."));
-//            if(!isset($get['branch_addr_city'])) $this->print_error(array("status"=>"fail","response"=>"Please enter Branch City."));
-//            if(!isset($get['branch_addr_state'])) $this->print_error(array("status"=>"fail","response"=>"Please enter Branch State."));
-//            if(!isset($get['branch_addr_country'])) $this->print_error(array("status"=>"fail","response"=>"Please enter Branch Country."));
-//            if(!isset($get['branch_addr_zip'])) $this->print_error(array("status"=>"fail","response"=>"Please enter Branch Zip."));
+            if(!isset($get['group_id'])) $this->print_error(array("status"=>"error","response"=>"Please group id is missing."));
+            if(!isset($get['branch_id'])) $this->print_error(array("status"=>"error","response"=>"Please branch id is missing."));
+            if(!isset($get['branchname'])) $this->print_error(array("status"=>"error","response"=>"Please enter Branch Name."));
+            if(!isset($get['branchdescr'])) $this->print_error(array("status"=>"error","response"=>"Please enter Branch Description."));
+            if(!isset($get['branch_addr_line_1'])) $this->print_error(array("status"=>"error","response"=>"Please enter Branch Addressline1."));
+            //if(!isset($get['branch_addr_line_2'])) $this->print_error(array("status"=>"error","response"=>"Please enter Branch Addressline2."));
+            //if(!isset($get['branch_addr_line_3'])) $this->print_error(array("status"=>"error","response"=>"Please enter Branch Addressline3."));
+//            if(!isset($get['branch_addr_city'])) $this->print_error(array("status"=>"error","response"=>"Please enter Branch City."));
+//            if(!isset($get['branch_addr_state'])) $this->print_error(array("status"=>"error","response"=>"Please enter Branch State."));
+//            if(!isset($get['branch_addr_country'])) $this->print_error(array("status"=>"error","response"=>"Please enter Branch Country."));
+//            if(!isset($get['branch_addr_zip'])) $this->print_error(array("status"=>"error","response"=>"Please enter Branch Zip."));
 
             $branch_owner_uid = mysql_real_escape_string(urldecode($get["uid"]));
             $branch_id = mysql_real_escape_string(urldecode($get["branch_id"]));
@@ -592,7 +592,7 @@ class Modify extends Baseclass
             mysql_query($sql,$linkid) or $this->print_error(mysql_error($linkid));
            
             if(mysql_errno($linkid)) {
-                $this->print_error(array("status"=>"fail","response"=>mysql_error($linkid)));
+                $this->print_error(array("status"=>"error","response"=>mysql_error($linkid)));
             }
             else {
                 $rslt_arr = array("status"=>"success","response"=>"Branch updated sucessfully");
@@ -601,12 +601,12 @@ class Modify extends Baseclass
         elseif($module == 'update_group')
         {
             $linkid=$this->db_conn();
-            if(!isset($get['uid'])) $this->print_error(array("status"=>"fail","response"=>"Please enter UID."));
-            if(!isset($get['group_id'])) $this->print_error(array("status"=>"fail","response"=>"Please enter group_id."));
-            if(!isset($get['grouptype'])) $this->print_error(array("status"=>"fail","response"=>"Please enter group type."));
-            if(!isset($get['groupname'])) $this->print_error(array("status"=>"fail","response"=>"Please enter group name."));
-            if(!isset($get['group_description'])) $this->print_error(array("status"=>"fail","response"=>"Please enter group description."));
-            if(!isset($get['common_prod_flag'])) $this->print_error(array("status"=>"fail","response"=>"Common product flag is missing."));
+            if(!isset($get['uid'])) $this->print_error(array("status"=>"error","response"=>"Please enter UID."));
+            if(!isset($get['group_id'])) $this->print_error(array("status"=>"error","response"=>"Please enter group_id."));
+            if(!isset($get['grouptype'])) $this->print_error(array("status"=>"error","response"=>"Please enter group type."));
+            if(!isset($get['groupname'])) $this->print_error(array("status"=>"error","response"=>"Please enter group name."));
+            if(!isset($get['group_description'])) $this->print_error(array("status"=>"error","response"=>"Please enter group description."));
+            if(!isset($get['common_prod_flag'])) $this->print_error(array("status"=>"error","response"=>"Common product flag is missing."));
             $created_on = time();
             $group_id = mysql_real_escape_string(urldecode($get['group_id']));
             $grouptype = mysql_real_escape_string(urldecode($get['grouptype']));
@@ -621,7 +621,7 @@ class Modify extends Baseclass
             
             mysql_query($sql,$linkid) or $this->print_error(mysql_error($linkid));
             if(mysql_errno($linkid)) {
-                $this->print_error(array("status"=>"fail","response"=>mysql_error($linkid)));
+                $this->print_error(array("status"=>"error","response"=>mysql_error($linkid)));
             }
             else {
                 $rslt_arr = array("status"=>"success","response"=>"Group Updated.");
@@ -640,16 +640,16 @@ else
 {
     switch($get['content_style']) {
 	case 'single_content':
-			if(!isset($get['module'])) $ob->print_error(array("status"=>"fail","response"=>"Undefined module."));
-//			if(!isset($get['uid'])) $ob->print_error(array("status"=>"fail","response"=>"Undefined uid."));
-//			if(!isset($get['content_id'])) $ob->print_error(array("status"=>"fail","response"=>"Undefined content id."));
-//                        if(!isset($get['field_name'])) $ob->print_error(array("status"=>"fail","response"=>"Undefined required field name."));
-//                        if(!isset($get['field_value'])) $ob->print_error(array("status"=>"fail","response"=>"Undefined field value."));
+			if(!isset($get['module'])) $ob->print_error(array("status"=>"error","response"=>"Undefined module."));
+//			if(!isset($get['uid'])) $ob->print_error(array("status"=>"error","response"=>"Undefined uid."));
+//			if(!isset($get['content_id'])) $ob->print_error(array("status"=>"error","response"=>"Undefined content id."));
+//                        if(!isset($get['field_name'])) $ob->print_error(array("status"=>"error","response"=>"Undefined required field name."));
+//                        if(!isset($get['field_value'])) $ob->print_error(array("status"=>"error","response"=>"Undefined field value."));
 			$output = $ob->modify_single_content_info($get);
 	    break;
 //	case 'groups_content':
-//			if(!isset($get['uid'])) $ob->print_error(array("status"=>"fail","response"=>"Undefined uid."));
-//			if(!isset($get['module'])) $ob->print_error(array("status"=>"fail","response"=>"Undefined module."));
+//			if(!isset($get['uid'])) $ob->print_error(array("status"=>"error","response"=>"Undefined uid."));
+//			if(!isset($get['module'])) $ob->print_error(array("status"=>"error","response"=>"Undefined module."));
 //			$output = $ob->modify_groups_content_info($get);
 //	    break;
 	default : $output = $ob->unknown();

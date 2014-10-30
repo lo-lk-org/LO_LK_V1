@@ -119,7 +119,7 @@
      */
     function unknown() 
     {
-        return array("status"=>"fail","response"=>"Unknown url");
+        return array("status"=>"error","response"=>"Unknown url");
     }
     
     /**
@@ -132,7 +132,7 @@
         include $db_file_url;
         
         if(mysql_error($linkid)) {
-            echo json_encode(array("status"=>"fail","response"=>mysql_error($linkid)));die();
+            echo json_encode(array("status"=>"error","response"=>mysql_error($linkid)));die();
         }
         else {
             return $linkid;
@@ -193,7 +193,7 @@ class Baseclass extends Myactions
      * @author shivaraj <mrshivaraj123@gmail.com>
      * @param type array or exit execution
      */
-    function print_error($msg,$status="fail") {
+    function print_error($msg,$status="error") {
         if(is_array($msg)) {
             $msg['status']=$status;
             echo json_encode($msg);
@@ -456,6 +456,66 @@ class Baseclass extends Myactions
     function replace($object_image_file,$search='http://',$replace='gs://')
     {
 	return str_replace($search, $replace, $object_image_file);
+    }
+    
+    /**
+     * Function to return quarter month start date
+     * @author shivaraj <mrshivaraj123@gmail.com>_Oct_17_2014
+     * @return date
+     */
+    function this_quarter()
+    {
+	$current_month = date('m');
+	$current_year = date('Y');
+
+	if($current_month>=1 && $current_month<=3)
+	{
+	  $start_date = strtotime('1-October-'.($current_year-1));  // timestamp or 1-October Last Year 12:00:00 AM
+	  $end_date = strtotime('1-Janauary-'.$current_year);  // // timestamp or 1-January  12:00:00 AM means end of 31 December Last year
+	}
+	else if($current_month>=4 && $current_month<=6)
+	{
+	  $start_date = strtotime('1-January-'.$current_year);  // timestamp or 1-Janauray 12:00:00 AM
+	  $end_date = strtotime('1-April-'.$current_year);  // timestamp or 1-April 12:00:00 AM means end of 31 March
+	}
+	else  if($current_month>=7 && $current_month<=9)
+	{
+	  $start_date = strtotime('1-April-'.$current_year);  // timestamp or 1-April 12:00:00 AM
+	  $end_date = strtotime('1-July-'.$current_year);  // timestamp or 1-July 12:00:00 AM means end of 30 June
+	}
+	else  if($current_month>=10 && $current_month<=12)
+	{
+	  $start_date = strtotime('1-July-'.$current_year);  // timestamp or 1-July 12:00:00 AM
+	  $end_date = strtotime('1-October-'.$current_year);  // timestamp or 1-October 12:00:00 AM means end of 30 September
+	}
+	return $start_date;
+    }
+    
+    /**
+     * Function to validate default start & end time
+     * @author shivaraj <mrshivaraj123@gmail.com>_Oct_18_2014
+     * @param date $date
+     * @param string $dt_type
+     * @return date
+     */
+    function validate_datetime($datetime,$dt_type='from')
+    {
+	$ar_dt=explode(" ",trim($datetime) );
+	$date=$ar_dt[0];
+	$time=@$ar_dt[1];
+	if($date=='') {
+	    if($dt_type=='to')
+		$date=date("Y-m-d",time());
+	    else
+		$date=date("Y-m-d",strtotime('-2 year'));
+	}
+	if($time=='') {
+	    if($dt_type=='to')
+		$time='23:59:59';
+	    else
+		$time='00:00:00';
+	}
+	return $date.' '.$time;
     }
 }
 ?>

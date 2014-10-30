@@ -25,7 +25,7 @@ class Analytics extends Baseclass
             //echo '<pre>';die($sql);
             $rslt = mysql_query($sql,$linkid) or $this->print_error(mysql_error($linkid));
                 if(mysql_errno($linkid)) {
-                    $output=array("status"=>"fail","response"=>mysql_error($linkid));
+                    $output=array("status"=>"error","response"=>mysql_error($linkid));
                 }
                 else {
                     $row = mysql_fetch_array($rslt);
@@ -92,7 +92,7 @@ class Analytics extends Baseclass
         //mysql_query('alter table `oneapp_db`.`generic_profile` change `slno` `sno` bigint (20)  NOT NULL AUTO_INCREMENT;',$linkid);
         //mysql_query('alter table `oneapp_db`.`generic_profile` change `uid` `uid` bigint(20) NOT NULL UNIQUE;',$linkid);
         if(mysql_errno($linkid)) {
-            $rslt_arr=array("status"=>"fail","response"=>mysql_error($linkid));
+            $rslt_arr=array("status"=>"error","response"=>mysql_error($linkid));
         }
         else { 
             $rslt_arr = array("affected_rows"=>mysql_affected_rows($linkid),"result"=>"User info has inserted.");
@@ -109,7 +109,7 @@ else
 {
     switch($get['content_style']) {
 	case 'user_count': 
-			if(!isset($get['content_type'])) $ob->print_error(array("status"=>"fail","response"=>"Undefined Content Type."));
+			if(!isset($get['content_type'])) $ob->print_error(array("status"=>"error","response"=>"Undefined Content Type."));
 			$output = $ob->get_user_count($get);
 	    break;
 
@@ -117,8 +117,8 @@ else
 	    break;
 
 	case 'content_count': 
-			if(!isset($get['content_type'])) $ob->print_error(array("status"=>"fail","response"=>"Undefined Content Type."));
-			if(!isset($get['uid'])) $ob->print_error(array("status"=>"fail","response"=>"Undefined UID."));
+			if(!isset($get['content_type'])) $ob->print_error(array("status"=>"error","response"=>"Undefined Content Type."));
+			if(!isset($get['uid'])) $ob->print_error(array("status"=>"error","response"=>"Undefined UID."));
 			$output = $ob->get_content_count($get);
 
 	    break;
