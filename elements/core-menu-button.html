@@ -34,7 +34,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
 <polymer-element name="core-menu-button" attributes="icon label src selected opened halign valign valueattr multi inlineMenu">
   <template>
-    <link rel="stylesheet" href="core-menu-button.css">
+    <link rel="stylesheet" href="../components/core-menu-button/core-menu-button.css">
     <core-icon-button id="button" on-tap="{{toggle}}" src="{{src}}" icon="{{icon}}" active="{{opened}}"><span>{{label}}</span></core-icon-button>
     <core-popup-menu id="menu" relatedTarget="{{$.button}}" opened="{{opened}}" halign="{{halign}}" valign="{{valign}}" selected="{{selected}}" selectedItem="{{selectedItem}}" selectedClass="{{selectedClass}}" valueattr="{{valueattr}}" on-core-select="{{closeAction}}">
       <content select="*"></content>
