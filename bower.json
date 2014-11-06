@@ -1,0 +1,38 @@
+{
+  "name": "LyfeKit",
+  "version": "1.0.1",
+  "homepage": "https://github.com/lo-lk-org/lo_lk_v1",
+  "authors": [
+    "Shivaraj <publish@lyfeon.com>"
+  ],
+  "description": "Manage your life",
+  "main": "prelaunch.php",
+  "moduleType": [
+    "amd",
+    "es6",
+    "globals",
+    "node",
+    "yui"
+  ],
+  "keywords": [
+    "manage",
+    "your",
+    "life",
+    "LyfeKit"
+  ],
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "core-elements": "Polymer/core-elements#~0.4.2",
+    "paper-elements": "Polymer/paper-elements#~0.4.2",
+    "polymer-ui-elements": "PolymerLabs/polymer-ui-elements#~0.3.0",
+    "polymer-ui-sidebar-menu": "Polymer/polymer-ui-sidebar-menu#~0.3.0"
+  }
+}

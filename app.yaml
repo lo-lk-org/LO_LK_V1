@@ -8,6 +8,8 @@ runtime: php
 api_version: 1
 threadsafe: yes
 
+default_expiration: "30d"
+
 handlers:
 - url: /api/*
   script: api/api.php
@@ -27,11 +29,6 @@ handlers:
 #==< DONE Money Category >====
 
 #==< Bower components >====
-- url: /components/paper-menu-button/demo.html
-  script: components/paper-menu-button/demo.html
-  
-- url: /components
-  static_dir: components
 
 - url: /elements
   static_dir: elements
@@ -43,7 +40,40 @@ handlers:
 - url: /favicon\.ico
   static_files: favicon.ico
   upload: favicon\.ico
-#==
+  secure: always
+  
+- url: /bower_components/paper-menu-button/demo.html
+  script: bower_components/paper-menu-button/demo.html
+
+- url: /bower_components/core-menu-button/demo.html
+  script: bower_components/core-menu-button/demo.html
+
+- url: /bower_components/core-menu/demo.html
+  script: bower_components/core-menu/demo.html
+
+- url: /bower_components/core-layout-trbl/demo.html
+  script: bower_components/core-layout-trbl/demo.html
+  
+- url: /bower_components/core-item/demo.html
+  script: bower_components/core-item/demo.html
+
+- url: /bower_components/core-iconset-svg/demo.html
+  script: bower_components/core-iconset-svg/demo.html
+
+- url: /bower_components/core-header-panel/demo.html
+  script: bower_components/core-header-panel/demo.html
+
+- url: /bower_components/polymer-ui-sidebar-header/demo.html
+  script: bower_components/polymer-ui-sidebar-header/demo.html
+
+- url: /bower_components/polymer-ui-sidebar-menu/demo.html
+  script: bower_components/polymer-ui-sidebar-menu/demo.html
+  
+- url: /bower_components
+  static_dir: bower_components
+#  application_readable: true
+
+#==< END Bower components >====
 
  #==============================================
 - url: /+
@@ -53,3 +83,9 @@ handlers:
 #- name: webapp2
 #  version: "2.5.2"
   
+  
+#- url: /
+#  script: index.php
+
+#- url: /(.+\.php)$
+#  script: \1

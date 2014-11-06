@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html>
+    <head>
+	<title>Lyfekit-Polymer</title>
+	<meta charset="utf-8">
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+	<meta name="mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	
+	
+	
+	
+	<script src="bower_components/platform/platform.js"></script>
+	<link rel="import" href="bower_components/core-icons/core-icons.html">
+	<link rel="import" href="bower_components/core-item/core-item.html">
+	<link rel="import" href="bower_components/core-menu-button/core-menu-button.html">
+	<link rel="import" href="elements/demos/sample-content.html">
+	
+	<link rel="import" href="bower_components/core-transition/core-transition-css.html">
+	
+<!--	<link rel="import" href="bower_components/core-header-panel/core-header-panel.html">
+	<link rel="import" href="bower_components/core-toolbar/core-toolbar.html">-->
+
+<link rel="import"
+      href="bower_components/polymer-ui-sidebar-menu/polymer-ui-sidebar-menu.html">
+
+	<style shim-shadowdom>
+	    body {
+	      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+	      font-size: 16px;
+	    }
+
+	    html, body {
+	      height: 100%;
+	      margin: 0;
+	    }
+
+	    .toolbar {
+	      color: #fff;
+	      font-size: 16px;
+	      padding: 12px;
+	    }
+
+	    .toolbar-1 {
+	      background-color: #3b78e7;
+	    }
+
+	    .toolbar-2 {
+	      background-color: #4285f4;
+	    }
+
+	    .toolbar-3 {
+	      background-color: #5e97f6;
+	    }
+
+	    .bottom-toolbar-1 {
+	      background-color: #0d904f;
+	    }
+
+	    .bottom-toolbar-2 {
+	      background-color: #0f9d58;
+	    }
+
+	    .bottom-toolbar-3 {
+	      background-color: #33ac71;
+	    }
+
+	  </style>
+
+    </head>
+    <body unresolved>
+
+<!--	<core-toolbar class="tall">
+
+	    <core-icon-button icon="arrow-back"></core-icon-button>
+	    <div flex></div>
+	    <core-icon-button icon="search"></core-icon-button>
+	    <core-icon-button icon="more-vert"></core-icon-button>
+	    <div class="bottom indent title">Title</div>
+
+	  </core-toolbar>-->
+
+	<template is="auto-binding">
+
+	    <div layout vertical fit on-core-select="{{selectAction}}" on-core-activate="{{activateAction}}">
+	      <div class="toolbar toolbar-1" layout horizontal center>
+		<core-menu-button icon="menu" onclick="stuff();">
+<!--		  <template repeat="{{pastries}}">
+		    <core-item>{{}}</core-item>
+		  </template>-->
+		    <div id="animate-me" >
+			<core-item><div>dsgfdlasfjgdh;fjg;sdhjfg sifyhoaisyortdsgfasdf<br>khgdsfhgsdfghsdfg</div></core-item>
+		    </div>
+
+		</core-menu-button>
+
+		<div flex></div>
+
+		<core-menu-button icon="more-vert" halign="right">
+		  <template repeat="{{pastries}}">
+		    <core-item>{{}}</core-item>
+		  </template>
+		</core-menu-button>
+	      </div>
+
+	      <div flex>
+		   <div class="content">
+		    <sample-content size="100"></sample-content>
+		  </div>
+	      </div>
+
+<!--	      <div class="toolbar bottom-toolbar-1" layout horizontal center>
+		<core-menu-button icon="menu" valign="bottom">
+		  <template repeat="{{pastries}}">
+		    <core-item>{{}}</core-item>
+		  </template>
+		</core-menu-button>
+		<core-menu-button icon="menu" valign="bottom">
+		  <template repeat="{{countries}}">
+		    <core-item>{{name}}</core-item>
+		  </template>
+		</core-menu-button>
+		<div flex>&nbsp;</div>
+		<core-menu-button icon="more-vert" halign="right" valign="bottom">
+		  <template repeat="{{countries}}">
+		    <core-item>{{name}}</core-item>
+		  </template>
+		</core-menu-button>
+		<core-menu-button icon="more-vert" halign="right" valign="bottom">
+		  <template repeat="{{pastries}}">
+		    <core-item>{{}}</core-item>
+		  </template>
+		</core-menu-button>
+	      </div>-->
+	      
+	    </div>
+	    
+	    </template>
+    
+	    <script>
+
+	    scope = document.querySelector('template[is=auto-binding]');
+
+	    /*scope.countries = [
+	      {name: 'Turks and Caicos Islands', code: 'TC'},
+	      {name: 'Tuvalu', code: 'TV'},
+	      {name: 'Uganda', code: 'UG'},
+	      {name: 'Ukraine', code: 'UA'},
+	      {name: 'United Arab Emirates', code: 'AE'},
+	      {name: 'United Kingdom', code: 'GB'},
+	      {name: 'United States', code: 'US'},
+	      {name: 'United States Minor Outlying Islands', code: 'UM'},
+	      {name: 'Uruguay', code: 'UY'},
+	      {name: 'Uzbekistan', code: 'UZ'},
+	      {name: 'Vanuatu', code: 'VU'},
+	      {name: 'Venezuela', code: 'VE'},
+	      {name: 'Viet Nam', code: 'VN'},
+	      {name: 'Virgin Islands, British', code: 'VG'},
+	      {name: 'Virgin Islands, U.S.', code: 'VI'},
+	      {name: 'Wallis and Futuna', code: 'WF'},
+	      {name: 'Western Sahara', code: 'EH'},
+	      {name: 'Yemen', code: 'YE'},
+	      {name: 'Zambia', code: 'ZM'},
+	      {name: 'Zimbabwe', code: 'ZW'}
+	    ];*/
+
+	    scope.pastries = [
+	      'Apple fritter',
+	      'Croissant',
+	      'Donut',
+	      'Financier',
+	      'Jello',
+	      'Madeleine',
+	      'Pound cake',
+	      'Pretzel',
+	      'Sfogliatelle'
+	    ];
+
+//	    scope.selectAction = function(e) {
+//	      console.log('core-select', e.target.selectedItem && e.target.selectedItem.textContent);
+//	    };
+//
+//	    scope.activateAction = function(e) {
+//	      console.log('core-activate', e.target.selectedItem && e.target.selectedItem.textContent);
+//	    };
+
+//==========fsa==================
+
+	document.addEventListener('polymer-ready', function() {
+	  // initial setup
+	  setup();
+	  document.getElementById('animate-me').removeAttribute('hidden');
+	});
+    
+	var meta;
+	var transition;
+	var state = {
+	  opened: false
+	}
+	
+	function getMeta()
+	{
+	    if (!meta)
+	    {
+	      meta = document.createElement('core-meta');
+	      meta.type = 'transition';
+	    }
+	    alert("meta");
+	    return meta;
+	}
+
+
+	function setup()
+	{
+	  var target = document.getElementById('animate-me');
+	  
+	  if (transition)
+	  {
+	      alert("SETUP"+transition);
+	    transition.teardown(target);
+	  }
+	  
+	  var value = "core-transition-left";//document.getElementById('sel').selectedOptions[0].value;
+	  transition = getMeta().byId(value);
+	  transition.setup(target);
+	}
+
+	function stuff()
+	{
+	    alert("STUFF");
+	  var target = document.getElementById('animate-me');
+	  state.opened = !state.opened;
+	  transition.go(target, state);
+	}
+	    
+	</script>
+    </body>
+</html>

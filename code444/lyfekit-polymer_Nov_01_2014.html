@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+    <head>
+	<title></title>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<link rel="import" href="components/core-toolbar/core-toolbar.html">
+	
+    </head>
+    <body>
+	
+	<core-toolbar>
+	    <core-icon-button icon="menu" on-tap="{{menuAction}}"></core-icon-button>
+	    <div flex>Title</div>
+	    <core-icon-button icon="more" on-tap="{{moreAction}}"></core-icon-button>
+	</core-toolbar>
+	
+	<core-toolbar class="tall">
+	    <div id="progressBar" class="bottom fit"></div>
+	</core-toolbar>
+    </body>
+</html>
