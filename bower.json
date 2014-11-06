@@ -33,6 +33,8 @@
     "core-elements": "Polymer/core-elements#~0.4.2",
     "paper-elements": "Polymer/paper-elements#~0.4.2",
     "polymer-ui-elements": "PolymerLabs/polymer-ui-elements#~0.3.0",
-    "polymer-ui-sidebar-menu": "Polymer/polymer-ui-sidebar-menu#~0.3.0"
+    "polymer-ui-sidebar-menu": "Polymer/polymer-ui-sidebar-menu#~0.3.0",
+    "core-toolbar": "Polymer/core-toolbar#~0.4.2",
+    "core-icon-button": "Polymer/core-icon-button#~0.4.2"
   }
 }

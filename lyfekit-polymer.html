@@ -11,6 +11,8 @@
 	<link rel="import" href="bower_components/core-item/core-item.html">
 	<link rel="import" href="bower_components/core-menu-button/core-menu-button.html">
 	
+	<link rel="import" href="bower_components/paper-fab/paper-fab.html">
+	
 	<style>
 	    body {
 		font-family: sans-serif;
@@ -34,6 +36,9 @@
 	    .small::shadow core-icon-button {
 		    padding: 12px;
 	    }
+	    #my-button::shadow #ripple {
+	    color: blue;
+	  }
 	</style>
     </head>
     
@@ -41,7 +46,6 @@
 	
 	
 
-    
       <core-header-panel flex>
 	<core-toolbar id="mainheader">
 	  <!--<paper-icon-button id="navicon" icon="menu"></paper-icon-button>-->
@@ -61,11 +65,31 @@
 	  <span flex>LyfeKit</span>
 	  <paper-icon-button id="searchbutton" icon="search"></paper-icon-button>
 	</core-toolbar>
-	<!--<p>.</p>-->
 	<p>Sample content goes here.</p>
+	<p>Sample content goes here.</p>
+	<p>Sample content goes here.</p>
+	<p>Sample content goes here.</p>
+	<p>Sample content goes here.</p>
+	
       </core-header-panel>
-    </body>
+	
+	
+<!--	<core-toolbar>
+	    <core-icon-button icon="menu"></core-icon-button>
+	    <span flex>Toolbar</span>
+	      <core-icon-button icon="refresh"></core-icon-button>
+	    <core-icon-button icon="add"></core-icon-button>
+	  </core-toolbar>-->
+
+
+	  
+	<paper-fab icon="add" aria-label="star"></paper-fab>
+<!--	<paper-fab mini icon="favorite"></paper-fab>
+	<paper-fab src="star.png"></paper-fab>-->
+	<!--<paper-fab icon="cloud" style="color: blue;"></paper-fab>-->
     
+
+    </body>
 </html>
 <!--Info-->
  <!--<paper-icon-button id="navicon" icon="arrow-back"></paper-icon-button>-->
