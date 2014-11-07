@@ -2,11 +2,9 @@
 <html>
 
 <head>
-  <title>unquote</title>
-  <meta name="viewport" 
-  content=
-  "width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
-  <script src="bower_components/platform/platform.js"></script>
+    <title>LyfeKit</title>
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+    <script src="bower_components/platform/platform.js"></script>
   
     <link rel="import" href="bower_components/font-roboto/roboto.html">
     <link rel="import" href="bower_components/core-scaffold/core-scaffold.html">
@@ -34,22 +32,45 @@
 	    <core-menu  id='menu'  selected="s1" >
 	      <core-item name="s1" icon="explore"  label="Stream"></core-item>
 	      <core-item name="s2" icon="explore"  label="Money"></core-item>
+	      
+	      
+	    <core-item icon="settings" label="Stream"></core-item>
+	    
+	    <core-item icon="favorite" label="Members"></core-item>
 	    </core-menu>
 	</core-header-panel>
       
       <div tool class="bottom indent">Streams</div>
 
 	<span tool flex></span>
-	<core-icon-button tool icon="more-vert" on-tap="{{settingsAction}}"></core-icon-button>
+	<core-icon-button tool icon="more-vert" on-tap="{{settingsAction}}">
+	   
+	    <core-toolbar   mode="seamed">
+	    <!--<core-menu-button tool icon="more-vert" on-tap="{{settingsAction}}">-->
+		    <core-item icon="settings" label="Settings"></core-item>
+		    <core-item icon="add" label="Add"></core-item>
+		    
+		    <core-item icon="arrow-back" label="My Stuff"></core-item>
+		    <core-item icon="settings" label="Stream"></core-item>
+		    <core-item icon="settings" label="Money"></core-item>
+		    <core-item icon="arrow-next" label="Members"></core-item>
+	    <!--</core-menu-button>-->
+	</core-toolbar>
+	    
+	</core-icon-button>
+	
 
-	<div class="content">Samle line 1 <br/>Second line</div>
+	<div class="content">
+	    <h4>Welcome Member,</h4> 
+	    <p>Updating features</p>
+	</div>
   </core-scaffold>
 	<script>
 	    var menu = document.querySelector('core-menu');
 
 	    menu.addEventListener( 'core-select', function (evt) {
 		   //... event handler logic ...
-		   alert("Hi");
+//		   alert("Hi");
 		   if (evt.detail.isSelected)  {
 			var chart = document.querySelector('google-chart');
 			var scaffold = document.querySelector('core-scaffold');
