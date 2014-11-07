@@ -35,6 +35,7 @@
     "polymer-ui-elements": "PolymerLabs/polymer-ui-elements#~0.3.0",
     "polymer-ui-sidebar-menu": "Polymer/polymer-ui-sidebar-menu#~0.3.0",
     "core-toolbar": "Polymer/core-toolbar#~0.4.2",
-    "core-icon-button": "Polymer/core-icon-button#~0.4.2"
+    "core-icon-button": "Polymer/core-icon-button#~0.4.2",
+    "google-chart": "GoogleWebComponents/google-chart#~0.1.0"
   }
 }
