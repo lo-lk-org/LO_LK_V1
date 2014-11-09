@@ -11,22 +11,45 @@
     <link rel="import" href="bower_components/core-icon-button/core-icon-button.html">
     <link rel="import" href="bower_components/core-menu/core-menu.html">
     <link rel="import" href="bower_components/core-header-panel/core-header-panel.html">
+    <link rel="import" href="bower_components/core-menu-button/core-menu-button.html">
     <link rel="import" href="bower_components/core-item/core-item.html">
     
-    <link rel="import" href="bower_components/google-chart/google-chart.html">
-    
+    <!--<link rel="import" href="bower_components/google-chart/google-chart.html">-->
+      <link href="bower_components/core-icons/core-icons.html" rel="import">
     <style>
-	google-chart {
-	    width: 380px;
-	 }
+	::content > .indent {
+	    margin-left: 10px;
+	}
+	.toolbar {
+	    color: #fff;
+	    font-size: 16px;
+	    padding: 12px;
+	}
+
+	.toolbar-1 {
+	    background-color: #3b78e7;
+	}
+	.toolbar-2 {
+	    background-color: #4285f4;
+	}
+	.content {
+	    margin: 0 10px;
+	}
+	/* position this drop-down below the button, and style it white on black. */
+/*	#btn::shadow #dropdown {
+	    top: 38px;
+	    color: #fff;
+	    background: #000;
+	}*/
     </style>
 </head>
 
 <body unresolved touch="auto">
     <core-scaffold responsiveWidth="800px" mode="waterfall-tall">
-	<core-header-panel navigation flex mode="seamed">
-	    <core-toolbar><img src='/images/dwlogo.svg' width='50px' height='30px'>
-	    <span flex>LyfeKit</span>
+	<core-header-panel navigation flex mode="waterfall-tall">
+	    <core-toolbar style="background-color:#5F7290;">
+		<img src='/images/dwlogo.svg' width='50px' height='30px'>
+		<span flex>LyfeKit</span>
 	    </core-toolbar>
 	    
 	    <core-menu  id='menu'  selected="s1" >
@@ -40,25 +63,53 @@
 	    </core-menu>
 	</core-header-panel>
       
-      <div tool class="bottom indent">Streams</div>
+	<div tool class="bottom min-indent">Streams</div>
 
-	<span tool flex></span>
-	<core-icon-button tool icon="more-vert" on-tap="{{settingsAction}}">
-	   
-	    <core-toolbar   mode="seamed">
+	<span tool flex style="background-color:#000;"></span>
+	
+	<!--<core-icon-button tool icon="more-vert" on-tap="{{settingsAction}}">-->
+	    <!--<core-toolbar   mode="seamed">-->
 	    <!--<core-menu-button tool icon="more-vert" on-tap="{{settingsAction}}">-->
-		    <core-item icon="settings" label="Settings"></core-item>
+<!--		    <core-item icon="settings" label="Settings"></core-item>
 		    <core-item icon="add" label="Add"></core-item>
-		    
 		    <core-item icon="arrow-back" label="My Stuff"></core-item>
 		    <core-item icon="settings" label="Stream"></core-item>
 		    <core-item icon="settings" label="Money"></core-item>
-		    <core-item icon="arrow-next" label="Members"></core-item>
+		    <core-item icon="arrow-next" label="Members"></core-item>-->
 	    <!--</core-menu-button>-->
-	</core-toolbar>
-	    
-	</core-icon-button>
-	
+	    <!--</core-toolbar>-->
+	<!--</core-icon-button>-->
+
+<!--	<template is="auto-binding">
+	    <div tool class="toolbar toolbar-1" layout horizontal center>
+	      <core-menu-button icon="more-vert" halign="right">
+	        <template repeat="{{pastries}}">
+		  <core-item>{{}}</core-item>
+		</template>
+		<template>
+		    <core-item icon="settings" label="Settings"></core-item>
+		    <core-item icon="add" label="Add">Add</core-item>
+		    <core-item icon="arrow-back" label="">My Stuff</core-item>
+		    <core-item icon="settings" label="Stream">Stream</core-item>
+		    <core-item icon="settings" label="Money"></core-item>
+		    <core-item icon="arrow-next" label="Members"></core-item>
+		</template>
+	      </core-menu-button> 
+	    </div>
+	</template>-->
+    
+<!--    <core-menu-button tool icon="search" halign="right" valign="top">
+    </core-menu-button>-->
+    
+	<core-icon-button tool id="search_btn" icon="search" on-tap="{{searchAction}}"></core-icon-button>    
+
+	<core-menu-button tool id="btn" icon="more-vert" halign="right" valign="top">
+	    <core-item icon="settings" label="Settings"></core-item>
+	    <core-item icon="work" label="Sign Out"></core-item>
+
+       </core-menu-button>
+    
+    
 
 	<div class="content">
 	    <h4>Welcome Member,</h4> 
@@ -86,6 +137,12 @@
 			scaffold.togglePanel();
 		      }
 	   });
+	   var srch = document.querySelector('core-icon-button');
+	   srch.addEventListener(function(evt) {
+		alert("44");
+	   });
+	   
+	   
 	</script>
 </body>
 
