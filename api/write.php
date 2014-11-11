@@ -73,7 +73,7 @@ class Write extends Baseclass
 //			$session_id=$this->create_session($get);
 //		    $output['session_id']=$session_id;
 	}
-	if($module=='social-contact')
+	elseif($module=='social-contact')
 	{
 		$output = $this->create_social_contact($get);
 	}
@@ -88,8 +88,8 @@ class Write extends Baseclass
 	else
 	{
 	    
-	    if(!isset($get['uid'])) $ob->print_error(array("status"=>"error","response"=>"Undefined uid."));
-	    if(!isset($get['timestamp'])) $ob->print_error(array("status"=>"error","response"=>"Undefined timestamp."));
+	    if(!isset($get['uid'])) $this->print_error(array("status"=>"error","response"=>"Undefined uid."));
+	    if(!isset($get['timestamp'])) $this->print_error(array("status"=>"error","response"=>"Undefined timestamp."));
 	    
 	    $uid=mysql_real_escape_string(($get['uid']));
 	    
@@ -253,9 +253,9 @@ class Write extends Baseclass
      */
     function create_profile($get) {
         $linkid=$this->db_conn();
-        if(!isset($get['gid'])) $ob->print_error(array("status"=>"error","response"=>"Undefined gid."));
-	if(!isset($get['name'])) $ob->print_error(array("status"=>"error","response"=>"Undefined name."));
-	if(!isset($get['email'])) $ob->print_error(array("status"=>"error","response"=>"Undefined email."));
+        if(!isset($get['gid'])) $this->print_error(array("status"=>"error","response"=>"Undefined gid."));
+	if(!isset($get['name'])) $this->print_error(array("status"=>"error","response"=>"Undefined name."));
+	if(!isset($get['email'])) $this->print_error(array("status"=>"error","response"=>"Undefined email."));
 		    
         $module=mysql_real_escape_string(urldecode($get['module']));//req
 //        $uid=mysql_real_escape_string(urldecode($get['uid'])); 
@@ -319,12 +319,12 @@ class Write extends Baseclass
     function create_social_contact($get)
     {
 	$linkid=$this->db_conn();
-	if(!isset($get['uid'])) $ob->print_error(array("status"=>"error","response"=>"Undefined uid."));
-	if(!isset($get['gid'])) $ob->print_error(array("status"=>"error","response"=>"Undefined gid."));
-	if(!isset($get['following_uid'])) $ob->print_error(array("status"=>"error","response"=>"Undefined following_uid."));
-	if(!isset($get['following_gid'])) $ob->print_error(array("status"=>"error","response"=>"Undefined following_gid."));
-//	if(!isset($get['following_uname'])) $ob->print_error(array("status"=>"error","response"=>"Undefined following_uname."));
-//	if(!isset($get['following_name'])) $ob->print_error(array("status"=>"error","response"=>"Undefined following_name."));
+	if(!isset($get['uid'])) $this->print_error(array("status"=>"error","response"=>"Undefined uid."));
+	if(!isset($get['gid'])) $this->print_error(array("status"=>"error","response"=>"Undefined gid."));
+	if(!isset($get['following_uid'])) $this->print_error(array("status"=>"error","response"=>"Undefined following_uid."));
+	if(!isset($get['following_gid'])) $this->print_error(array("status"=>"error","response"=>"Undefined following_gid."));
+//	if(!isset($get['following_uname'])) $this->print_error(array("status"=>"error","response"=>"Undefined following_uname."));
+//	if(!isset($get['following_name'])) $this->print_error(array("status"=>"error","response"=>"Undefined following_name."));
 	
 
         $uid=mysql_real_escape_string(urldecode($get['uid']));  //req
