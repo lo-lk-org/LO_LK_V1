@@ -16,7 +16,9 @@ SELECT * FROM m_profile WHERE gid='4523623456456456' LIMIT 1
 UPDATE m_profile SET
 	    `fname`='Shivaraj',`mname`='Ranganath',`lname`='Halegowdars',`name`='ShivarajRH',`uname`='shivarajrh'
 	    ,`email`='mrshivaraj123@gmail.com',`phone`='9590932088',`timezone`='1411725530',`info_update_timestamp`='2014-09-30 03:27:22',`image_url`=''
-    WHERE sno=''
+    WHERE sno='';
+    
+    
 
 
     SELECT NOW()
@@ -77,4 +79,15 @@ SELECT * FROM m_social_contacts WHERE uid='4523623456456456' ORDER BY following_
     
     SELECT * FROM m_money m
 					    WHERE m.uid='4523623456456456'  AND (money_title LIKE '%medimix%') AND (m.timestamp) BETWEEN '2014-01-02 00:00:00' AND '2014-10-16 23:59:59' 
-					    ORDER BY m.sno DESC LIMIT 0,3
+					    ORDER BY m.sno DESC LIMIT 0,3;
+					    
+SELECT * FROM m_profile WHERE gid=105890155775932582508;
+
+SELECT * FROM m_profile WHERE `uid`='105890155775932582508';
+
+#================
+ALTER TABLE `m_profile` CHANGE `uid` `uid` VARCHAR(60) CHARSET latin1 COLLATE latin1_swedish_ci NULL, CHANGE `gid` `gid` VARCHAR(60) CHARSET latin1 COLLATE latin1_swedish_ci NULL;
+#================
+#Nov_20_2014
+ALTER TABLE `oneapp_dbsep`.`m_money` ADD COLUMN `group_id` VARCHAR(20) NULL AFTER `modified_on`;
+#================

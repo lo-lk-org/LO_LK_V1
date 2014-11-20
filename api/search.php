@@ -417,6 +417,7 @@ class Search extends Baseclass {
 				$data_array['file_id']=$row['file_id'];
 				$data_array['category_id']=$row['category_id'];
 				$data_array['modified_on']=$row['modified_on'];
+				$data_array['group_id']=$row['group_id'];
 				//$i++;
 			    }
 			    $output['money'] = $data_array;
@@ -719,6 +720,7 @@ class Search extends Baseclass {
 				    $data_array['today'][$i]['category_id']=$row['category_id'];
 				    $data_array['today'][$i]['modified_on']=$row['modified_on'];
 				    $data_array['today'][$i]['timestamp']=$row['timestamp'];
+				    $data_array['today'][$i]['group_id']=$row['group_id'];
 				}
 				elseif( strtotime('yesterday' ) == $tmstmp )
 				{
@@ -739,6 +741,7 @@ class Search extends Baseclass {
 				    $data_array['yesterday'][$i]['category_id']=$row['category_id'];
 				    $data_array['yesterday'][$i]['modified_on']=$row['modified_on'];
 				    $data_array['yesterday'][$i]['timestamp']=$row['timestamp'];
+				    $data_array['yesterday'][$i]['group_id']=$row['group_id'];
 				}
 				elseif( strtotime('-1 week' ) <= $tmstmp )
 				{
@@ -759,6 +762,7 @@ class Search extends Baseclass {
 				    $data_array['this_week'][$i]['category_id']=$row['category_id'];
 				    $data_array['this_week'][$i]['modified_on']=$row['modified_on'];
 				    $data_array['this_week'][$i]['timestamp']=$row['timestamp'];
+				    $data_array['this_week'][$i]['group_id']=$row['group_id'];
 				}
 				elseif(strtotime(date("Y-m-1",time())) < $tmstmp )
 				{
@@ -779,6 +783,7 @@ class Search extends Baseclass {
 				    $data_array['this_month'][$i]['category_id']=$row['category_id'];
 				    $data_array['this_month'][$i]['modified_on']=$row['modified_on'];
 				    $data_array['this_month'][$i]['timestamp']=$row['timestamp'];
+				    $data_array['this_month'][$i]['group_id']=$row['group_id'];
 				}
 				elseif($quarter_start_dt < $tmstmp )
 				{
@@ -799,6 +804,7 @@ class Search extends Baseclass {
 				    $data_array['this_quarter'][$i]['category_id']=$row['category_id'];
 				    $data_array['this_quarter'][$i]['modified_on']=$row['modified_on'];
 				    $data_array['this_quarter'][$i]['timestamp']=$row['timestamp'];
+				    $data_array['this_quarter'][$i]['group_id']=$row['group_id'];
 				}
 				elseif(strtotime(date("Y-01-01",time())) < $tmstmp )
 				{
@@ -819,6 +825,7 @@ class Search extends Baseclass {
 				    $data_array['this_year'][$i]['category_id']=$row['category_id'];
 				    $data_array['this_year'][$i]['modified_on']=$row['modified_on'];
 				    $data_array['this_year'][$i]['timestamp']=$row['timestamp'];
+				    $data_array['this_year'][$i]['group_id']=$row['group_id'];
 				}
 				else
 				{
@@ -839,6 +846,7 @@ class Search extends Baseclass {
 				    $data_array['last_year'][$i]['category_id']=$row['category_id'];
 				    $data_array['last_year'][$i]['modified_on']=$row['modified_on'];
 				    $data_array['last_year'][$i]['timestamp']=$row['timestamp'];
+				    $data_array['last_year'][$i]['group_id']=$row['group_id'];
 				}
 
 //				$data_array[$i]['month']=$month;

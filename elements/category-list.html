@@ -1,0 +1,24 @@
+<!--
+ - @author Shivaraj <mrshivaraj123@gmail.com> Nov_20_2014
+ - @tutorial Sample file
+ - -->
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/core-ajax/core-ajax.html">
+
+<polymer-element name="category-list" noscript>
+    <template>
+<!--	<core-ajax url="http://localhost:13080/api/" params='{"action":"read","module":"category","content_style":"list_content"}' 
+		   method="POST" auto response="{{handleResponse}}"></core-ajax>
+	<div>{{handleResponse}}</div>-->
+	
+	<h3>Category List</h3>
+	
+	<core-ajax url="../api/" auto response="{{categorylist}}" params='{"action":"read","module":"category","content_style":"list_content"}'
+		   method="POST" handleAs="json"></core-ajax>
+	<div>Status:{{categorylist.status}}</div>
+	<div>Message:{{categorylist.message}}</div>
+	<template repeat="categorylist">
+	    <span>{{categorylist.category_name}}</span>
+	</template>
+    </template>
+</polymer-element>

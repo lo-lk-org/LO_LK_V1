@@ -4,7 +4,8 @@
 <head>
     <title>LyfeKit</title>
     <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
-    <script src="bower_components/platform/platform.js"></script>
+    <!--<script src="bower_components/platform/platform.js"></script>-->
+    <script src="bower_components/webcomponentsjs/webcomponents.js"></script>
   
     <link rel="import" href="bower_components/font-roboto/roboto.html">
     <link rel="import" href="bower_components/core-scaffold/core-scaffold.html">
@@ -16,9 +17,22 @@
     
     <!--<link rel="import" href="bower_components/google-chart/google-chart.html">-->
       <link href="bower_components/core-icons/core-icons.html" rel="import">
+      <link href="bower_components/core-ajax/core-ajax.html" rel="import">
+      <link href="elements/category-list.html" rel="import">
     <style>
+	html,body {
+	    margin: 0;
+	    font-family : 'RobotoDraft',sans-serif;
+	    background-color: #E5E5E5;
+	}
 	::content > .indent {
 	    margin-left: 10px;
+	}
+	.a_stop_select {
+	    -webkit-user-select: none;
+	    -moz-user-select: none;
+	    -ms-user-select: none;
+	    user-select: none;
 	}
 	.toolbar {
 	    color: #fff;
@@ -41,109 +55,184 @@
 	    color: #fff;
 	    background: #000;
 	}*/
+
+
+
+/*    app-bar {
+	width: 100%;
+	display: block;
+    }*/
+
+/*    :host {
+	display: inline-block;
+	position: relative;
+	padding: 8px;
+	outline: 0;
+	-webkit-user-select: none;
+	user-select: none;
+	cursor: pointer;
+	z-index: 0;
+    }*/
+/*    #search {
+	display: -webkit-box;
+	display: -webkit-flex;
+	display: -moz-flex;
+	display: -ms-flexbox;
+	display: -o-flex;
+	display: flex;
+	-webkit-box-align: center;
+	-webkit-align-items: center;
+	-moz-align-items: center;
+	-ms-align-items: center;
+	-o-align-items: center;
+	align-items: center;
+	-webkit-box-flex: 1;
+	-webkit-flex: 0 0 auto;
+	-moz-flex: 0 0 auto;
+	-ms-flex: 0 0 auto;
+	-o-flex: 0 0 auto;
+	flex: 0 0 auto;
+	width: 40px;
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	box-sizing: border-box;
+	background-color: inherit;
+    }*/
     </style>
 </head>
 
 <body unresolved touch="auto">
     <core-scaffold responsiveWidth="800px" mode="waterfall-tall">
 	<core-header-panel navigation flex mode="waterfall-tall">
-	    <core-toolbar style="background-color:#5F7290;">
-		<img src='/images/dwlogo.svg' width='50px' height='30px'>
+	    <core-toolbar style="background-color:#5F7290;" class="a_stop_select">
+		<img src='/images/logo.svg' width='50px' height='30px'>
 		<span flex>LyfeKit</span>
 	    </core-toolbar>
 	    
-	    <core-menu  id='menu'  selected="s1" >
-	      <core-item name="s1" icon="explore"  label="Stream"></core-item>
-	      <core-item name="s2" icon="explore"  label="Money"></core-item>
-	      
-	      
-	    <core-item icon="settings" label="Stream"></core-item>
-	    
-	    <core-item icon="favorite" label="Members"></core-item>
+	    <core-menu  id='menu'  selected="s1" class="a_stop_select">
+		<core-item icon="explore" name="Stream"  label="Stream"></core-item>
+		<core-item icon="explore" name="Money" label="Money"></core-item>
+		<core-item icon="settings" name="Stream2" label="Stream"></core-item>
+		<core-item icon="favorite" name="Members" label="Members"></core-item>
 	    </core-menu>
 	</core-header-panel>
       
-	<div tool class="bottom min-indent">Streams</div>
+	<!--<app-bar tool flex style="display:block; ">-->
+	    <div tool class="bottom min-indent a_stop_select" id="head_title">Streams</div>
 
-	<span tool flex style="background-color:#000;"></span>
+	    <span tool flex style="background-color:#000;"></span>
+	    
+	    <input type="search" tool id="input" on-keyup="{{ onKeyPress }}" autocomplete="off">
+	    <core-icon-button tool id="search_btn" icon="search" on-tap="{{searchAction}}"></core-icon-button>
+	    
+<!--	    <div id="search" tool on-click="{{ toggleSearch }}" show="">
+		<paper-icon-button icon="search" role="button" tabindex="0" aria-label="search"></paper-icon-button>
+		<input type="search" id="input" on-keyup="{{ onKeyPress }}" autocomplete="off">
+	    </div>-->
+	    
+	    
+	    <core-menu-button tool icon="more-vert" halign="right" valign="top">
+		<core-item icon="settings" label="Settings"></core-item>
+		<core-item icon="work" label="Sign Out"></core-item>
+	   </core-menu-button>
+	<!--</app-bar>-->
 	
-	<!--<core-icon-button tool icon="more-vert" on-tap="{{settingsAction}}">-->
-	    <!--<core-toolbar   mode="seamed">-->
-	    <!--<core-menu-button tool icon="more-vert" on-tap="{{settingsAction}}">-->
-<!--		    <core-item icon="settings" label="Settings"></core-item>
-		    <core-item icon="add" label="Add"></core-item>
-		    <core-item icon="arrow-back" label="My Stuff"></core-item>
-		    <core-item icon="settings" label="Stream"></core-item>
-		    <core-item icon="settings" label="Money"></core-item>
-		    <core-item icon="arrow-next" label="Members"></core-item>-->
-	    <!--</core-menu-button>-->
-	    <!--</core-toolbar>-->
-	<!--</core-icon-button>-->
-
-<!--	<template is="auto-binding">
-	    <div tool class="toolbar toolbar-1" layout horizontal center>
-	      <core-menu-button icon="more-vert" halign="right">
-	        <template repeat="{{pastries}}">
-		  <core-item>{{}}</core-item>
-		</template>
-		<template>
-		    <core-item icon="settings" label="Settings"></core-item>
-		    <core-item icon="add" label="Add">Add</core-item>
-		    <core-item icon="arrow-back" label="">My Stuff</core-item>
-		    <core-item icon="settings" label="Stream">Stream</core-item>
-		    <core-item icon="settings" label="Money"></core-item>
-		    <core-item icon="arrow-next" label="Members"></core-item>
-		</template>
-	      </core-menu-button> 
-	    </div>
-	</template>-->
-    
-<!--    <core-menu-button tool icon="search" halign="right" valign="top">
-    </core-menu-button>-->
-    
-	<core-icon-button tool id="search_btn" icon="search" on-tap="{{searchAction}}"></core-icon-button>    
-
-	<core-menu-button tool id="btn" icon="more-vert" halign="right" valign="top">
-	    <core-item icon="settings" label="Settings"></core-item>
-	    <core-item icon="work" label="Sign Out"></core-item>
-
-       </core-menu-button>
     
     
 
 	<div class="content">
 	    <h4>Welcome Member,</h4> 
 	    <p>Updating features</p>
+<!--	    <core-ajax url="http://localhost:13080/api/" params='{"action":"read","module":"category","content_style":"list_content"}' method="POST" auto response="{{handleResponse}}">
+	    </core-ajax>
+	<div>{{handleResponse.response.status}}</div>-->
+
+	<category-list></category-list>
+    
+	    
 	</div>
   </core-scaffold>
-	<script>
-	    var menu = document.querySelector('core-menu');
+    <script>
+	// Wait for 'polymer-ready'. Ensures the element is upgraded.
+	window.addEventListener("polymer-ready",function(e) {
+		//=======< 1 >========
+		var menu = document.querySelector('core-menu');
+		menu.addEventListener( 'core-select', function (evt) {
+		       //... event handler logic ...
+		       if (evt.detail.isSelected)  {
 
-	    menu.addEventListener( 'core-select', function (evt) {
-		   //... event handler logic ...
-//		   alert("Hi");
-		   if (evt.detail.isSelected)  {
-			var chart = document.querySelector('google-chart');
-			var scaffold = document.querySelector('core-scaffold');
-			var graph = document.getElementById('graph');
-			var selectedGraph = analytics[menu.selected];
-			chart.setAttribute("type", selectedGraph.type);
-			chart.setAttribute("options", selectedGraph.options);
-			chart.setAttribute("cols", selectedGraph.cols);
-			chart.setAttribute("rows", selectedGraph.rows);
+			    var scaffold = document.querySelector('core-scaffold');
+			    var head_title = document.getElementById('head_title');
 
-			graph.innerHTML = selectedGraph.name;
-			console.log(menu.selected);
-			scaffold.togglePanel();
-		      }
-	   });
-	   var srch = document.querySelector('core-icon-button');
-	   srch.addEventListener(function(evt) {
-		alert("44");
-	   });
-	   
-	   
-	</script>
+			    head_title.innerHTML = menu.selected;
+//				console.log(menu.selected);
+			    scaffold.togglePanel();
+			}
+		});
+		//=======< 1 >========
+		//=====< 2 >========
+		var ajax=document.querySelector('core-ajax');
+//		ajax.addEventListener('core-response',function(e) {
+//		    console.log(this.response.message);
+//		    document.querySelector('template').model = {
+//			response: e.detail.response
+//		    };
+//		});
+		
+		//=====< 2 >========
+		var srch = document.querySelector('core-icon-button');
+		srch.addEventListener('core-select',function(evt) {
+		     console.log("Search"+this.response);
+		});
+
+	
+//		var srh=document.querySelector("search_btn");
+//		srh.addEventListener("core-select",function() {
+//		   alert("SELECT"); 
+//		});
+//		appBar = document.querySelector('app-bar');
+//			document.addEventListener('click', function(e) {
+//			 // Search box close.
+//			 if (appBar.showingSearch) {
+//			   appBar.toggleSearch(e);
+//			 }
+//		});
+	    
+	});
+	    Polymer('core-scaffold',{
+		publish: {
+		    search : {
+			value : false
+			,reflect: true
+		    }
+		}
+		,searchAction : function(event,detail,sender) {
+		    alert("hdgshjfgsdf");
+		    this.search = !this.search;
+		    this.fire("search-tap");
+		}
+	    });
+	    
+    </script>
 </body>
 
 </html>
+
+
+    <!--	<template is="auto-binding">
+		<div tool class="toolbar toolbar-1" layout horizontal center>
+		  <core-menu-button icon="more-vert" halign="right">
+		    <template repeat="{{pastries}}">
+		      <core-item>{{}}</core-item>
+		    </template>
+		    <template>
+			<core-item icon="settings" label="Settings"></core-item>
+			<core-item icon="add" label="Add">Add</core-item>
+			<core-item icon="arrow-back" label="">My Stuff</core-item>
+			<core-item icon="settings" label="Stream">Stream</core-item>
+			<core-item icon="settings" label="Money"></core-item>
+			<core-item icon="arrow-next" label="Members"></core-item>
+		    </template>
+		  </core-menu-button> 
+		</div>
+	    </template>-->

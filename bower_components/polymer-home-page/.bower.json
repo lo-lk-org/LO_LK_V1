@@ -1,0 +1,20 @@
+{
+  "name": "polymer-home-page",
+  "private": true,
+  "dependencies": {
+    "polymer": "Polymer/polymer#0.2.4",
+    "polymer-ui-action-icons": "Polymer/polymer-ui-action-icons#0.2.4"
+  },
+  "version": "0.2.4",
+  "homepage": "https://github.com/Polymer/polymer-home-page",
+  "_release": "0.2.4",
+  "_resolution": {
+    "type": "version",
+    "tag": "0.2.4",
+    "commit": "4afdddda437fce1512a4740f372ddc3bcd3a087a"
+  },
+  "_source": "git://github.com/Polymer/polymer-home-page.git",
+  "_target": "~0.2.4",
+  "_originalSource": "Polymer/polymer-home-page",
+  "_direct": true
+}

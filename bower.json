@@ -36,6 +36,8 @@
     "polymer-ui-sidebar-menu": "Polymer/polymer-ui-sidebar-menu#~0.3.0",
     "core-toolbar": "Polymer/core-toolbar#~0.4.2",
     "core-icon-button": "Polymer/core-icon-button#~0.4.2",
-    "google-chart": "GoogleWebComponents/google-chart#~0.1.0"
+    "google-chart": "GoogleWebComponents/google-chart#~0.1.0",
+    "polymer-home-page": "Polymer/polymer-home-page#~0.2.4",
+    "webcomponentsjs": "Polymer/webcomponentsjs#~0.5.1"
   }
 }

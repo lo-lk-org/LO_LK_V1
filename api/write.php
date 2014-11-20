@@ -101,6 +101,8 @@ class Write extends Baseclass
 	    $file_id = (!isset($get['file_id']))? 0:mysql_real_escape_string(($get['file_id']));
 	    $category_id=(!isset($get['category_id']))? 0:mysql_real_escape_string(($get['category_id']));
 	    
+	    $group_id=(!isset($get['group_id']))? 0:mysql_real_escape_string(($get['group_id']));
+	    
 	    $content_tbl='m_content';
 	    
 	    //=============
@@ -163,8 +165,8 @@ class Write extends Baseclass
 		    $tbl_name='m_money';
 		    
 //,`content_id`,'".$content_id."'
-		    mysql_query("insert into `$tbl_name`(`sno`,`money_id`,`uid`,`timestamp`,`lat`,`long`,`visibility`,`money_title`,`money_amount`,`item_unit_price`,`item_units`,`item_qty`,`total_price`,`money_flow_direction`,`file_id`,`category_id`)
-					values ( NULL,NULL,'".$uid."','".$timestamp."','".$lat."','".$long."','".$visibility."','".$money_title."','".$money_amount."','".$item_unit_price."','".$item_units."','".$item_qty."','".$total_price."','".$money_flow_direction."','".$file_id."','".$category_id."');",$linkid) or $this->print_error(mysql_error($linkid));
+		    mysql_query("insert into `$tbl_name`(`sno`,`money_id`,`uid`,`timestamp`,`lat`,`long`,`visibility`,`money_title`,`money_amount`,`item_unit_price`,`item_units`,`item_qty`,`total_price`,`money_flow_direction`,`file_id`,`category_id`,`group_id`)
+					values ( NULL,NULL,'".$uid."','".$timestamp."','".$lat."','".$long."','".$visibility."','".$money_title."','".$money_amount."','".$item_unit_price."','".$item_units."','".$item_qty."','".$total_price."','".$money_flow_direction."','".$file_id."','".$category_id."','".$group_id."');",$linkid) or $this->print_error(mysql_error($linkid));
 		    $insert_id = $money_id=mysql_insert_id();
 		    mysql_query("update `$tbl_name` set `money_id`='".$insert_id."' where `sno`=$insert_id") or $this->print_error(mysql_error($linkid));
 
@@ -298,7 +300,7 @@ class Write extends Baseclass
 	    
 		$sql="insert into `m_profile`(`uid`,`gid`,`fname`,`mname`,`lname`,`name`,`uname`,`email`,`phone`,`timezone`,`info_update_timestamp`,`image_url`) 
 		    values( '".$uid."','".$gid."','".$fname."','".$mname."','".$lname."','".$name."','".$uname."','".$email."','".$phone."','".$timezone."','".$datetime."','".$image_url."')";
-	//	die('<pre>'.$sql.'</pre>');
+//		die('<pre>'.$sql.'</pre>');
 		mysql_query($sql,$linkid);
 		if(mysql_errno($linkid)) {
 		    $this->print_error(array("status"=>"error","response"=>mysql_error($linkid)));
@@ -407,10 +409,10 @@ class Write extends Baseclass
 	// m_groups: group_id,group_type,group_name,group_description,group_owner_uid,group_member_ctr,file_id,group_addr_line_1,group_addr_line_2,group_addr_line_3
 	// ,group_addr_city,group_addr_state,group_addr_country,group_addr_zip,entity_id
 	
-	
-	$rslt = mysql_query("select `uid` from m_profile where `uid`='$group_owner_uid'",$linkid) or $this->print_error(mysql_error($linkid));
+	//echo $uq="select `uid` from m_profile where `uid`='$group_owner_uid'";
+	$rslt = mysql_query($uq,$linkid) or $this->print_error(mysql_error($linkid));
         $row = mysql_fetch_array($rslt);
-        if($row['uid']=='') { $this->print_error("User/uid does not exits."); }
+        if($row['uid']=='') { $this->print_error("User / uid does not exits."); }
 	
 	$file_id='';
         $sql="insert into `m_groups`(`group_type`,`group_name`,`group_description`,`group_owner_uid`,`group_member_ctr`,`file_id`,`group_addr_line_1`,`group_addr_line_2`,`group_addr_line_3`,`group_addr_city`,`group_addr_state`,`group_addr_country`,`group_addr_zip`,`created_on`) values

@@ -13,6 +13,6 @@
     "commit": "6c1e3a7e61cc63d010d145fa72200c23dc64d65c"
   },
   "_source": "git://github.com/Polymer/core-icon-button.git",
-  "_target": "^0.4.0",
+  "_target": "~0.4.2",
   "_originalSource": "Polymer/core-icon-button"
 }
