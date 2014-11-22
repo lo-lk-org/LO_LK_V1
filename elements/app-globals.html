@@ -1,0 +1,32 @@
+<!--
+ - @author Shivaraj <mrshivaraj123@gmail.com> Nov_22_2014
+ - @tutorial Sample file
+ - -->
+<link rel="import" href="../bower_components/polymer/polymer.html">
+
+<polymer-element name="app-globals">
+    <script>
+	(function() {
+	    var username='Guest';
+	    var uid='';
+	    //var values={};
+	    
+	    Polymer('app-globals',{
+		ready: function() {
+		    /*this.values=values;
+		    // console.log(this.attributes);
+		    for(var i=0; i< this.attributes.length; ++i)
+		    {
+			var attr=this.attributes[i];
+			console.log(attr);
+			values[attr.nodeName]=attr.name;
+			
+			console.log('User name: ' + this.$.globals.username);
+		    }*/
+		    this.username=username;
+		    this.uid=uid;
+		}
+	    });
+	})();
+    </script>
+</polymer-element>

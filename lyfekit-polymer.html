@@ -16,9 +16,10 @@
     <link rel="import" href="bower_components/core-item/core-item.html">
     
     <!--<link rel="import" href="bower_components/google-chart/google-chart.html">-->
-      <link href="bower_components/core-icons/core-icons.html" rel="import">
-      <link href="bower_components/core-ajax/core-ajax.html" rel="import">
-      <link href="elements/category-list.html" rel="import">
+    <link href="bower_components/core-icons/core-icons.html" rel="import">
+    <link href="bower_components/core-ajax/core-ajax.html" rel="import">
+    <link href="elements/category-list.html" rel="import">
+    <link href="elements/app-globals.html" rel="import">
     <style>
 	html,body {
 	    margin: 0;
@@ -55,14 +56,10 @@
 	    color: #fff;
 	    background: #000;
 	}*/
-
-
-
 /*    app-bar {
 	width: 100%;
 	display: block;
     }*/
-
 /*    :host {
 	display: inline-block;
 	position: relative;
@@ -103,6 +100,13 @@
 
 <body unresolved touch="auto">
     <core-scaffold responsiveWidth="800px" mode="waterfall-tall">
+	
+    <template>
+	<app-globals id="globals" username="Shiva" uid="1123345934556773456" ></app-globals>
+	<div id="firstname">{{$.globals.username}}</div>
+	<div id="lastname">{{$.globals.uid}}</div>
+    </template>
+	
 	<core-header-panel navigation flex mode="waterfall-tall">
 	    <core-toolbar style="background-color:#5F7290;" class="a_stop_select">
 		<img src='/images/logo.svg' width='50px' height='30px'>
@@ -199,19 +203,19 @@
 //		});
 	    
 	});
-	    Polymer('core-scaffold',{
-		publish: {
-		    search : {
-			value : false
-			,reflect: true
-		    }
-		}
-		,searchAction : function(event,detail,sender) {
-		    alert("hdgshjfgsdf");
-		    this.search = !this.search;
-		    this.fire("search-tap");
-		}
-	    });
+//	    Polymer('core-scaffold',{
+//		publish: {
+//		    search : {
+//			value : false
+//			,reflect: true
+//		    }
+//		}
+//		,searchAction : function(event,detail,sender) {
+//		    alert("hdgshjfgsdf");
+//		    this.search = !this.search;
+//		    this.fire("search-tap");
+//		}
+//	    });
 	    
     </script>
 </body>
