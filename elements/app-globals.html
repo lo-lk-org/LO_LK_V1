@@ -4,15 +4,19 @@
  - -->
 <link rel="import" href="../bower_components/polymer/polymer.html">
 
-<polymer-element name="app-globals">
+<polymer-element name="app-globals" attributes="values">
     <script>
 	(function() {
 	    var username='Guest';
 	    var uid='';
 	    //var values={};
 	    
-	    Polymer('app-globals',{
-		ready: function() {
+	    Polymer({
+		created: function() {
+		    console.log("I'm created");
+		}
+		,ready: function() {
+		    console.log("I'm Ready");
 		    /*this.values=values;
 		    // console.log(this.attributes);
 		    for(var i=0; i< this.attributes.length; ++i)
@@ -26,6 +30,20 @@
 		    this.username=username;
 		    this.uid=uid;
 		}
+		,attached: function() {
+		    console.log("I'm 3");
+		}
+		,domReady: function() {
+		    console.log("I'm 4");
+		}
+		,detached: function() {
+		    console.log("I'm 5");
+		}
+		,attributeChanged: function(attrname,oldval,newval) {
+		    //var newVal = this.getAttribute(attrName);
+		    console.log(attrName, 'old: ' + oldVal, 'new:', newVal);
+		}
+		
 	    });
 	})();
     </script>

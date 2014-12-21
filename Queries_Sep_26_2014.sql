@@ -89,5 +89,9 @@ SELECT * FROM m_profile WHERE `uid`='105890155775932582508';
 ALTER TABLE `m_profile` CHANGE `uid` `uid` VARCHAR(60) CHARSET latin1 COLLATE latin1_swedish_ci NULL, CHANGE `gid` `gid` VARCHAR(60) CHARSET latin1 COLLATE latin1_swedish_ci NULL;
 #================
 #Nov_20_2014
-ALTER TABLE `oneapp_dbsep`.`m_money` ADD COLUMN `group_id` VARCHAR(20) NULL AFTER `modified_on`;
+ALTER TABLE `oneapp_dbsep`.`m_money` ADD COLUMN `group_id` VARCHAR(20) DEFAULT 0 AFTER `modified_on`;
+ALTER TABLE `oneapp_dbsep`.`m_money` ADD COLUMN `group_id` VARCHAR(20) DEFAULT '0' AFTER `modified_on`;
 #================
+
+SQL> UPDATE m_money SET group_id=0 WHERE group_id IS NULL;
+11 ROW(s) affected.

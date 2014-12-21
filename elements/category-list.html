@@ -7,18 +7,17 @@
 
 <polymer-element name="category-list" noscript>
     <template>
-<!--	<core-ajax url="http://localhost:13080/api/" params='{"action":"read","module":"category","content_style":"list_content"}' 
-		   method="POST" auto response="{{handleResponse}}"></core-ajax>
-	<div>{{handleResponse}}</div>-->
-	
 	<h3>Category List</h3>
 	
 	<core-ajax url="../api/" auto response="{{categorylist}}" params='{"action":"read","module":"category","content_style":"list_content"}'
 		   method="POST" handleAs="json"></core-ajax>
-	<div>Status:{{categorylist.status}}</div>
-	<div>Message:{{categorylist.message}}</div>
-	<template repeat="categorylist">
-	    <span>{{categorylist.category_name}}</span>
+	<template if="{{categorylist.status=='success'}}">
+	    <div>Showing {{categorylist.num_rows}} categories.</div>
+	    <ol>
+		<template repeat="{{g in categorylist.results}}">
+		    <li><a href="../category/{{g.category_id}}">{{g.category_name}}</a><br></li>
+		</template>
+	    </ol>
 	</template>
     </template>
 </polymer-element>

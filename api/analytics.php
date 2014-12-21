@@ -1,4 +1,6 @@
 <?php
+header('Content-Type: application/json');
+
 //include "blocks/paths.php";
 //include $myclass_url;
 

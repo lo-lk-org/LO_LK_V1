@@ -1,4 +1,6 @@
 <?php
+header('Content-Type: application/json');
+
 require_once 'google/appengine/api/taskqueue/PushTask.php';
 use \google\appengine\api\taskqueue\PushTask;
 

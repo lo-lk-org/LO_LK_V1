@@ -1,4 +1,17 @@
 <?php
+header('Content-Type: application/json');
+
+/**
+ * Encoding used to transfer the data within the HTTP protocol
+ * ,like raw binary or base64. (binary is more compact than base64. base64 having 33% overhead)
+ */
+//header('Content-Transfer-Encoding: binary');
+
+/**
+ * Apply things like gzip compression to the content/data
+ */
+//header('Content-Encoding: gzip');
+
 $output= '';
 //$get = ($_REQUEST);
 //include "blocks/paths.php";
@@ -18,7 +31,7 @@ class Search extends Baseclass {
      */
     function _view_profile($get) {
         $linkid=$this->db_conn();
-	if(!isset($get['uid'])) $this->print_error(array("status"=>"error","response"=>"Undefined uid."));
+	if(!isset($get['uid']) || !$get['uid']) $this->print_error(array("status"=>"error","response"=>"Undefined uid."));
 	$uid=mysql_real_escape_string($get['uid']);
 	$sql = "SELECT * FROM `m_profile` WHERE `uid`='$uid'";
         $rslt = mysql_query($sql,$linkid);
@@ -57,17 +70,20 @@ class Search extends Baseclass {
     function _group_info($get)
     {
         $linkid=$this->db_conn();
-        if(!isset($get['group_id'])) $this->print_error(array("status"=>"error","response"=>"Undefined group id."));
+        if(!isset($get['group_id']) || !$get['group_id'] ) $this->print_error(array("status"=>"error","response"=>"Undefined group id."));
+        if(!isset($get['uid']) || !$get['uid'] ) $this->print_error(array("status"=>"error","response"=>"Undefined uid."));
+	
         $group_id = mysql_real_escape_string(urldecode($get['group_id']));//$group_id = trim($group_id,',');
+        $uid = mysql_real_escape_string(urldecode($get['uid']));//$group_id = trim($group_id,',');
          //find_in_set(`group_id`,'$group_ids')
-            $rslt=mysql_query("SELECT * FROM m_groups WHERE group_id='$group_id' ",$linkid) or $this->print_error(mysql_error($linkid));
+            $rslt=mysql_query("SELECT * FROM m_groups WHERE group_id='$group_id' and group_owner_uid='$uid' ",$linkid) or $this->print_error(mysql_error($linkid));
 
             if(mysql_errno($linkid)) {
                 $rslt_arr=array("status"=>"error","response"=>mysql_error($linkid));
             }
 	    elseif(mysql_num_rows($rslt)==0)
 	    {
-		$this->print_error("No records found");
+		$this->print_error("No group data found OR group not created by you");
 	    }
             else {
                 $i=0;$data_array=array();
@@ -154,8 +170,8 @@ class Search extends Baseclass {
 //        if(!isset($get['group_id'])) $this->print_error(array("status"=>"error","response"=>"Undefined group id."));
 //        $group_id = mysql_real_escape_string(urldecode($get['group_id']));//$group_id = trim($group_id,',');
         if(!isset($get['uid'])) $this->print_error(array("status"=>"error","response"=>"Undefined uid."));
-	$page = $lat=(!isset($get['page']))? '0' : mysql_real_escape_string(urldecode($get['page']))-1;
-	$limit = $lat=(!isset($get['limit']))? '35' : mysql_real_escape_string(urldecode($get['limit']));
+	$page = (!isset($get['page']))? '0' : mysql_real_escape_string(urldecode($get['page']))-1;
+	$limit = (!isset($get['limit']))? '35' : mysql_real_escape_string(urldecode($get['limit']));
 		
         $uid = mysql_real_escape_string(urldecode($get['uid']));
 	
@@ -209,7 +225,7 @@ class Search extends Baseclass {
     {
         $linkid=$this->db_conn();
 //        if(!isset($get['member_id'])) $this->print_error(array("status"=>"error","response"=>"Undefined Member id."));
-	if(!isset($get['group_id'])) $this->print_error(array("status"=>"error","response"=>"Undefined Group id."));
+	if(!isset($get['group_id']) || !$get['group_id']) $this->print_error(array("status"=>"error","response"=>"Undefined Group id."));
         $group_id = mysql_real_escape_string(urldecode($get['group_id']));
 //        $member_id = mysql_real_escape_string(urldecode($get['member_id']));
         
@@ -477,8 +493,8 @@ class Search extends Baseclass {
 		if(!isset($get['uid'])) $this->print_error(array("status"=>"error","response"=>"Undefined uid."));
 		$uid=mysql_real_escape_string($get['uid']);
 		
-		$page = (!isset($get['page']) || $get['page']< 0)? 1 : mysql_real_escape_string(urldecode($get['page']));
-		$limit = (!isset($get['limit']) || $get['limit']< 0)? 3 : mysql_real_escape_string(urldecode($get['limit']));
+		$page = (!isset($get['page']) || !$get['page'])? 1 : mysql_real_escape_string(urldecode($get['page']));
+		$limit = (!isset($get['limit']) || !$get['limit'])? 5 : mysql_real_escape_string(urldecode($get['limit']));
 		
 		/*if($get['module'] == 'all') {
 		    //money total
@@ -635,11 +651,18 @@ class Search extends Baseclass {
 			if(!isset($get['tff'])) $this->print_error(array("status"=>"error","response"=>"Please specify time filter from."));
 			if(!isset($get['tft'])) $this->print_error(array("status"=>"error","response"=>"Please specify time filter to."));
 			
+			$group_id = (!isset($get['group_id']) || !$get['group_id'])? '' : mysql_real_escape_string(urldecode($get['group_id']));
+			$category_id = (!isset($get['category_id']) || !$get['category_id'])? '' : mysql_real_escape_string(urldecode($get['category_id']));
+			
 			$uid = mysql_real_escape_string(urldecode($get['uid']));
-			$q = mysql_real_escape_string(urldecode($get['q']));
+			$q = (!isset($get['q']) || !$get['q'])? '' : mysql_real_escape_string(urldecode($get['q']));
 			
 			if($q!='')
-			    $cond.= " AND (money_title LIKE '%".$q."%')";
+			    $cond.= " AND (m.money_title LIKE '%".$q."%')";
+			if($group_id!='')
+			    $cond.= " AND m.group_id = '$group_id'";
+			if($category_id!='')
+			    $cond.= " AND m.category_id = '$category_id'";
 			
 			$dt_from=$this->validate_datetime(urldecode($get['tff']),'from');
 			$dt_to=$this->validate_datetime(urldecode($get['tft']),'to');
@@ -695,164 +718,68 @@ class Search extends Baseclass {
 			    $this->print_error($output);
 			}
 			else {
-			    $i=0;$data_array=array();
+			    $i=0; $data_array=array();
+			    
 			    while($row = mysql_fetch_assoc($rslt))
 			    {
+				
+				$data_array[$i]['sno']=$page+$i;
+				$data_array[$i]['money_id']=$row['money_id'];
+				$data_array[$i]['uid']=$row['uid'];
+				$data_array[$i]['lat']=$row['lat'];
+				$data_array[$i]['long']=$row['long'];
+				$data_array[$i]['visibility']=$row['visibility'];
+				$data_array[$i]['money_title']= $this->format_text($row['money_title']);
+				$data_array[$i]['money_amount']=$row['money_amount'];
+				$data_array[$i]['item_unit_price']=$row['item_unit_price'];
+				$data_array[$i]['item_units']=$row['item_units'];
+				$data_array[$i]['item_qty']=$row['item_qty'];
+				$data_array[$i]['total_price']=$row['total_price'];
+				$data_array[$i]['money_flow_direction']=$row['money_flow_direction'];
+				$data_array[$i]['file_id']=$row['file_id'];
+				$data_array[$i]['category_id']=$row['category_id'];
+				$data_array[$i]['modified_on']=$row['modified_on'];
+				$data_array[$i]['timestamp']=$row['timestamp'];
+				$data_array[$i]['group_id']=$row['group_id'];
+				
+				//=========
 				$month=date("M",strtotime($row['timestamp']));
 				$tmstmp=strtotime(date("Y-m-d",strtotime($row['timestamp']) ));
 				$quarter_start_dt=$this->this_quarter();
 				if( strtotime('today' ) == $tmstmp)
 				{
-				    $data_array['today'][$i]['sno']=$page+$i;
-				    $data_array['today'][$i]['money_id']=$row['money_id'];
-				    $data_array['today'][$i]['uid']=$row['uid'];
-				    $data_array['today'][$i]['lat']=$row['lat'];
-				    $data_array['today'][$i]['long']=$row['long'];
-				    $data_array['today'][$i]['visibility']=$row['visibility'];
-				    $data_array['today'][$i]['money_title']= $this->format_text($row['money_title']);
-				    $data_array['today'][$i]['money_amount']=$row['money_amount'];
-				    $data_array['today'][$i]['item_unit_price']=$row['item_unit_price'];
-				    $data_array['today'][$i]['item_units']=$row['item_units'];
-				    $data_array['today'][$i]['item_qty']=$row['item_qty'];
-				    $data_array['today'][$i]['total_price']=$row['total_price'];
-				    $data_array['today'][$i]['money_flow_direction']=$row['money_flow_direction'];
-				    $data_array['today'][$i]['file_id']=$row['file_id'];
-				    $data_array['today'][$i]['category_id']=$row['category_id'];
-				    $data_array['today'][$i]['modified_on']=$row['modified_on'];
-				    $data_array['today'][$i]['timestamp']=$row['timestamp'];
-				    $data_array['today'][$i]['group_id']=$row['group_id'];
+				    $data_array[$i]['time_string']='today';
 				}
 				elseif( strtotime('yesterday' ) == $tmstmp )
 				{
-				    $data_array['yesterday'][$i]['sno']=$page+$i;
-				    $data_array['yesterday'][$i]['money_id']=$row['money_id'];
-				    $data_array['yesterday'][$i]['uid']=$row['uid'];
-				    $data_array['yesterday'][$i]['lat']=$row['lat'];
-				    $data_array['yesterday'][$i]['long']=$row['long'];
-				    $data_array['yesterday'][$i]['visibility']=$row['visibility'];
-				    $data_array['yesterday'][$i]['money_title']= $this->format_text($row['money_title']);
-				    $data_array['yesterday'][$i]['money_amount']=$row['money_amount'];
-				    $data_array['yesterday'][$i]['item_unit_price']=$row['item_unit_price'];
-				    $data_array['yesterday'][$i]['item_units']=$row['item_units'];
-				    $data_array['yesterday'][$i]['item_qty']=$row['item_qty'];
-				    $data_array['yesterday'][$i]['total_price']=$row['total_price'];
-				    $data_array['yesterday'][$i]['money_flow_direction']=$row['money_flow_direction'];
-				    $data_array['yesterday'][$i]['file_id']=$row['file_id'];
-				    $data_array['yesterday'][$i]['category_id']=$row['category_id'];
-				    $data_array['yesterday'][$i]['modified_on']=$row['modified_on'];
-				    $data_array['yesterday'][$i]['timestamp']=$row['timestamp'];
-				    $data_array['yesterday'][$i]['group_id']=$row['group_id'];
+				   $data_array[$i]['time_string']='yesterday';
 				}
 				elseif( strtotime('-1 week' ) <= $tmstmp )
 				{
-				    $data_array['this_week'][$i]['sno']=$page+$i;
-				    $data_array['this_week'][$i]['money_id']=$row['money_id'];
-				    $data_array['this_week'][$i]['uid']=$row['uid'];
-				    $data_array['this_week'][$i]['lat']=$row['lat'];
-				    $data_array['this_week'][$i]['long']=$row['long'];
-				    $data_array['this_week'][$i]['visibility']=$row['visibility'];
-				    $data_array['this_week'][$i]['money_title']= $this->format_text($row['money_title']);
-				    $data_array['this_week'][$i]['money_amount']=$row['money_amount'];
-				    $data_array['this_week'][$i]['item_unit_price']=$row['item_unit_price'];
-				    $data_array['this_week'][$i]['item_units']=$row['item_units'];
-				    $data_array['this_week'][$i]['item_qty']=$row['item_qty'];
-				    $data_array['this_week'][$i]['total_price']=$row['total_price'];
-				    $data_array['this_week'][$i]['money_flow_direction']=$row['money_flow_direction'];
-				    $data_array['this_week'][$i]['file_id']=$row['file_id'];
-				    $data_array['this_week'][$i]['category_id']=$row['category_id'];
-				    $data_array['this_week'][$i]['modified_on']=$row['modified_on'];
-				    $data_array['this_week'][$i]['timestamp']=$row['timestamp'];
-				    $data_array['this_week'][$i]['group_id']=$row['group_id'];
+				    $data_array[$i]['time_string']='this_week';
 				}
 				elseif(strtotime(date("Y-m-1",time())) < $tmstmp )
 				{
-				    $data_array['this_month'][$i]['sno']=$page+$i;
-				    $data_array['this_month'][$i]['money_id']=$row['money_id'];
-				    $data_array['this_month'][$i]['uid']=$row['uid'];
-				    $data_array['this_month'][$i]['lat']=$row['lat'];
-				    $data_array['this_month'][$i]['long']=$row['long'];
-				    $data_array['this_month'][$i]['visibility']=$row['visibility'];
-				    $data_array['this_month'][$i]['money_title']= $this->format_text($row['money_title']);
-				    $data_array['this_month'][$i]['money_amount']=$row['money_amount'];
-				    $data_array['this_month'][$i]['item_unit_price']=$row['item_unit_price'];
-				    $data_array['this_month'][$i]['item_units']=$row['item_units'];
-				    $data_array['this_month'][$i]['item_qty']=$row['item_qty'];
-				    $data_array['this_month'][$i]['total_price']=$row['total_price'];
-				    $data_array['this_month'][$i]['money_flow_direction']=$row['money_flow_direction'];
-				    $data_array['this_month'][$i]['file_id']=$row['file_id'];
-				    $data_array['this_month'][$i]['category_id']=$row['category_id'];
-				    $data_array['this_month'][$i]['modified_on']=$row['modified_on'];
-				    $data_array['this_month'][$i]['timestamp']=$row['timestamp'];
-				    $data_array['this_month'][$i]['group_id']=$row['group_id'];
+				    $data_array[$i]['time_string']='this_month';
 				}
 				elseif($quarter_start_dt < $tmstmp )
 				{
-				    $data_array['this_quarter'][$i]['sno']=$page+$i;
-				    $data_array['this_quarter'][$i]['money_id']=$row['money_id'];
-				    $data_array['this_quarter'][$i]['uid']=$row['uid'];
-				    $data_array['this_quarter'][$i]['lat']=$row['lat'];
-				    $data_array['this_quarter'][$i]['long']=$row['long'];
-				    $data_array['this_quarter'][$i]['visibility']=$row['visibility'];
-				    $data_array['this_quarter'][$i]['money_title']= $this->format_text($row['money_title']);
-				    $data_array['this_quarter'][$i]['money_amount']=$row['money_amount'];
-				    $data_array['this_quarter'][$i]['item_unit_price']=$row['item_unit_price'];
-				    $data_array['this_quarter'][$i]['item_units']=$row['item_units'];
-				    $data_array['this_quarter'][$i]['item_qty']=$row['item_qty'];
-				    $data_array['this_quarter'][$i]['total_price']=$row['total_price'];
-				    $data_array['this_quarter'][$i]['money_flow_direction']=$row['money_flow_direction'];
-				    $data_array['this_quarter'][$i]['file_id']=$row['file_id'];
-				    $data_array['this_quarter'][$i]['category_id']=$row['category_id'];
-				    $data_array['this_quarter'][$i]['modified_on']=$row['modified_on'];
-				    $data_array['this_quarter'][$i]['timestamp']=$row['timestamp'];
-				    $data_array['this_quarter'][$i]['group_id']=$row['group_id'];
+				    $data_array[$i]['time_string']='this_quarter';
 				}
 				elseif(strtotime(date("Y-01-01",time())) < $tmstmp )
 				{
-				    $data_array['this_year'][$i]['sno']=$page+$i;
-				    $data_array['this_year'][$i]['money_id']=$row['money_id'];
-				    $data_array['this_year'][$i]['uid']=$row['uid'];
-				    $data_array['this_year'][$i]['lat']=$row['lat'];
-				    $data_array['this_year'][$i]['long']=$row['long'];
-				    $data_array['this_year'][$i]['visibility']=$row['visibility'];
-				    $data_array['this_year'][$i]['money_title']= $this->format_text($row['money_title']);
-				    $data_array['this_year'][$i]['money_amount']=$row['money_amount'];
-				    $data_array['this_year'][$i]['item_unit_price']=$row['item_unit_price'];
-				    $data_array['this_year'][$i]['item_units']=$row['item_units'];
-				    $data_array['this_year'][$i]['item_qty']=$row['item_qty'];
-				    $data_array['this_year'][$i]['total_price']=$row['total_price'];
-				    $data_array['this_year'][$i]['money_flow_direction']=$row['money_flow_direction'];
-				    $data_array['this_year'][$i]['file_id']=$row['file_id'];
-				    $data_array['this_year'][$i]['category_id']=$row['category_id'];
-				    $data_array['this_year'][$i]['modified_on']=$row['modified_on'];
-				    $data_array['this_year'][$i]['timestamp']=$row['timestamp'];
-				    $data_array['this_year'][$i]['group_id']=$row['group_id'];
+				    $data_array[$i]['time_string']='this_year';
 				}
 				else
 				{
-				    $data_array['last_year'][$i]['sno']=$page+$i;
-				    $data_array['last_year'][$i]['money_id']=$row['money_id'];
-				    $data_array['last_year'][$i]['uid']=$row['uid'];
-				    $data_array['last_year'][$i]['lat']=$row['lat'];
-				    $data_array['last_year'][$i]['long']=$row['long'];
-				    $data_array['last_year'][$i]['visibility']=$row['visibility'];
-				    $data_array['last_year'][$i]['money_title']= $this->format_text($row['money_title']);
-				    $data_array['last_year'][$i]['money_amount']=$row['money_amount'];
-				    $data_array['last_year'][$i]['item_unit_price']=$row['item_unit_price'];
-				    $data_array['last_year'][$i]['item_units']=$row['item_units'];
-				    $data_array['last_year'][$i]['item_qty']=$row['item_qty'];
-				    $data_array['last_year'][$i]['total_price']=$row['total_price'];
-				    $data_array['last_year'][$i]['money_flow_direction']=$row['money_flow_direction'];
-				    $data_array['last_year'][$i]['file_id']=$row['file_id'];
-				    $data_array['last_year'][$i]['category_id']=$row['category_id'];
-				    $data_array['last_year'][$i]['modified_on']=$row['modified_on'];
-				    $data_array['last_year'][$i]['timestamp']=$row['timestamp'];
-				    $data_array['last_year'][$i]['group_id']=$row['group_id'];
+				    $data_array[$i]['time_string']='last_year';
 				}
 
 //				$data_array[$i]['month']=$month;
 //				$data_array[$month]['month_total']+=$row['money_amount'];
-				$i++;
+				++$i;
 			    }
+			    
 			    $output['money'] = $data_array;
 			}
 			///========================

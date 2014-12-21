@@ -12,36 +12,69 @@
      /**
       * GET API Data
       * @param type $url string
-      * @author shivaraj <mrshivaraj123@gmail.com>
+      * @author shivaraj <mrshivaraj123@gmail.com>_Nov_02_2013
       * @param type $outtype string
       * @param type $post Array
       * @return type array
       */
     function getApiContent($url,$outtype,$post='') {
+//	echo '<pre>';echo $url.'<br>';	print_r($post); die();
             $content ='';
             if($post != '') {
                 $post = http_build_query($post);
                 $content = array(
                     "http" => array(
                         "method"=>"POST"
-                        ,"header"=> "custom-header: if-any\r\n" .
-                                    "custom-header-two: custome-value-2\r\n"
+                        ,"header"=> "Content-type: application/x-www-form-urlencoded; charset=UTF-8"
+				    ."custom-header: if-any\r\n" 
+                                    ."custom-header-two: custome-value-2\r\n"
+				    ."Content-Length: ".strlen($post)."\r\n"
+				    ."User-Agent:MyAgent/1.0\r\n"
                         ,"content" => $post
+			//,"verify_peer" => FALSE
                     )
                 );
                 $content = stream_context_create($content);
-                $rdata = file_get_contents($url,false,$content);
+                $rdata = file_get_contents($url,FALSE,$content);
             }
             else {
                 $rdata = file_get_contents($url,false);
             }
             
+	    
+	    //=============
+	    foreach ($http_response_header as $header_line)
+		if (preg_match('/^HTTP\/\d.\d (\d+)/',$header_line,$match))
+		      $http_status = intval($match[1]);
+	    $rdata= array("status_code"=>$http_status, 'response'=>$rdata);
+	    //=============
+	    
             if($outtype=='json') {
                 return json_decode($rdata,true);
             }
             else {
                 return $rdata;
             }
+    }
+    
+    /**
+     * Function to return site url
+     * @author Shivaraj<mrshivaraj123@gmail.com>_Dec_20_2014
+     * @return string URL
+     */
+    function site_url()
+    {
+	return ($_SERVER['HTTP_HOST'] == 'localhost:13080')? 'http://localhost:13080' : 'http://lyfekit.com';
+    }
+    
+    /**
+     * Get current date time
+     * @author Shivaraj<mrshivaraj123@gmail.com>_Dec_20_2014
+     * @return string DateTime
+     */
+    function cur_datetime()
+    {
+	return date("Y-m-d H:i:s",time());
     }
     
     /**
@@ -147,14 +180,14 @@
      * @return boolean Bool/error
      */
     function auth($uid,$linkid) {
-		$rslt=mysql_query("SELECT * FROM `generic_profile` WHERE `uid`='$uid'",$linkid) or $this->print_error(mysql_error($linkid));
-	        
-	        if(mysql_affected_rows($linkid) > 0) {
-		    return TRUE;
-		}
-		else {
-		    $this->print_error("Invalid uid login");
-		}
+	$rslt=mysql_query("SELECT * FROM `m_profile` WHERE `uid`='$uid'",$linkid) or $this->print_error(mysql_error($linkid));
+
+	if(mysql_affected_rows($linkid) > 0) {
+	    return TRUE;
+	}
+	else {
+	    $this->print_error("Invalid uid login");
+	}
     }
     
 }
@@ -517,5 +550,6 @@ class Baseclass extends Myactions
 	}
 	return $date.' '.$time;
     }
+
 }
 ?>

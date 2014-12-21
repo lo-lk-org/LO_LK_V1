@@ -7,6 +7,20 @@
 require_once 'google/appengine/api/taskqueue/PushTask.php';
 use \google\appengine\api\taskqueue\PushTask;
 
+header('Content-Type: application/json');
+
+/**
+ * Encoding used to transfer the data within the HTTP protocol
+ * ,like raw binary or base64. (binary is more compact than base64. base64 having 33% overhead)
+ */
+//header('Content-Transfer-Encoding: binary');
+
+/**
+ * Apply things like gzip compression to the content/data
+ */
+//header('Content-Encoding: gzip');
+//header("HTTP/1.0 404 Not Found");
+
 //$output= '';
 //include "blocks/paths.php";
 //include $myclass_url;
@@ -65,13 +79,31 @@ class Write extends Baseclass
         //$uid=mysql_real_escape_string(urldecode($get['uid']));
         $module=mysql_real_escape_string(urldecode($get['module']));
 	
-	if($module=='profile')
+	if($module=='google-login')
 	{
-                    $output = $this->create_profile($get);
+		if(!isset($get['code']) ) $this->print_error(array("status"=>"error","response"=>"Undefined validation code."));
+		//if(empty($get['code']) ) $this->print_error(array("status"=>"error","response"=>"Invalid validation code."));
+		
+		/**
+		 * Google generated code
+		 */
+		$code=$get['code'];
+		/**
+		 * $request_from : web,mobile
+		 */
+		$request_from=($get['request_from']);
+		//$this->print_error('Working on...');
+		include_once '../src2/google_api.php';
+		
+		
+	}
+	elseif($module=='profile')
+	{
+		    $output = $this->create_profile($get);
 			//session
 			$get['uid']=$output['uid'];
-//			$session_id=$this->create_session($get);
-//		    $output['session_id']=$session_id;
+			$session_id=$this->create_session($get);
+			$output['session_id']=$session_id;
 	}
 	elseif($module=='social-contact')
 	{
@@ -99,9 +131,9 @@ class Write extends Baseclass
 	    $visibility=(!isset($get['visibility']))? 'pri' : mysql_real_escape_string(urldecode($get['visibility']));
 	    
 	    $file_id = (!isset($get['file_id']))? 0:mysql_real_escape_string(($get['file_id']));
-	    $category_id=(!isset($get['category_id']))? 0:mysql_real_escape_string(($get['category_id']));
+	    $category_id=(!isset($get['category_id']) || !$get['category_id'])? 0:mysql_real_escape_string(($get['category_id']));
 	    
-	    $group_id=(!isset($get['group_id']))? 0:mysql_real_escape_string(($get['group_id']));
+	    $group_id=(!isset($get['group_id']) || !$get['group_id'])? 0:mysql_real_escape_string(($get['group_id']));
 	    
 	    $content_tbl='m_content';
 	    
@@ -185,7 +217,10 @@ class Write extends Baseclass
 			
 			//$taskname = $this->createTaskQueue($content_id,$module,$uid,$visibility);
 			
-			$rslt_arr = array("status"=>"success","money_id"=>$money_id);
+			$rslt_arr = array("status"=>"success","results"=>array(
+					0=>array(
+					    "money_id"=>$money_id)
+					) );
 		    }
 	    }
 	    elseif($module == 'reminder') {//todo
@@ -245,6 +280,25 @@ class Write extends Baseclass
 	}
 
         return $output;
+    }
+    
+    function put_list_content_info($get)
+    {
+	$linkid = $this->db_conn();
+	$output=array();
+        //$uid=mysql_real_escape_string(urldecode($get['uid']));
+        $module=mysql_real_escape_string(urldecode($get['module']));
+	
+	if($module=='social-contact')
+	{
+	    $output = $this->create_multi_social_contact($get);
+	}
+	else
+	{
+	    //$output=$rslt_arr;
+	    $output = $this->unknown();
+	}
+	return $output;
     }
     
     /**
@@ -374,6 +428,80 @@ class Write extends Baseclass
 	}
         return $rslt_arr;
     }
+    
+    /**
+     * Function to store social contact of profile user
+     * @author Shivaraj<mrshivaraj123@gmail.com>_Nov_26_2014
+     * @param type $get
+     */
+    function create_multi_social_contact($get)//uid,gid,following_uid,following_gid,following_uname
+    {
+	$linkid=$this->db_conn();
+	if(!isset($get['uid'])) $this->print_error(array("status"=>"error","response"=>"Undefined uid."));
+	if(!isset($get['gid'])) $this->print_error(array("status"=>"error","response"=>"Undefined gid."));
+	if(!isset($get['friends'])) $this->print_error(array("status"=>"error","response"=>"Undefined friends input."));
+	
+//	if(!isset($get['following_uid'])) $this->print_error(array("status"=>"error","response"=>"Undefined following_uid."));
+//	if(!isset($get['following_gid'])) $this->print_error(array("status"=>"error","response"=>"Undefined following_gid."));
+//	if(!isset($get['following_uname'])) $this->print_error(array("status"=>"error","response"=>"Undefined following_uname."));
+//	if(!isset($get['following_name'])) $this->print_error(array("status"=>"error","response"=>"Undefined following_name."));
+	
+//	[action] => write
+//	[module] => social-contact
+//	[content_style] => list_content
+//	[uid] => 4523623456456456
+//	[gid] => 4523623456456456
+//	[friends] => {{following_uid:'3453452354',following_gid:'3453452354',following_uname:'Jagad',following_name:Jagadeesh},{following_uid:'34534523555',following_gid:'34534523555',following_uname:'Mayyu',following_name:Mahesh}}
+	//{{following_uid:'3453452354',following_gid:'3453452354',following_uname:'Jagad',following_name:Jagadeesh},{following_uid:'34534523555',following_gid:'34534523555',following_uname:'Mayyu',following_name:Mahesh}}
+	print_r($get);
+	die("TEST");
+	
+        $uid=mysql_real_escape_string(urldecode($get['uid']));  //req
+        $gid=mysql_real_escape_string(urldecode($get['gid'])); //req
+	$friends=mysql_real_escape_string(urldecode($get['friends'])); //req
+//        $following_uid=mysql_real_escape_string(urldecode($get['following_uid'])); //req
+//        $following_gid=mysql_real_escape_string(urldecode($get['following_gid'])); //req
+	$datetime = date("Y-m-d H:i:s",time());
+	
+        $following_uname=(!isset($get['following_uname']))? '' : mysql_real_escape_string(urldecode($get['following_uname']));
+        $following_name=(!isset($get['following_name']))? '' : mysql_real_escape_string(urldecode($get['following_name']));
+
+	$profile_res=mysql_query("SELECT * FROM m_social_contacts WHERE uid='".$uid."' AND gid='".$gid."' AND following_uid='".$following_uid."' AND following_gid='".$following_gid."' LIMIT 1",$linkid) or $this->print_error(mysql_error($linkid));
+	if(mysql_affected_rows($linkid)>0)
+	{
+		$profile_det=mysql_fetch_assoc($profile_res);
+		$rowid=$profile_det['sno'];
+		$sql="UPDATE m_social_contacts SET
+				    `following_uname`='".$following_uname."',`following_name`='".$following_name."'
+			    WHERE uid='".$uid."' AND gid='".$gid."' AND following_uid='".$following_uid."' AND following_gid='".$following_gid."' ";
+		mysql_query($sql) or $this->print_error(mysql_error($linkid));//`uid`='".$uid."',`gid`='".$gid."',
+			
+		if(mysql_errno($linkid)) {
+		    $this->print_error(array("status"=>"error","response"=>mysql_error($linkid)));
+		}
+		else { 
+
+		    $rslt_arr = array("status"=>"success",'following_uid'=>$following_uid,'message'=>"Contact Updated");
+		}
+		
+	}
+	else {
+	    
+		$sql="INSERT INTO m_social_contacts (uid,gid,following_uid,following_gid,following_uname,following_name)
+				VALUES('".$uid."','".$gid."','".$following_uid."','".$following_gid."','".$following_uname."','".$following_name."')";
+		
+	//	die('<pre>'.$sql.'</pre>');
+		mysql_query($sql,$linkid);
+		if(mysql_errno($linkid)) {
+		    $this->print_error(array("status"=>"error","response"=>mysql_error($linkid)));
+		}
+		else { 
+
+		    $rslt_arr = array("status"=>"success",'following_uid'=>$following_uid,'message'=>"Contact Created");
+		}
+	}
+        return $rslt_arr;
+    }
 
     /**
      * Create Group
@@ -409,7 +537,7 @@ class Write extends Baseclass
 	// m_groups: group_id,group_type,group_name,group_description,group_owner_uid,group_member_ctr,file_id,group_addr_line_1,group_addr_line_2,group_addr_line_3
 	// ,group_addr_city,group_addr_state,group_addr_country,group_addr_zip,entity_id
 	
-	//echo $uq="select `uid` from m_profile where `uid`='$group_owner_uid'";
+	$uq="select `uid` from m_profile where `uid`='$group_owner_uid'";
 	$rslt = mysql_query($uq,$linkid) or $this->print_error(mysql_error($linkid));
         $row = mysql_fetch_array($rslt);
         if($row['uid']=='') { $this->print_error("User / uid does not exits."); }
@@ -754,6 +882,10 @@ switch($get['content_style']) {
         break;
         
     case 'table_actions': $output = $ob->table_actions($get);
+        break;
+    case 'list_content': 
+                if(!isset($get['module'])) $ob->print_error(array("status"=>"error","response"=>"Undefined content type."));
+                $output = $ob->put_list_content_info($get);
         break;
     /*
     case 'groups_content':
