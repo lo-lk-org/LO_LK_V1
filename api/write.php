@@ -7,7 +7,7 @@
 require_once 'google/appengine/api/taskqueue/PushTask.php';
 use \google\appengine\api\taskqueue\PushTask;
 
-header('Content-Type: application/json');
+//header('Content-Type: application/json');
 
 /**
  * Encoding used to transfer the data within the HTTP protocol
@@ -82,8 +82,8 @@ class Write extends Baseclass
 	if($module=='google-login')
 	{
 		if(!isset($get['code']) ) $this->print_error(array("status"=>"error","response"=>"Undefined validation code."));
-		//if(empty($get['code']) ) $this->print_error(array("status"=>"error","response"=>"Invalid validation code."));
-		
+		if(!isset($get['request_from']) ) $this->print_error(array("status"=>"error","response"=>"Undefined request from input code."));
+		echo 'TEST--#0';
 		/**
 		 * Google generated code
 		 */
@@ -94,6 +94,8 @@ class Write extends Baseclass
 		$request_from=($get['request_from']);
 		//$this->print_error('Working on...');
 		include_once '../src2/google_api.php';
+		
+		echo 'TEST--#6 <pre>';print_r($output);
 		
 		
 	}

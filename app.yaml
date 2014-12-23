@@ -7,9 +7,20 @@ version: 1
 runtime: php
 api_version: 1
 threadsafe: yes
+module: default
 
-default_expiration: "30d"
+default_expiration: "30d 5h 4m 3s"
 
+#skip bak files
+skip_files:
+- ^(.*/)?\.bak$
+- ^(.*/)?\.json$
+- ^(.*/)?\.md$
+
+# Set env variable, get with echo echo getenv('authname'); or echo $_SERVER['authname'];
+env_variables:
+  authname: 'Ganau'
+  
 handlers:
 - url: /api/*
   script: api/api.php
@@ -79,13 +90,53 @@ handlers:
 - url: /+
   script: prelaunch.php
   
+# Error handling
+#  error_handlers:
+#  - file: default_error.html
+#
+#  - error_code: over_quota
+#    file: over_quota.html
+#  - error_code:    over_quota, which indicates the app has exceeded a resource quota;
+#  - error_code:    dos_api_denial, which is served to any client blocked by your app's DoS Protection configuration;
+#  - error_code:		timeout, served if a deadline is reached before there is a response from your app.
+
 #libraries:
 #- name: webapp2
 #  version: "2.5.2"
   
-  
+    
 #- url: /
 #  script: index.php
 
 #- url: /(.+\.php)$
 #  script: \1
+
+#- url: /(.*\.(ico|gif|png|jpg|css|js|html|txt|pdf|mp3|eps|svg|ttf|woff|eot))
+#  static_files: public/\1
+#  upload: (.*\.(ico|gif|png|jpg|css|js|html|txt|pdf|mp3|eps|svg|ttf|woff|eot))
+  
+#handlers:
+#- url: /images
+#  static_dir: static/images
+#  expiration: "4d 5h" #default_expiration 
+#  http_headers:
+#    Access-Control-Allow-Origin: http://mygame.appspot.com
+
+#handlers:
+#- url: /youraccount/.*
+#  script: accounts.php
+#  login: required
+#  secure: always
+
+# Page speed 
+#pagespeed:
+#  domains_to_rewrite:
+#  - www.foo.com
+#  - https://*.secure.foo.com
+#  url_blacklist:
+#  - http://myapp.com/blob/*
+#  - http://myapp.com/comments/*
+#  enabled_rewriters:
+#  - MinifyCss
+#  disabled_rewriters:
+#  - ImageStripColorProfile

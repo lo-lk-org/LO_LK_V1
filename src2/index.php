@@ -21,6 +21,7 @@ $client->setClientId($client_id);
 $client->setClientSecret($client_secret);
 $client->setRedirectUri($redirect_uri);
 $client->setApprovalPrompt('auto');
+$client->include_granted_scopes(TRUE);
 $client->setScopes(array("https://www.googleapis.com/auth/plus.login","https://www.googleapis.com/auth/userinfo.profile","https://www.googleapis.com/auth/userinfo.email") );
 
 if (isset($_SESSION['access_token']) && !empty($_SESSION['access_token']) ) {
@@ -44,7 +45,8 @@ if (isset($_SESSION['access_token']) && !empty($_SESSION['access_token']) ) {
   $authUrl = $client->createAuthUrl();
 }
 
-if (isset($_GET['code']) && !isset($_SESSION['access_token']) ) {
+if (isset($_GET['code']) && !isset($_SESSION['access_token']) )
+{
      die();
     $results=$ob->getApiContent($site_url."/api/", 'array', array("action"=>"write","module"=>"google-login","content_style"=>"single_content","code"=>$_GET['code'],"access_token"=>"","request_from"=>"web"));
     //echo '<pre>';print_r($results);

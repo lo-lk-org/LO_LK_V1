@@ -3,7 +3,9 @@
  * @author Shivaraj <mrshivaraj123@gmail.com> date
  * @tutorial Sample file
  */
-
+	/**
+	 * day_before_yesterday
+	 */
 	if( strtotime('-3 day' ) <= $tmstmp )
 	{
 		$data_array['day_before_yesterday'][$i]['day_before_yesterday']=$month;
@@ -25,4 +27,61 @@
 //		    $data_array['day_before_yesterday'][$i]['modified_on']=$row['modified_on'];
 		$data_array['day_before_yesterday'][$i]['timestamp']=$row['timestamp'];
 	}
+	
+	
+	
+	
+	
+	
+	/**
+	 * Connection time out
+	 */
+	function check_conn_timeout() {
+	    $status = connection_status();
+	    if (($status & CONNECTION_TIMEOUT) == CONNECTION_TIMEOUT) {
+	      echo 'Got timeout';
+	    }
+	}
+	  
+	while(1) {
+	    check_conn_timeout();
+	    sleep(1);
+	}
+	
+	
 ?>
+<scritp>
+    /**
+     * 
+     */
+    function loadSpecdoc(file) {
+	var acceptedTypes = {
+	    'application/pdf' : true
+	};
+	if (acceptedTypes[file.type] === true) {
+	    var reader = new FileReader();
+	    reader.onload = function(event) {
+		$.ajax({
+		    url : "my_handler.php",
+		    type : 'POST',
+		    dataType : "json",
+		    data : {
+			spec_id : $('#list_spec_items_spec_id').val(),
+			file_content : event.target.result
+		    },
+		    success : function(response) {
+			// Handle Success
+		    },
+		    error : function(XMLHttpRequest, textStatus, exception) {
+			// Handle Failure
+		    },
+		    async : true
+		});
+	    };
+	    reader.readAsDataURL(file);
+	} else {
+	    alert("Unsupported file");
+	    console.log(file);
+	}
+    };
+</scritp>
