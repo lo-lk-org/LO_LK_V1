@@ -93,6 +93,7 @@ class Google_Task_Runner
         throw new Google_Task_Exception(
             'Task configuration `initial_delay` must not be negative.'
         );
+	
       }
 
       $this->delay = $config['initial_delay'];

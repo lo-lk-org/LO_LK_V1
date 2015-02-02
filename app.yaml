@@ -41,11 +41,17 @@ handlers:
 
 #==< Bower components >====
 
+- url: /elements/api_handler
+  script: elements/api_handler.php
+
 - url: /elements
   static_dir: elements
   
 - url: /lyfekit-polymer
   script: lyfekit-polymer.html
+
+- url: /profile
+  script: profile.php
 
   
 - url: /favicon\.ico

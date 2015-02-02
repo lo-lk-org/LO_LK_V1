@@ -1,5 +1,6 @@
 <?php
 session_start();
+ob_start();
 ?>
 <script>
 var site_url ="http://"+(document.domain =='localhost'?'localhost:13080':document.domain)+"/";
@@ -21,7 +22,7 @@ var site_url ="http://"+(document.domain =='localhost'?'localhost:13080':documen
 			"577040276233-jve4tho9nlqkhtr0gkjt9usmnksssar2.apps.googleusercontent.com"
 		    :"577040276233-uaf3iiujllb7dq49g96a80jsn1690dhg.apps.googleusercontent.com";
 		// api key
-		$apiKey = 'AIzaSyDHjqldF75Nm54jrlQ6oUHpRPEI-5HrwuM';//'AIzaSyBt514eUceQLLd8b_KI2XKD_tsaVtwm4E8';
+		$apiKey = 'AIzaSyDHjqldF75Nm54jrlQ6oUHpRPEI-5HrwuM';
 	    ?>
 		<div class="bg_white" style="">
 			<?php /*<div class="mw45em center" style="padding:3%;">
@@ -52,9 +53,30 @@ var site_url ="http://"+(document.domain =='localhost'?'localhost:13080':documen
 			<div class="mw45em center" style="padding:3%;">
 			    <h1 style="font-size:200%;font-weight:600;" title="LyfeKit">LyfeKit</h1>
 			    <h2 style="font-size:110%;font-weight:100;">Manage your Life. <br><strong>You just Love and Live. We do the rest.</strong></h2>
+			    <p style="font-family:Roboto; font-weight:400;font-size:75%;">Coming soon on <a href="https://chrome.google.com/webstore/detail/lyfekit/ddpmfmlfaonpbigeobfkjeklaloplepn" class="font_black" style="text-decoration:underline;">Chrome</a> and <a href="https://play.google.com/store/apps/details?id=com.lyfekit.oneapp&hl=en" class="font_black" style="text-decoration:underline;">Android</a></p>
 			    <?php 
 			    //phpinfo(); die();
-			    include('src2/index.php'); ?>
+			    include('src2/index.php');
+			    
+			    echo '<div class="request">';
+			    if (isset($authUrl)) {
+				    echo '<span class="blog" style="font-size:150%;font-weight:100;">Get Early Access. Sign up with your Google Account<br><br></span>
+					    <a class="login" href="' . $authUrl . '">Sign In</a>';
+
+			    } else {
+			      echo "<div><a class='logout' href='?logout'>Logout</a></div>";
+
+
+			      echo '<div style="overflow: auto;">Dear '.$user_det['name'].', <img src="'.$user_det['picture'].'" alt="Profile" width="100" height="100" align="left"/></div>';
+			      
+			      echo '<span class="aflog" style="font-size:150%;font-weight:100;">Great ! Just hold tight. <br>We will let you know when your LyfeKit is ready.<br><br></span>
+					<span class="aflog signout_block" style="font-family:Roboto; font-weight:400;font-size:75%;"></span>';
+			    }
+			    echo '</div>';
+		    ?>
+		    
+
+
 			</div>
 		</div>
 		<div class="bg_black font_white" style="margin:0;padding:0;">
@@ -133,7 +155,7 @@ var site_url ="http://"+(document.domain =='localhost'?'localhost:13080':documen
 	</script>
   <!-- END FACEBOOK SDK -->
   <script>
-    function handleAuthClick(event)
+   /* function handleAuthClick(event)
     {
 	var clientId=$(".g-signin").attr("data-clientid");
 //	var apiKey=$(".g-signin").attr("data-apikey");
@@ -146,8 +168,8 @@ var site_url ="http://"+(document.domain =='localhost'?'localhost:13080':documen
 	// Step 3: get authorization to use private data
 	gapi.auth.authorize({client_id: clientId, scope: scopes, immediate: false}, signInCallback);
 	return false;
-    }
-    
+    }*/
+    /*
     var access_token = '';
     function signInCallback(authResult)
     {
@@ -174,13 +196,11 @@ var site_url ="http://"+(document.domain =='localhost'?'localhost:13080':documen
 	    authorizeButton.onclick = handleAuthClick;
 	  }
 
-    }
+    }*/
 //    
 //    // Load the API and make an API call.  Display the results on the screen.
-    function makeApiCall()
+    /*function makeApiCall()
     {
-//        
-//	   
 //            // Step 4: Load the Google+ API
             gapi.client.load('plus', 'v1', function() {
 //                
@@ -242,12 +262,12 @@ var site_url ="http://"+(document.domain =='localhost'?'localhost:13080':documen
 
 		  });
 	    });
-    }
+    }*/
 
     /**
      * Set required API keys and check authentication status.
      */
-    function setApiKey(apiKey) {
+    /*function setApiKey(apiKey) {
       gapi.client.setApiKey(apiKey);
     }
 
@@ -264,7 +284,7 @@ var site_url ="http://"+(document.domain =='localhost'?'localhost:13080':documen
 		alert(resp.message);
 	    }
 	});
-    }
+    }*/
     
     //==================================================
     
@@ -335,8 +355,6 @@ var site_url ="http://"+(document.domain =='localhost'?'localhost:13080':documen
     //===============================================
   </script>
   <style>
-      .aflog {
-	  display: none;
-      }
+      //.aflog { display: none; }
   </style>
 </body>

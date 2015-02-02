@@ -1,5 +1,4 @@
 <?php
-header('Content-Type: application/json');
 
 /**
  * Encoding used to transfer the data within the HTTP protocol
@@ -225,11 +224,21 @@ class Search extends Baseclass {
     {
         $linkid=$this->db_conn();
 //        if(!isset($get['member_id'])) $this->print_error(array("status"=>"error","response"=>"Undefined Member id."));
-	if(!isset($get['group_id']) || !$get['group_id']) $this->print_error(array("status"=>"error","response"=>"Undefined Group id."));
+	//if(!isset($get['group_id']) || !$get['group_id']) $this->print_error(array("status"=>"error","response"=>"Undefined Group id."));
+	//if(!isset($get['uid']) || !$get['uid']) $this->print_error(array("status"=>"error","response"=>"Undefined Group id."));
+	
         $group_id = mysql_real_escape_string(urldecode($get['group_id']));
+        $uid = mysql_real_escape_string(urldecode($get['uid']));
 //        $member_id = mysql_real_escape_string(urldecode($get['member_id']));
         
-        $rslt = mysql_query("select * from m_member where group_id=".$group_id."",$linkid) or $this->print_error(mysql_error($linkid));
+	$cond='';
+	if(isset($get['group_id']) && !empty($get['group_id']) )
+	    $cond.=' AND group_id="'.$group_id.'" ';
+	
+	if(isset($get['uid']) && !empty($get['uid']))
+	    $cond.=' AND uid="'.$uid.'" ';
+	    
+        $rslt = mysql_query("select * from m_member m where 1 $cond ",$linkid) or $this->print_error(mysql_error($linkid));
         if(mysql_errno($linkid)) {
             $rslt_arr=array("status"=>"error","response"=>mysql_error($linkid));
         }
@@ -310,7 +319,7 @@ class Search extends Baseclass {
         $uid = mysql_real_escape_string(urldecode($get['uid']));
 	
 
-	$rslt=mysql_query("SELECT * FROM m_social_contacts WHERE uid='".$uid."' ORDER BY following_name ASC",$linkid) or $this->print_error(mysql_error($linkid));
+	$rslt=mysql_query("SELECT * FROM m_social_contacts WHERE uid='".$uid."' OR gid='".$uid."' ORDER BY following_name ASC",$linkid) or $this->print_error(mysql_error($linkid));
 
 	if(mysql_errno($linkid)) {
 	    $rslt_arr=array("status"=>"error","response"=>mysql_error($linkid));
@@ -471,7 +480,7 @@ class Search extends Baseclass {
         
         $module=mysql_real_escape_string($get['module']);
         
-
+//	echo '<pre>'; print_r($get); die();
 	if($module == 'profile')
 	{
 	    $output= $this->_list_profiles($get); 
@@ -714,10 +723,12 @@ class Search extends Baseclass {
 			}
 			elseif(mysql_num_rows($rslt)==0)
 			{
-			    $output['response'] = "No matching record found or item may not belongs to you";
+			    $output['response'] = "No items found.";
 			    $this->print_error($output);
 			}
 			else {
+			    $num_rows=mysql_num_rows($rslt);
+			    $output['num_rows'] = $num_rows;
 			    $i=0; $data_array=array();
 			    
 			    while($row = mysql_fetch_assoc($rslt))
@@ -780,6 +791,7 @@ class Search extends Baseclass {
 				++$i;
 			    }
 			    
+			    $output['status'] = 'success';
 			    $output['money'] = $data_array;
 			}
 			///========================

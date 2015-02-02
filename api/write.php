@@ -83,7 +83,9 @@ class Write extends Baseclass
 	{
 		if(!isset($get['code']) ) $this->print_error(array("status"=>"error","response"=>"Undefined validation code."));
 		if(!isset($get['request_from']) ) $this->print_error(array("status"=>"error","response"=>"Undefined request from input code."));
-		echo 'TEST--#0';
+		//if(!isset($get['access_token']) ) $this->print_error(array("status"=>"error","response"=>"Undefined access token."));
+		//if(!isset($get['refresh_token']) ) $this->print_error(array("status"=>"error","response"=>"Undefined refresh token."));
+
 		/**
 		 * Google generated code
 		 */
@@ -91,21 +93,25 @@ class Write extends Baseclass
 		/**
 		 * $request_from : web,mobile
 		 */
+		$refresh_token=@$get['refresh_token'];
+		/**
+		 * $request_from : web,mobile
+		 */
 		$request_from=($get['request_from']);
 		//$this->print_error('Working on...');
 		include_once '../src2/google_api.php';
 		
-		echo 'TEST--#6 <pre>';print_r($output);
+		//echo 'TEST--#6 <pre>';print_r($output);
 		
 		
 	}
 	elseif($module=='profile')
 	{
 		    $output = $this->create_profile($get);
-			//session
-			$get['uid']=$output['uid'];
-			$session_id=$this->create_session($get);
-			$output['session_id']=$session_id;
+		    //session
+		    $get['uid']=$output['uid'];
+		    $session_id=$this->create_session($get);
+		    $output['session_id']=$session_id;
 	}
 	elseif($module=='social-contact')
 	{
@@ -438,71 +444,68 @@ class Write extends Baseclass
      */
     function create_multi_social_contact($get)//uid,gid,following_uid,following_gid,following_uname
     {
+	ini_set('max_execution_time', 3000);
 	$linkid=$this->db_conn();
 	if(!isset($get['uid'])) $this->print_error(array("status"=>"error","response"=>"Undefined uid."));
 	if(!isset($get['gid'])) $this->print_error(array("status"=>"error","response"=>"Undefined gid."));
 	if(!isset($get['friends'])) $this->print_error(array("status"=>"error","response"=>"Undefined friends input."));
 	
-//	if(!isset($get['following_uid'])) $this->print_error(array("status"=>"error","response"=>"Undefined following_uid."));
-//	if(!isset($get['following_gid'])) $this->print_error(array("status"=>"error","response"=>"Undefined following_gid."));
-//	if(!isset($get['following_uname'])) $this->print_error(array("status"=>"error","response"=>"Undefined following_uname."));
-//	if(!isset($get['following_name'])) $this->print_error(array("status"=>"error","response"=>"Undefined following_name."));
-	
-//	[action] => write
-//	[module] => social-contact
-//	[content_style] => list_content
-//	[uid] => 4523623456456456
-//	[gid] => 4523623456456456
-//	[friends] => {{following_uid:'3453452354',following_gid:'3453452354',following_uname:'Jagad',following_name:Jagadeesh},{following_uid:'34534523555',following_gid:'34534523555',following_uname:'Mayyu',following_name:Mahesh}}
-	//{{following_uid:'3453452354',following_gid:'3453452354',following_uname:'Jagad',following_name:Jagadeesh},{following_uid:'34534523555',following_gid:'34534523555',following_uname:'Mayyu',following_name:Mahesh}}
-	print_r($get);
-	die("TEST");
+	//print_r($get);die("TEST");
 	
         $uid=mysql_real_escape_string(urldecode($get['uid']));  //req
         $gid=mysql_real_escape_string(urldecode($get['gid'])); //req
-	$friends=mysql_real_escape_string(urldecode($get['friends'])); //req
-//        $following_uid=mysql_real_escape_string(urldecode($get['following_uid'])); //req
-//        $following_gid=mysql_real_escape_string(urldecode($get['following_gid'])); //req
-	$datetime = date("Y-m-d H:i:s",time());
+	$friends=$get['friends']; //req
+	$datetime=empty($get['datetime'])? date("Y-m-d H:i:s",time()) :mysql_real_escape_string(urldecode($get['datetime']));
 	
-        $following_uname=(!isset($get['following_uname']))? '' : mysql_real_escape_string(urldecode($get['following_uname']));
-        $following_name=(!isset($get['following_name']))? '' : mysql_real_escape_string(urldecode($get['following_name']));
-
-	$profile_res=mysql_query("SELECT * FROM m_social_contacts WHERE uid='".$uid."' AND gid='".$gid."' AND following_uid='".$following_uid."' AND following_gid='".$following_gid."' LIMIT 1",$linkid) or $this->print_error(mysql_error($linkid));
-	if(mysql_affected_rows($linkid)>0)
+	
+	//action=write&module=social-contact&content_style=single_content&uid=4523623456456456&gid=4523623456456456&following_uid=3453452354&following_gid=3453452354
+	//&following_uname=Jagad&following_name=Jagadeesh
+	
+	$rslt_arr=array();
+	foreach($friends as $friend)
 	{
-		$profile_det=mysql_fetch_assoc($profile_res);
-		$rowid=$profile_det['sno'];
-		$sql="UPDATE m_social_contacts SET
-				    `following_uname`='".$following_uname."',`following_name`='".$following_name."'
-			    WHERE uid='".$uid."' AND gid='".$gid."' AND following_uid='".$following_uid."' AND following_gid='".$following_gid."' ";
-		mysql_query($sql) or $this->print_error(mysql_error($linkid));//`uid`='".$uid."',`gid`='".$gid."',
-			
-		if(mysql_errno($linkid)) {
-		    $this->print_error(array("status"=>"error","response"=>mysql_error($linkid)));
-		}
-		else { 
-
-		    $rslt_arr = array("status"=>"success",'following_uid'=>$following_uid,'message'=>"Contact Updated");
-		}
-		
-	}
-	else {
+	    $frnd_displayname=(!isset($friend['displayName']))? '' : mysql_real_escape_string($friend['displayName']);
+	    $frnd_url=(!isset($friend['url']))? '' : mysql_real_escape_string($friend['url']);
 	    
-		$sql="INSERT INTO m_social_contacts (uid,gid,following_uid,following_gid,following_uname,following_name)
-				VALUES('".$uid."','".$gid."','".$following_uid."','".$following_gid."','".$following_uname."','".$following_name."')";
-		
-	//	die('<pre>'.$sql.'</pre>');
-		mysql_query($sql,$linkid);
-		if(mysql_errno($linkid)) {
-		    $this->print_error(array("status"=>"error","response"=>mysql_error($linkid)));
-		}
-		else { 
+	    $frnd_uid=$frnd_id=mysql_real_escape_string($friend['id']);
+	    
+	    if(!empty($frnd_uid) && !empty($frnd_displayname) )
+	    {
+		$profile_res=mysql_query("SELECT * FROM m_social_contacts WHERE uid='".$uid."' AND gid='".$gid."' AND following_uid='".$frnd_uid."' AND following_gid='".$frnd_id."' LIMIT 1",$linkid) or $this->print_error(mysql_error($linkid));
+		if(mysql_num_rows($profile_res)>0)
+		{
+		    $profile_det=mysql_fetch_assoc($profile_res);
+		    $rowid=$profile_det['sno'];
+		    $sql="UPDATE m_social_contacts SET `following_uname`='".$frnd_displayname."',`following_name`='".$frnd_displayname."',`url`='".$frnd_url."'
+				WHERE sno='".$rowid."' ";
+		    mysql_query($sql) or $this->print_error(mysql_error($linkid));
 
-		    $rslt_arr = array("status"=>"success",'following_uid'=>$following_uid,'message'=>"Contact Created");
+		    if(mysql_errno($linkid)) {
+			$rslt_arr[$frnd_uid]='Not Updated'; //$this->print_error(array("status"=>"error","response"=>mysql_error($linkid)));
+		    }
+		    else {
+			$rslt_arr[$frnd_uid]='Updated'; //$rslt_arr = array("status"=>"success",'following_uid'=>$frnd_uid,'message'=>"Contact Updated");
+		    }
 		}
+		else {
+		    $sql="INSERT INTO m_social_contacts (uid,gid,following_uid,following_gid,following_uname,following_name,url)
+				    VALUES('".$uid."','".$gid."','".$frnd_uid."','".$frnd_id."','".$frnd_displayname."','".$frnd_displayname."','".$frnd_url."')";
+
+		    mysql_query($sql,$linkid);
+		    if(mysql_errno($linkid)) {
+			$rslt_arr[$frnd_uid]='Not Added'; //$this->print_error(array("status"=>"error","response"=>mysql_error($linkid)));
+		    }
+		    else {
+			$rslt_arr[$frnd_uid]='Added';
+		    }
+		}
+	    }
 	}
-        return $rslt_arr;
+	$response="No friends updated";
+	if(!empty($rslt_arr))
+	    $response="Contacts updated";
+	
+        return array("status"=>"success",'response'=>$response,'result'=>$rslt_arr);
     }
 
     /**

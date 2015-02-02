@@ -54,7 +54,9 @@ class Google_Auth_LoginTicket
     if (array_key_exists(self::USER_ATTR, $this->payload)) {
       return $this->payload[self::USER_ATTR];
     }
-    throw new Google_Auth_Exception("No user_id in token");
+    //throw new Google_Auth_Exception("No user_id in token");
+    echo json_encode(array('status'=>FALSE,'response-code'=>400,'response'=>"No user_id in token" ,'message'=>"No user_id in token",'map'=>''));
+    die();
   }
 
   /**

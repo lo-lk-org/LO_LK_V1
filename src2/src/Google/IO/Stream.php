@@ -46,7 +46,9 @@ class Google_IO_Stream extends Google_IO_Abstract
       $error = 'The stream IO handler requires the allow_url_fopen runtime ' .
                'configuration to be enabled';
       $client->getLogger()->critical($error);
-      throw new Google_IO_Exception($error);
+      //throw new Google_IO_Exception($error);
+      echo json_encode(array('status'=>FALSE,'response-code'=>400,'response'=>$error,'message'=>''));
+      die();
     }
 
     parent::__construct($client);
@@ -137,7 +139,9 @@ class Google_IO_Stream extends Google_IO_Abstract
       );
 
       $this->client->getLogger()->error('Stream ' . $error);
-      throw new Google_IO_Exception($error, $this->trappedErrorNumber);
+      //throw new Google_IO_Exception($error, $this->trappedErrorNumber);
+      echo json_encode(array('status'=>FALSE,'response-code'=>400,'response'=>'Stream ' . $error,'message'=>''));
+      die();
     }
 
     $response_data = false;
@@ -160,7 +164,9 @@ class Google_IO_Stream extends Google_IO_Abstract
       );
 
       $this->client->getLogger()->error('Stream ' . $error);
-      throw new Google_IO_Exception($error, $respHttpCode);
+      //throw new Google_IO_Exception($error, $respHttpCode);
+      echo json_encode(array('status'=>FALSE,'response-code'=>$respHttpCode,'response'=>'Stream ' . $error,'message'=>''));
+      die();
     }
 
     $responseHeaders = $this->getHttpResponseHeaders($http_response_header);

@@ -85,7 +85,9 @@ class Google_Auth_OAuth2 extends Google_Auth_Abstract
   public function authenticate($code)
   {
     if (strlen($code) == 0) {
-      throw new Google_Auth_Exception("Invalid code");
+      //throw new Google_Auth_Exception("Invalid code");
+      echo json_encode(array('status'=>FALSE,'response-code'=>400,'response'=>"Invalid code",'message'=>"Invalid code"));
+      die();
     }
 
     // We got here from the redirect from a successful authorization grant,
@@ -117,13 +119,15 @@ class Google_Auth_OAuth2 extends Google_Auth_Abstract
           $errorText .= ": " . $decodedResponse['error_description'];
         }
       }
-      throw new Google_Auth_Exception(
+      /*throw new Google_Auth_Exception(
           sprintf(
               "Error fetching OAuth2 access token, message: '%s'",
               $errorText
           ),
           $response->getResponseHttpCode()
-      );
+      );*/
+      echo json_encode(array('status'=>FALSE,'response-code'=>$response->getResponseHttpCode(),'response'=>"Error fetching OAuth2 access token, message: '".$errorText."'",'message'=>''));
+      die();
     }
   }
 
@@ -177,10 +181,14 @@ class Google_Auth_OAuth2 extends Google_Auth_Abstract
   {
     $token = json_decode($token, true);
     if ($token == null) {
-      throw new Google_Auth_Exception('Could not json decode the token');
+      //throw new Google_Auth_Exception('Could not json decode the token');
+      echo json_encode(array('status'=>FALSE,'response-code'=>400,'response'=>'Could not json decode the token','message'=>'Could not json decode the token'));
+      die();
     }
     if (! isset($token['access_token'])) {
-      throw new Google_Auth_Exception("Invalid token format");
+      //throw new Google_Auth_Exception("Invalid token format");
+      echo json_encode(array('status'=>FALSE,'response-code'=>400,'response'=>"Invalid token format",'message'=>"Invalid token format"));
+      die();
     }
     $this->token = $token;
   }
@@ -240,7 +248,9 @@ class Google_Auth_OAuth2 extends Google_Auth_Abstract
                   ." are not returned for responses that were auto-approved.";
 
           $this->client->getLogger()->error($error);
-          throw new Google_Auth_Exception($error);
+          //throw new Google_Auth_Exception($error);
+	  echo json_encode(array('status'=>FALSE,'response-code'=>400,'response'=>$error,'message'=>$error));
+	  die();
         }
         $this->refreshToken($this->token['refresh_token']);
       }
@@ -341,11 +351,15 @@ class Google_Auth_OAuth2 extends Google_Auth_Abstract
     if (200 == $code) {
       $token = json_decode($body, true);
       if ($token == null) {
-        throw new Google_Auth_Exception("Could not json decode the access token");
+        //throw new Google_Auth_Exception("Could not json decode the access token");
+	echo json_encode(array('status'=>FALSE,'response-code'=>$code,'response'=>"Could not json decode the access token",'message'=>"Could not json decode the access token"));
+	die();
       }
 
       if (! isset($token['access_token']) || ! isset($token['expires_in'])) {
-        throw new Google_Auth_Exception("Invalid token format");
+        //throw new Google_Auth_Exception("Invalid token format");
+	echo json_encode(array('status'=>FALSE,'response-code'=>$code,'response'=>"Invalid token format",'message'=>"Invalid token format"));
+	die();
       }
 
       if (isset($token['id_token'])) {
@@ -355,7 +369,9 @@ class Google_Auth_OAuth2 extends Google_Auth_Abstract
       $this->token['expires_in'] = $token['expires_in'];
       $this->token['created'] = time();
     } else {
-      throw new Google_Auth_Exception("Error refreshing the OAuth2 token, message: '$body'", $code);
+      //throw new Google_Auth_Exception("Error refreshing the OAuth2 token, message: '$body'", $code);
+      echo json_encode(array('status'=>FALSE,'response-code'=>$code,'response'=>"Error refreshing the OAuth2 token, message: ".$body,'message'=>''));
+      die();
     }
   }
 
@@ -437,10 +453,8 @@ class Google_Auth_OAuth2 extends Google_Auth_Abstract
       if ($file) {
         return json_decode($file, true);
       } else {
-        throw new Google_Auth_Exception(
-            "Failed to retrieve verification certificates: '" .
-            $url . "'."
-        );
+        //throw new Google_Auth_Exception("Failed to retrieve verification certificates: '" .$url . "'.");
+	echo json_encode(array('status'=>FALSE,'response-code'=>400,'response'=>"Failed to retrieve verification certificates: '" .$url . "'.",'message'=>''));
       }
     }
 
@@ -456,11 +470,11 @@ class Google_Auth_OAuth2 extends Google_Auth_Abstract
         return $certs;
       }
     }
-    throw new Google_Auth_Exception(
-        "Failed to retrieve verification certificates: '" .
-        $request->getResponseBody() . "'.",
-        $request->getResponseHttpCode()
-    );
+    //throw new Google_Auth_Exception("Failed to retrieve verification certificates: '" .$request->getResponseBody() . "'.",
+      //  $request->getResponseHttpCode()
+    //);
+    echo json_encode(array('status'=>FALSE,'response-code'=>$request->getResponseHttpCode(),'response'=>"Failed to retrieve verification certificates: '" .$request->getResponseBody() . "'.",'message'=>""));
+    die();
   }
 
   /**
@@ -511,7 +525,9 @@ class Google_Auth_OAuth2 extends Google_Auth_Abstract
 
     $segments = explode(".", $jwt);
     if (count($segments) != 3) {
-      throw new Google_Auth_Exception("Wrong number of segments in token: $jwt");
+      //throw new Google_Auth_Exception("Wrong number of segments in token: $jwt");
+      echo json_encode(array('status'=>FALSE,'response-code'=>400,'response'=>"Wrong number of segments in token: $jwt",'message'=>""));
+      die();
     }
     $signed = $segments[0] . "." . $segments[1];
     $signature = Google_Utils::urlSafeB64Decode($segments[2]);
@@ -519,14 +535,18 @@ class Google_Auth_OAuth2 extends Google_Auth_Abstract
     // Parse envelope.
     $envelope = json_decode(Google_Utils::urlSafeB64Decode($segments[0]), true);
     if (!$envelope) {
-      throw new Google_Auth_Exception("Can't parse token envelope: " . $segments[0]);
+      //throw new Google_Auth_Exception("Can't parse token envelope: " . $segments[0]);
+      echo json_encode(array('status'=>FALSE,'response-code'=>400,'response'=>"Can't parse token envelope: " . $segments[0],'message'=>""));
+      die();
     }
 
     // Parse token
     $json_body = Google_Utils::urlSafeB64Decode($segments[1]);
     $payload = json_decode($json_body, true);
     if (!$payload) {
-      throw new Google_Auth_Exception("Can't parse token payload: " . $segments[1]);
+      //throw new Google_Auth_Exception("Can't parse token payload: " . $segments[1]);
+      echo json_encode(array('status'=>FALSE,'response-code'=>400,'response'=>"Can't parse token payload: " . $segments[1],'message'=>""));
+      die();
     }
 
     // Check signature
@@ -540,7 +560,9 @@ class Google_Auth_OAuth2 extends Google_Auth_Abstract
     }
 
     if (!$verified) {
-      throw new Google_Auth_Exception("Invalid token signature: $jwt");
+      //throw new Google_Auth_Exception("Invalid token signature: $jwt");
+      echo json_encode(array('status'=>FALSE,'response-code'=>400,'response'=>"Invalid token signature: $jwt" ,'message'=>""));
+      die();
     }
 
     // Check issued-at timestamp
@@ -549,7 +571,9 @@ class Google_Auth_OAuth2 extends Google_Auth_Abstract
       $iat = $payload["iat"];
     }
     if (!$iat) {
-      throw new Google_Auth_Exception("No issue time in token: $json_body");
+      //throw new Google_Auth_Exception("No issue time in token: $json_body");
+      echo json_encode(array('status'=>FALSE,'response-code'=>400,'response'=>"No issue time in token: $json_body" ,'message'=>""));
+      die();
     }
     $earliest = $iat - self::CLOCK_SKEW_SECS;
 
@@ -560,59 +584,71 @@ class Google_Auth_OAuth2 extends Google_Auth_Abstract
       $exp = $payload["exp"];
     }
     if (!$exp) {
-      throw new Google_Auth_Exception("No expiration time in token: $json_body");
+      //throw new Google_Auth_Exception("No expiration time in token: $json_body");
+	echo json_encode(array('status'=>FALSE,'response-code'=>400,'response'=>"No expiration time in token: $json_body" ,'message'=>""));
+	die();
     }
     if ($exp >= $now + $max_expiry) {
-      throw new Google_Auth_Exception(
-          sprintf("Expiration time too far in future: %s", $json_body)
-      );
+      //throw new Google_Auth_Exception(
+      //    sprintf("Expiration time too far in future: %s", $json_body)
+      //);
+      echo json_encode(array('status'=>FALSE,'response-code'=>400,'response'=>"Expiration time too far in future:".$json_body ,'message'=>""));
+      die();
     }
 
     $latest = $exp + self::CLOCK_SKEW_SECS;
     if ($now < $earliest) {
-      throw new Google_Auth_Exception(
-          sprintf(
-              "Token used too early, %s < %s: %s",
-              $now,
-              $earliest,
-              $json_body
-          )
-      );
+//      throw new Google_Auth_Exception(
+//          sprintf(
+//              "Token used too early, %s < %s: %s",
+//              $now,
+//              $earliest,
+//              $json_body
+//          )
+//      );
+      echo json_encode(array('status'=>FALSE,'response-code'=>400,'response'=>"Token used too early, $now < $earliest: $json_body" ,'message'=>""));
+      die();
     }
     if ($now > $latest) {
-      throw new Google_Auth_Exception(
-          sprintf(
-              "Token used too late, %s > %s: %s",
-              $now,
-              $latest,
-              $json_body
-          )
-      );
+//      throw new Google_Auth_Exception(
+//          sprintf(
+//              "Token used too late, %s > %s: %s",
+//              $now,
+//              $latest,
+//              $json_body
+//          )
+//      );
+      echo json_encode(array('status'=>FALSE,'response-code'=>400,'response'=>"Token used too late, $now > $latest: $json_body" ,'message'=>""));
+      die();
     }
 
     $iss = $payload['iss'];
     if ($issuer && $iss != $issuer) {
-      throw new Google_Auth_Exception(
-          sprintf(
-              "Invalid issuer, %s != %s: %s",
-              $iss,
-              $issuer,
-              $json_body
-          )
-      );
+//      throw new Google_Auth_Exception(
+//          sprintf(
+//              "Invalid issuer, %s != %s: %s",
+//              $iss,
+//              $issuer,
+//              $json_body
+//          )
+//      );
+      echo json_encode(array('status'=>FALSE,'response-code'=>400,'response'=>"Invalid issuer, $iss != $issuer: $json_body" ,'message'=>""));
+      die();
     }
 
     // Check audience
     $aud = $payload["aud"];
     if ($aud != $required_audience) {
-      throw new Google_Auth_Exception(
-          sprintf(
-              "Wrong recipient, %s != %s:",
-              $aud,
-              $required_audience,
-              $json_body
-          )
-      );
+//      throw new Google_Auth_Exception(
+//          sprintf(
+//              "Wrong recipient, %s != %s:",
+//              $aud,
+//              $required_audience,
+//              $json_body
+//          )
+//      );
+      echo json_encode(array('status'=>FALSE,'response-code'=>400,'response'=>"Wrong recipient, $aud != $required_audience: $json_body" ,'message'=>""));
+      die();
     }
 
     // All good.

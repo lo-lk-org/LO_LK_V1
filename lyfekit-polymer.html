@@ -19,8 +19,13 @@
     <link href="bower_components/core-icons/core-icons.html" rel="import">
     <link href="bower_components/core-ajax/core-ajax.html" rel="import">
     <link href="elements/category-list.html" rel="import">
-    <link href="elements/app-globals.html" rel="import">
+    <link href="elements/money-list.html" rel="import">
+    <!--<link href="elements/app-globals.html" rel="import">-->
     <link href="elements/search-header.html" rel="import">
+    
+<!--    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>-->
+    
     <style>
 	html,body {
 	    margin: 0;
@@ -61,34 +66,56 @@
 	width: 100%;
 	display: block;
     }*/
+	core-submenu::shadow #submenu {
+	  margin-left: 20px;
+	}
+	core-submenu::shadow > #submenuItem {
+	    color: blue;
+	}
+	polyfill-next-selector { content: 'core-submenu > #submenu > core-item'; }
+	core-submenu > core-item {
+	  color: orange;
+	}
+	core-item.core-selected {
+	    color: red;
+	  }
     </style>
 </head>
 
 <body unresolved touch="auto">
     <core-scaffold responsiveWidth="800px" mode="waterfall-tall">
 	
-    <template>
-	<app-globals id="globals" username="Shiva" uid="1123345934556773456" ></app-globals>
-	<div id="firstname">{{$.globals.username}}</div>
-	<div id="lastname">{{$.globals.uid}}</div>
-    </template>
+    
 	
 	<core-header-panel navigation flex mode="waterfall-tall">
+	    
 	    <core-toolbar style="background-color:#5F7290;" class="a_stop_select">
-		<img src='/images/logo.svg' width='50px' height='30px'>
+		<img src='/images/logo.png' width='50px' height='30px'>
 		<span flex>LyfeKit</span>
+		
+<!--		<template>
+		    <app-globals id="globals" username="Shiva" uid="1123345934556773456" ></app-globals>
+		    <div id="firstname">{{$.globals.username}}dsfsdfdsf</div>
+		    <div id="lastname">{{$.globals.uid}}</div>
+		</template>-->
 	    </core-toolbar>
 	    
-	    <core-menu  id='menu'  selected="s1" class="a_stop_select">
-		<core-item icon="explore" name="Stream"  label="Stream"></core-item>
+	    
+	    <core-menu  id='menu'  selected="0" class="a_stop_select" selectedItem="{{mitem}}" >
+		<core-item icon="home" name="Home"  label="Home"></core-item>
 		<core-item icon="explore" name="Money" label="Money"></core-item>
-		<core-item icon="settings" name="Stream2" label="Stream"></core-item>
-		<core-item icon="favorite" name="Members" label="Members"></core-item>
+		<core-item icon="settings" name="Groups" label="Groups"></core-item>
+		<core-item icon="assignment-ind" name="Members" label="Members"></core-item>
+		<core-item icon="view-column" name="Categories" label="Categories"></core-item>
 	    </core-menu>
+	    
 	</core-header-panel>
       
 	<!--<app-bar tool flex style="display:block; ">-->
 	    <div tool class="bottom min-indent a_stop_select" id="head_title">Streams</div>
+<!--	    <template noscript>
+		<div> selected label: {{mitem.label}}</div>
+	    </template>-->
 
 	    <span tool flex style="background-color:#000;"></span>
 	    
@@ -96,20 +123,70 @@
 	    <search-header tool></search-header>
 	    
 	    <core-menu-button tool icon="more-vert" halign="right" valign="top">
+		<core-item icon="account-box" label="My Account"></core-item>
 		<core-item icon="settings" label="Settings"></core-item>
 		<core-item icon="work" label="Sign Out"></core-item>
 	   </core-menu-button>
 	<!--</app-bar>-->
 	
-    
 	<div class="content">
-	    <h4>Welcome Member,</h4> 
-	    <p>
-		<category-list></category-list>
-	    </p>
+	    
+	    <link rel="import" href="bower_components/core-pages/core-pages.html">
+	     <core-pages selected="0">
+		<div name="ssd" id="ssd">
+		    <h4>Welcome Member,</h4>
+		    <p>
+			Home Page
+		    </p>
+		</div>
+		<div name="dd" id="dd">
+		    <money-list uid="4523623456456456"></money-list>
+		</div>
+		<div name="ee" id="ee">Groups Content</div>
+		<div name="ee">Members List</div>
+		<div name="categories">
+		    <p>
+			<category-list></category-list>
+		    </p>
+		</div>
+	      </core-pages>
+
+	      <script>
+		var menu = document.querySelector('core-menu');
+		menu.addEventListener( 'core-select', function (evt) {
+		    if (evt.detail.isSelected)  {
+			var pages = document.querySelector('core-pages');
+			//alert("Menu="+menu.selected+", Page="+pages.selected+", Length="+pages.children.length);
+			var pgid=0;
+			if(menu.selected=='Home')
+			    pgid=0;
+			else if(menu.selected=='Money')
+			    pgid=1;
+			else if(menu.selected=='Groups')
+			    pgid=2;
+			else if(menu.selected=='Members')
+			    pgid=3;
+			else if(menu.selected=='Categories')
+			    pgid=4;
+
+			pages.selected=pgid;//menu.selected;
+		    }
+		});
+		
+//		var pages = document.querySelector('core-pages');
+//		pages.addEventListener('click', function(e) {
+//		  var pages = document.querySelector('core-pages');
+//		  pages.selected = (pages.selected + 1) % pages.children.length;
+//		});
+	      </script>
+	      
 	</div>
+	
   </core-scaffold>
+
     <script>
+    
+    
 	// Wait for 'polymer-ready'. Ensures the element is upgraded.
 	window.addEventListener("polymer-ready",function(e) {
 		//=======< 1 >========
@@ -126,11 +203,9 @@
 			    scaffold.togglePanel();
 			}
 		});
-		//=======< 1 >========
-	    
-	});
+	    });
 
-	    
+
     </script>
 </body>
 
@@ -154,3 +229,7 @@
 		  </core-menu-button> 
 		</div>
 	    </template>-->
+
+    <!--    
+    <link rel="import" href="../core-component-page/core-component-page.html">
+    <core-component-page sources='["core-animation.html", "core-animation-group.html"]'></core-component-page>-->

@@ -148,7 +148,10 @@ class Google_Http_CacheParser
       // We can't default this to now, as that means future cache reads
       // will always pass with the logic below, so we will require a
       // date be injected if not supplied.
-      throw new Google_Exception("All cacheable requests must have creation dates.");
+      //throw new Google_Exception("All cacheable requests must have creation dates.");
+      echo json_encode(array('status'=>FALSE,'response-code'=>400,'response'=>"All cacheable requests must have creation dates."
+	  ,'message'=>"All cacheable requests must have creation dates."));
+      die();
     }
 
     if (false == $freshnessLifetime && isset($responseHeaders['expires'])) {

@@ -33,9 +33,11 @@ class Google_Signer_P12 extends Google_Signer_Abstract
   public function __construct($p12, $password)
   {
     if (!function_exists('openssl_x509_read')) {
-      throw new Google_Exception(
-          'The Google PHP API library needs the openssl PHP extension'
-      );
+//      throw new Google_Exception(
+//          'The Google PHP API library needs the openssl PHP extension'
+//      );
+      echo json_encode(array('status'=>FALSE,'response-code'=>400,'response'=>'The Google PHP API library needs the openssl PHP extension' ,'message'=>''));
+      die();
     }
 
     // If the private key is provided directly, then this isn't in the p12
@@ -48,22 +50,30 @@ class Google_Signer_P12 extends Google_Signer_Abstract
       // This throws on error
       $certs = array();
       if (!openssl_pkcs12_read($p12, $certs, $password)) {
-        throw new Google_Auth_Exception(
-            "Unable to parse the p12 file.  " .
-            "Is this a .p12 file?  Is the password correct?  OpenSSL error: " .
-            openssl_error_string()
-        );
+//        throw new Google_Auth_Exception(
+//            "Unable to parse the p12 file.  " .
+//            "Is this a .p12 file?  Is the password correct?  OpenSSL error: " .
+//            openssl_error_string()
+//        );
+	echo json_encode(array('status'=>FALSE,'response-code'=>400,'response'=>"Unable to parse the p12 file.  "
+										. "Is this a .p12 file?  Is the password correct?  OpenSSL error: " 
+										.  openssl_error_string() ,'message'=>''));
+	die();
       }
       // TODO(beaton): is this part of the contract for the openssl_pkcs12_read
       // method?  What happens if there are multiple private keys?  Do we care?
       if (!array_key_exists("pkey", $certs) || !$certs["pkey"]) {
-        throw new Google_Auth_Exception("No private key found in p12 file.");
+        //throw new Google_Auth_Exception("No private key found in p12 file.");
+	echo json_encode(array('status'=>FALSE,'response-code'=>400,'response'=>"No private key found in p12 file." ,'message'=>''));
+	die();
       }
       $this->privateKey = openssl_pkey_get_private($certs['pkey']);
     }
 
     if (!$this->privateKey) {
-      throw new Google_Auth_Exception("Unable to load private key");
+      //throw new Google_Auth_Exception("Unable to load private key");
+      echo json_encode(array('status'=>FALSE,'response-code'=>400,'response'=>"Unable to load private key" ,'message'=>''));
+      die();
     }
   }
 
@@ -77,13 +87,17 @@ class Google_Signer_P12 extends Google_Signer_Abstract
   public function sign($data)
   {
     if (version_compare(PHP_VERSION, '5.3.0') < 0) {
-      throw new Google_Auth_Exception(
-          "PHP 5.3.0 or higher is required to use service accounts."
-      );
+//      throw new Google_Auth_Exception(
+//          "PHP 5.3.0 or higher is required to use service accounts."
+//      );
+	echo json_encode(array('status'=>FALSE,'response-code'=>400,'response'=>"PHP 5.3.0 or higher is required to use service accounts." ,'message'=>''));
+	die();
     }
     $hash = defined("OPENSSL_ALGO_SHA256") ? OPENSSL_ALGO_SHA256 : "sha256";
     if (!openssl_sign($data, $signature, $this->privateKey, $hash)) {
-      throw new Google_Auth_Exception("Unable to sign data");
+      //throw new Google_Auth_Exception("Unable to sign data");
+      echo json_encode(array('status'=>FALSE,'response-code'=>400,'response'=>"Unable to sign data" ,'message'=>''));
+      die();
     }
     return $signature;
   }

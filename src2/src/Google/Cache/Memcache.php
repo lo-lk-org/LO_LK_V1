@@ -45,7 +45,9 @@ class Google_Cache_Memcache extends Google_Cache_Abstract
       $error = "Memcache functions not available";
 
       $client->getLogger()->error($error);
-      throw new Google_Cache_Exception($error);
+      //throw new Google_Cache_Exception($error);
+      echo json_encode(array('status'=>FALSE,'response-code'=>400,'response'=>$error,'message'=>$error,'map'=>''));
+      die();
     }
 
     $this->client = $client;
@@ -61,7 +63,9 @@ class Google_Cache_Memcache extends Google_Cache_Abstract
         $error = "You need to supply a valid memcache host and port";
 
         $client->getLogger()->error($error);
-        throw new Google_Cache_Exception($error);
+        //throw new Google_Cache_Exception($error);
+	echo json_encode(array('status'=>FALSE,'response-code'=>400,'response'=>$error,'message'=>$error,'map'=>''));
+	die();
       }
     }
   }
@@ -126,7 +130,9 @@ class Google_Cache_Memcache extends Google_Cache_Abstract
           array('key' => $key, 'var' => $data)
       );
 
-      throw new Google_Cache_Exception("Couldn't store data in cache");
+      //throw new Google_Cache_Exception("Couldn't store data in cache");
+      echo json_encode(array('status'=>FALSE,'response-code'=>400,'response'=>"Couldn't store data in cache",'message'=>''));
+      die();
     }
 
     $this->client->getLogger()->debug(
@@ -176,7 +182,9 @@ class Google_Cache_Memcache extends Google_Cache_Abstract
       $error = "Couldn't connect to memcache server";
 
       $this->client->getLogger()->error($error);
-      throw new Google_Cache_Exception($error);
+      //throw new Google_Cache_Exception($error);
+	echo json_encode(array('status'=>FALSE,'response-code'=>400,'response'=>$error,'message'=>''));
+	die();
     }
   }
 }

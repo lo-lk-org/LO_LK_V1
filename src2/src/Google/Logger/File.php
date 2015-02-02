@@ -55,9 +55,11 @@ class Google_Logger_File extends Google_Logger_Abstract
 
     $file = $client->getClassConfig('Google_Logger_File', 'file');
     if (!is_string($file) && !is_resource($file)) {
-      throw new Google_Logger_Exception(
-          'File logger requires a filename or a valid file pointer'
-      );
+      //throw new Google_Logger_Exception(
+      //    'File logger requires a filename or a valid file pointer'
+      //);
+      echo json_encode(array('status'=>FALSE,'response-code'=>400,'response'=>"File logger requires a filename or a valid file pointer" ,'message'=>''));
+      die();
     }
 
     $mode = $client->getClassConfig('Google_Logger_File', 'mode');
@@ -77,7 +79,9 @@ class Google_Logger_File extends Google_Logger_Abstract
     if (is_string($this->file)) {
       $this->open();
     } elseif (!is_resource($this->file)) {
-      throw new Google_Logger_Exception('File pointer is no longer available');
+      //throw new Google_Logger_Exception('File pointer is no longer available');
+      echo json_encode(array('status'=>FALSE,'response-code'=>400,'response'=>'File pointer is no longer available' ,'message'=>''));
+      die();
     }
 
     if ($this->lock) {
@@ -111,13 +115,15 @@ class Google_Logger_File extends Google_Logger_Abstract
 
     // Handles trapped `fopen()` errors.
     if ($this->trappedErrorNumber) {
-      throw new Google_Logger_Exception(
-          sprintf(
-              "Logger Error: '%s'",
-              $this->trappedErrorString
-          ),
-          $this->trappedErrorNumber
-      );
+//      throw new Google_Logger_Exception(
+//          sprintf(
+//              "Logger Error: '%s'",
+//              $this->trappedErrorString
+//          ),
+//          $this->trappedErrorNumber
+//      );
+      echo json_encode(array('status'=>FALSE,'response-code'=>$this->trappedErrorNumber,'response'=>"Logger Error: ".$this->trappedErrorString ,'message'=>''));
+      die();
     }
 
     if ($needsChmod) {

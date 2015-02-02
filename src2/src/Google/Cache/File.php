@@ -111,7 +111,10 @@ class Google_Cache_File extends Google_Cache_Abstract
           'File cache delete failed',
           array('key' => $key, 'file' => $file)
       );
-      throw new Google_Cache_Exception("Cache file could not be deleted");
+      //throw new Google_Cache_Exception("Cache file could not be deleted");
+      echo json_encode(array('status'=>FALSE,'response-code'=>400,'response'=>"Cache file could not be deleted"
+	  ,'message'=>"Cache file could not be deleted",'map'=>''));
+      die();
     }
 
     $this->client->getLogger()->debug(
@@ -142,7 +145,10 @@ class Google_Cache_File extends Google_Cache_Abstract
             'File cache creation failed',
             array('dir' => $storageDir)
         );
-        throw new Google_Cache_Exception("Could not create storage directory: $storageDir");
+        //throw new Google_Cache_Exception("Could not create storage directory: $storageDir");
+	echo json_encode(array('status'=>FALSE,'response-code'=>400,'response'=>"Could not create storage directory: $storageDir"
+	  ,'message'=>"Could not create storage directory: $storageDir",'map'=>''));
+	die();
       }
     }
     return $storageDir;

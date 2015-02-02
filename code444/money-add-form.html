@@ -1,0 +1,104 @@
+<!--
+/**
+ * @author Shivaraj <mrshivaraj123@gmail.com> Jan_17_2015
+ * @tutorial Sample file
+ */
+-->
+<link rel="import" href="../bower_components/polymer/polymer.html">
+
+
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+
+<link rel="import" href="../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+
+<link rel="import" href="../bower_components/paper-dialog/paper-dialog-transition.html">
+<link rel="import" href="../bower_components/paper-dialog/paper-dialog.html">
+
+<polymer-element name="money-add-form">
+    <template>
+    <form is="money-form" method="post" enctype="multipart/form-data" action="form_handler">
+		
+	    </form>
+	    
+	    <polymer-element name="money-form" extends="form" on-submit="{{ prepareSubmit }}" on-click="{{ handleClick }}">
+		<script>
+		  Polymer('money-form', {
+
+		    handleClick: function(event, detail, sender) {
+			alert("dfgkjsdfg");
+		      if (event.target.localName.indexOf('-') !== -1 && event.target.getAttribute('type') === 'submit') {
+			this.prepareSubmit();
+			console.log(this);
+			return false;
+			//this.submit();
+		      }
+		    },
+
+		    prepareSubmit: function() {
+			alert("SUBMITTING");
+		      Array.prototype.forEach.call(this.children, function(child) {
+			var name = child.getAttribute('name');
+
+			// Add <input type="hidden">s for all custom elements with a name and value besides submit buttons
+			if (child.localName.indexOf('-') !== -1 && name && 'value' in child && child.getAttribute('type') !== 'submit') {
+			  element = document.createElement('input');
+			  element.setAttribute('type', 'hidden');
+			  element.setAttribute('name', name);
+			  element.setAttribute('value', child.value);
+			  this.appendChild(element);
+			}
+		      }.bind(this));
+		    }
+
+		  });
+		</script>
+	      </polymer-element>
+    </template>
+    <script>
+	
+	Polymer('money-list',{
+	    ready : function(){
+		this.next_page=0;
+		this.uid="4523623456456456";
+		
+//		document.addEventListener('polymer-ready', function() {
+		    document.querySelector('#cards').addEventListener(
+			'polymer-card-swipe-away', function(e) {
+			    e.target.parentNode.removeChild(e.target);
+		    });
+//		});
+
+	    }
+	    ,toggleDialog: function(e, detail, sender) {
+		//var story = e.target.templateInstance.model.s;
+		var transition = 'paper-dialog-transition-bottom';//paper-dialog-transition-center
+//		console.log(e);
+//		console.log(detail);
+//		console.log(e.detail.label);
+//		console.log(sender);
+//		console.log(transition);
+		var dialog = this.$.container.querySelector('paper-dialog[transition=' + transition + ']');
+//		console.log(dialog);
+		dialog.toggle();
+		   		   
+		//console.log("Clicked " + story.headline);
+		//this.loadStory(story.id); // accessing non-rendered data from the model
+	    }
+	    
+	    //,params:'{"action":"read","module":"money","content_style":"list_content","uid":{{'+uid+'}},"tff":"","tft":"","q":"","limit":10,"page":0,"category_id":"","group_id":""}'
+//	    document.querySelector('#cards').addEventListener(
+//		'polymer-card-swipe-away', function(e) {
+//	      e.target.parentNode.removeChild(e.target);
+//	    });
+	});
+	
+//	  function toggleDialog(transition) {
+//	       var dialog = document.querySelector('paper-dialog[transition=' + transition + ']');
+//	       console.log(dialog);
+//	       //dialog.toggle();
+//	   }
+    </script>
+    
+
+</polymer-element>

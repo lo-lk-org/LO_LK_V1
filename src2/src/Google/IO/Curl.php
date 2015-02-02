@@ -35,7 +35,9 @@ class Google_IO_Curl extends Google_IO_Abstract
     if (!extension_loaded('curl')) {
       $error = 'The cURL IO handler requires the cURL extension to be enabled';
       $client->getLogger()->critical($error);
-      throw new Google_IO_Exception($error);
+      //throw new Google_IO_Exception($error);
+      echo json_encode(array('status'=>FALSE,'response-code'=>400,'response'=>$error,'message'=>$error));
+      die();
     }
 
     parent::__construct($client);
@@ -106,7 +108,9 @@ class Google_IO_Curl extends Google_IO_Abstract
       $map = $this->client->getClassConfig('Google_IO_Exception', 'retry_map');
 
       $this->client->getLogger()->error('cURL ' . $error);
-      throw new Google_IO_Exception($error, $code, null, $map);
+      //throw new Google_IO_Exception($error, $code, null, $map);
+      echo json_encode(array('status'=>FALSE,'response-code'=>$code,'response'=>$error,'message'=>$error,'map'=>$map));
+      die();
     }
     $headerSize = curl_getinfo($curl, CURLINFO_HEADER_SIZE);
 

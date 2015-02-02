@@ -108,7 +108,9 @@ class Google_Http_REST
             'retry_map'
         );
       }
-      throw new Google_Service_Exception($err, $code, null, $errors, $map);
+      //throw new Google_Service_Exception($err, $code, null, $errors, $map);
+      echo json_encode(array('status'=>FALSE,'response-code'=>$code,'response'=>$err,'message'=>$errors,"map"=>$map));
+      die();
     }
 
     // Only attempt to decode the response, if the response code wasn't (204) 'no content'
@@ -119,7 +121,9 @@ class Google_Http_REST
         if ($client) {
           $client->getLogger()->error($error);
         }
-        throw new Google_Service_Exception($error);
+        //throw new Google_Service_Exception($error);
+	echo json_encode(array('status'=>FALSE,'response-code'=>$code,'response'=>$error,'message'=>$body));
+	die();
       }
 
       if ($response->getExpectedClass()) {

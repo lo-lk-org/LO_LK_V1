@@ -1,5 +1,5 @@
 <?php
-header('Content-Type: application/json');
+//header('Content-Type: application/json');
 /**
  * @author Shivaraj <mrshivaraj123@gmail.com>_Sep_15_2014
  * @tutorial Root for api urls

@@ -1,0 +1,466 @@
+<!--
+ - @author Shivaraj <mrshivaraj123@gmail.com> Nov_20_2014
+ - @tutorial Sample file
+ - -->
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/core-ajax/core-ajax.html">
+
+<link rel="import" href="../bower_components/paper-ripple/paper-ripple.html">
+<link rel="import" href="../bower_components/core-icon/core-icon.html">
+<link rel="import" href="../bower_components/core-icons/core-icons.html">
+
+<link rel="import" href="../bower_components/polymer-ui-card/polymer-ui-card.html">
+
+<link rel="import" href="../bower_components/paper-fab/paper-fab.html">
+
+<link rel="import" href="../bower_components/font-roboto/roboto.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/paper-dialog/paper-dialog-transition.html">
+<link rel="import" href="../bower_components/paper-dialog/paper-dialog.html">
+
+<link rel="import" href="../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+
+<link rel="import" href="../bower_components/ajax-form/ajax-form.html">
+<link rel="stylesheet" href="../bower_components/ajax-form/demo_resources/alertify.core.css" />
+<link rel="stylesheet" href="../bower_components/ajax-form/demo_resources/alertify.default.css" />
+<script src="../bower_components/ajax-form/demo_resources/alertify.min.js"></script>
+
+<polymer-element name="money-list" attributes="uid"><!--noscript-->
+
+<template>
+    <link rel="stylesheet" href="css/money-list.css">
+    
+    <div id="container">
+	<h3>Expense list</h3>
+	
+	<!--
+	Show Money List
+	--->
+	<core-ajax id="moneylist" url="../api/" auto response="{{moneylist}}" params="{{money_url}}" method="POST" handleAs="json" contentType='application/json'>
+	</core-ajax>
+	<template if="{{moneylist.status=='success'}}">
+	    <div>Showing {{moneylist.num_rows}} items out of {{moneylist.total_rows}}.</div>
+
+	    <div id="cards-list" name="cards-list">
+		<template repeat="{{g in moneylist.money}}">
+		    <polymer-ui-card swipeable money_id="{{g.money_id}}">
+			<!--<paper-fab mini icon="favorite" class="right"></paper-fab>-->
+			<h4>{{g.money_title}}</h4>
+			<div>Rs. {{g.money_amount}}</div>
+			<br>
+			    <div><small>Created On {{g.timestamp}}</small></div>
+			<br>
+			<paper-fab mini icon="remove" right on-click="{{handleRemoveItem}}"></paper-fab>
+			<paper-fab mini icon="create" right on-click="{{handleEditItem}}"></paper-fab>
+		    </polymer-ui-card>
+		</template>
+	    </div>
+	</template>
+	<template bind if="{{moneylist.next_page}}">
+	    <a href="/lyfekit-polymer/{{moneylist.next_page}}">Next</a>
+	</template>
+	<template bind if="{{moneylist.status=='error'}}">
+	    <p>{{moneylist.response}}</p>
+	</template>
+	<core-ajax id="card_remove" url="../api/" on-core-response="{{moneyremoveResponse}}" params="" method="POST" handleAs="json" >
+	</core-ajax>
+	
+	 <!--Money Add form--> 
+	 <!--transition="paper-dialog-transition-bottom"-->
+	<paper-dialog heading="Add Money Item" transition="paper-dialog-transition-bottom"  autoCloseDisabled="true" heading="Expense Manage List" backdrop="true">
+	    
+	    <h1 id="pleaseWait" class="hidden">Sending your data...</h1>
+	    
+	    <form is="ajax-form" action="api_handler" method="post" id="money-add-form" name="money-add-form" cookies on-submit="{{ prepareSubmit }}"> <!--  headers='{"Content-Type": "application/json"}' -->
+		
+		<input type="hidden" name="action-type" value="money-add-form">
+		<input type="hidden" name="uid" value="{{uid}}">
+		
+		<table class="gridtable" cellpadding="6" cellspacing="0" width="100%" border="0">
+		    <tr>
+			<td><label>Expense Title :<span class="required">*</span></label> </td>
+			<td><input type="text" name="money_title" required></td>
+		    </tr>
+		    <tr>
+			<td><label>Expense Amount : <span class="required">*</span></label></td>
+			<td> <input type="number" name="money_amount" required step="0.5"></td>
+		    </tr>
+		    <tr>
+			<td><label>Unit price :<span class="required">*</span></label></td>
+			<td>
+			   <input type="number" name="item_unit_price" required step="0.5">
+			</td>
+		    </tr>
+		    <tr>
+			<td><label>Total  Units :<span class="required">*</span></label></td>
+			<td>
+			   <input type="number" name="item_units" required>
+			</td>
+		    </tr>
+		    <tr>
+			<td><label>Item Qty :<span class="required">*</span></label></td>
+			<td>
+			   <input type="number" name="item_qty" required>
+			</td>
+		    </tr>
+		    <tr>
+			<td><label>Total Price :<span class="required">*</span></label></td>
+			<td>
+			   <input type="number" name="total_price" required step="0.5">
+			</td>
+		    </tr>
+		    <tr>
+			<td><label>Money Direction :<span class="required">*</span></label></td>
+			<td>
+			    <input type="radio" name="money_flow_direction" value="0" checked> Out &nbsp;&nbsp;
+			    <input type="radio" name="money_flow_direction" value="1" > In
+			</td>
+		    </tr>
+		    <tr>
+			<td><label>Group :</label></td>
+			<td>
+			    <core-ajax url="../api/" auto response="{{grouplist}}" params='{{group_list_url}}' method="POST" handleAs="json">
+			    </core-ajax>
+			    <template if="{{grouplist.status=='success'}}">
+				<select name="group_id">
+				    <option value="0" selected>Select</option>
+				    <template repeat="{{g in grouplist.results}}">
+					<!--<paper-fab mini icon="favorite" class="right"></paper-fab>-->
+					    <option value="{{g.group_id}}">{{g.group_name}}</option>
+				    </template>
+				</select>
+			    </template>
+			    <template bind if="{{grouplist.status=='error'}}">
+				<select name="group_id"><option  value="0">{{grouplist.response}}</option></select>
+			    </template>
+			</td>
+		    </tr>
+		    <tr>
+			<td><label>Category :</label></td>
+			<td>
+			    <core-ajax url="../api/" auto response="{{categorylist}}" params="{{categorylist_url}}" method="POST" handleAs="json">
+			    </core-ajax>
+			    <template if="{{categorylist.status=='success'}}">
+				<select name="category_id" required>
+				    <option value="0" selected>Choose</option>
+				    <template repeat="{{g in categorylist.results}}">
+					<option value="{{g.category_id}}">{{g.category_name}}</option>
+				    </template>
+				</select>
+			    </template>
+			    <template if="{{categorylist.status=='error'}}">
+				<select name="category_id"><option value="0">{{categorylist.response}</select>
+			    </template>
+			</td>
+		    </tr>
+		    <tr>
+			<td><label>Privacy :</label></td>
+			<td>
+			    <select name="visibility" required>
+				<option value="pri" selected>Private</option>
+				<option value="pub">Public</option>
+			    </select>
+			</td>
+		    </tr>
+		    <!--<tr><td colspan="2" align="right"><input type="submit" name="ssss" class="btn" on-click="{{ handleSubmitClick }}" ></td></tr>-->
+		    <tr>
+			<td colspan="2">&nbsp;</td>
+		    </tr>
+		</table>
+		<div id="notify_block">&nbsp;</div>
+            </form>
+	     <!---->
+	    <paper-button dismissive>Close</paper-button>
+	    <paper-button type="submit" affirmative autofocus on-click="{{ handleSubmitClick }}">Add Item</paper-button>
+    	    <!--<paper-button label="More Info..." dismissive></paper-button><paper-button label="Add" affirmative autofocus></paper-button>-->
+
+<!--	    <polymer-element name="" extends="form" on-submit="{{ prepareSubmit }}" on-click="{{ handleClick }}" >
+		<script></script>
+	      </polymer-element>-->
+	    
+	</paper-dialog>
+
+	    <div class="fab red">
+	      <core-icon icon="add"></core-icon>
+	      <paper-ripple class="circle recenteringTouch" fit left on-click="{{toggleDialog}}"></paper-ripple>
+	    </div>
+<!--	    <div class="fab green">
+	      <core-icon icon="create"></core-icon>
+	      <paper-ripple class="circle recenteringTouch" fit></paper-ripple>
+	    </div>-->
+<!--	    <paper-button label="Transition A" onclick="toggleDialog('paper-dialog-transition-bottom')"></paper-button>
+	    <paper-button label="Transition B" onclick="toggleDialog('paper-dialog-transition-center')"></paper-button>
+	    <paper-button label="Transition c" on-click="{{toggleDialog}}"></paper-button>-->
+    </div>
+</template>
+    
+    <script>
+	Polymer('money-list',{
+	    ready : function(){
+		var uid = this.uid;
+		/**
+		 * action=read&module=money&content_style=list_content&uid=105890155775932582508&tff=2014-11-15&tft=2014-12-09&q=&limit=10&page=&category_id=&group_id=
+		 * Response: {"total_rows":17,"pages":2,"start_row":0,"current_page":1,"next_page":2,"money":[{"sno":1,"money_id":"22","uid":"105890155775932582508","lat":"4455.596"
+		 * ,"long":"1476.7893","visibility":"pub","money_title":"Shopping","money_amount":"3000","item_unit_price":"3000","item_units":"Rs","item_qty":"1"
+		 * ,"total_price":"3000","money_flow_direction":"0","file_id":"0","category_id":"5","modified_on":null,"timestamp":"2014-12-07 02:55:17","group_id":"1"
+		 * ,"time_string":"this_week"},{"sno":2,"money_id":"21","uid":"105890155775932582508","lat":"4455.596","long":"1476.7893","visibility":"pub","money_title":"Rent"
+		 * ,"money_amount":"6000","item_unit_price":"6000","item_units":"Rs","item_qty":"1","total_price":"6000","money_flow_direction":"0","file_id":"0"
+		 * ,"category_id":"5","modified_on":null,"timestamp":"2014-12-08 22:55:17","group_id":"1","time_string":"yesterday"},{"sno":3,"money_id":"20"
+		 * ,"uid":"105890155775932582508","lat":"17.4466519","long":"78.3906701","visibility":"pub","money_title":"shivaraj","money_amount":"500"
+		 * ,"item_unit_price":"30","item_units":"pc","item_qty":"6","total_price":"180","money_flow_direction":"1","file_id":"0","category_id":"2","modified_on":null
+		 * ,"timestamp":"2014-12-08 00:00:00","group_id":"0","time_string":"yesterday"},{"sno":4,"money_id":"19","uid":"105890155775932582508","lat":"17.4466806"
+		 * ,"long":"78.390669","visibility":"pub","money_title":"uday","money_amount":"1000","item_unit_price":"30","item_units":"pc","item_qty":"6","total_price":"180"
+		 * ,"money_flow_direction":"0","file_id":"0","category_id":"2","modified_on":null,"timestamp":"2014-12-03 00:00:00","group_id":"7","time_string":"this_week"}
+		 * ,{"sno":5,"money_id":"17","uid":"105890155775932582508","lat":"17.4467406","long":"78.3906874","visibility":"pub","money_title":"uday","money_amount":"500"
+		 * ,"item_unit_price":"30","item_units":"pc","item_qty":"6","total_price":"180","money_flow_direction":"0","file_id":"0","category_id":"2","modified_on":null
+		 * ,"timestamp":"2014-11-29 00:00:00","group_id":"7","time_string":"this_quarter"},{"sno":6,"money_id":"16","uid":"105890155775932582508","lat":"17.446767"
+		 * ,"long":"78.3907064","visibility":"pub","money_title":"hi","money_amount":"500","item_unit_price":"30","item_units":"pc","item_qty":"6","total_price":"180"
+		 * ,"money_flow_direction":"1","file_id":"0","category_id":"2","modified_on":null,"timestamp":"2014-11-23 00:00:00","group_id":"0","time_string":"this_quarter"}
+		 * ,{"sno":7,"money_id":"15","uid":"105890155775932582508","lat":"17.4467566","long":"78.3906908","visibility":"pub","money_title":"hres","money_amount":"500"
+		 * ,"item_unit_price":"30","item_units":"pc","item_qty":"6","total_price":"180","money_flow_direction":"1","file_id":"0","category_id":"0","modified_on":null
+		 * ,"timestamp":"2014-11-22 00:00:00","group_id":"0","time_string":"this_quarter"},{"sno":8,"money_id":"14","uid":"105890155775932582508","lat":"17.4467402"
+		 * ,"long":"78.3907055","visibility":"pub","money_title":"uday","money_amount":"800","item_unit_price":"30","item_units":"pc","item_qty":"6","total_price":"180"
+		 * ,"money_flow_direction":"0","file_id":"0","category_id":"0","modified_on":null,"timestamp":"2014-11-22 00:00:00","group_id":"0","time_string":"this_quarter"},{"sno":9,"money_id":"13","uid":"105890155775932582508","lat":"17.4466869","long":"78.3907073","visibility":"pub","money_title":"tgdd","money_amount":"568","item_unit_price":"30","item_units":"pc","item_qty":"6","total_price":"180","money_flow_direction":"0","file_id":"0","category_id":"0","modified_on":null,"timestamp":"2014-11-22 00:00:00","group_id":"0","time_string":"this_quarter"},{"sno":10,"money_id":"11","uid":"105890155775932582508","lat":"17.4467189","long":"78.3906952","visibility":"pub","money_title":"fgfg","money_amount":"800","item_unit_price":"30","item_units":"pc","item_qty":"6","total_price":"180","money_flow_direction":"1","file_id":"0","category_id":"0","modified_on":null,"timestamp":"2014-11-20 00:00:00","group_id":"0","time_string":"this_quarter"}]}-->
+		 */
+		this.money_url = '{"action":"read","module":"money","content_style":"list_content","uid":"'+uid+'","tff":"","tft":"","q":"","limit":2,"page":0,"category_id":"","group_id":""}';
+		/**
+		 * action=read&module=group&content_style=list_content&uid=105890155775932582508
+		 * Response:{"status":"success","num_rows":2,"results":[{"group_id":"3","group_type":"Business","group_name":"Group333","group_description":"5345erwerwer\r\n"
+		 *	    ,"group_owner_uid":"452362345","group_member_ctr":"0","file_id":"0","group_addr_line_1":"Ken\r\n","group_addr_line_2":"Kumba"
+		 *	    ,"group_addr_line_3":"Mysore","group_addr_city":"blr","group_addr_state":"kar","group_addr_country":"in","group_addr_zip":"567577"
+		 *	    ,"entity_id":"4","created_on":"2014-10-05 22:57:19"},{"group_id":"4","group_type":"Business","group_name":"Group22225555"
+		 *	    ,"group_description":"This is my second group","group_owner_uid":"452362345","group_member_ctr":"1","file_id":"0","group_addr_line_1":"Kengeri"
+		 *	    ,"group_addr_line_2":"kumbalagudu","group_addr_line_3":"mysore road","group_addr_city":"Bengaluru","group_addr_state":"Karnataka"
+		 *	    ,"group_addr_country":"India","group_addr_zip":"567577","entity_id":"2","created_on":"2014-10-02 05:28:54"}]}-->
+		 */
+		this.group_list_url = '{"action":"read","module":"group","content_style":"list_content","uid":"'+uid+'"}';
+		
+		this.categorylist_url='{"action":"read","module":"category","content_style":"list_content"}';
+		this.next_page=0;
+		
+		console.log("==cardBlock==");
+		var that=this;
+//		document.addEventListener('polymer-ready', function() {});
+		    var cardBlock=this.$.container.querySelector('#cards-list');
+		    
+		    console.log(cardBlock);
+		    console.log("==cardBlock==");
+//		    cardBlock.addEventListener('polymer-card-swipe-away', function(e) {
+//			    alert("dkdhjashdfjhasdf");
+//			    that.removed();
+//			    console.log(this);
+//			    e.target.parentNode.removeChild(e.target);
+//		    });
+	    }
+	    ,prepareSubmit: function(e, detail, sender) {
+		event.preventDefault();
+		/**
+		 * Input
+		 */
+		//this.$.container.querySelector("#dddd")
+		var moneyform = this.shadowRoot.querySelector("#money-add-form"); //document.getElementsByTagName('form')[0],
+		var content = this.shadowRoot.querySelector('#notify_block');
+		var pleaseWait = this.shadowRoot.querySelector('#pleaseWait');//document.getElementById('pleaseWait').className = 'hidden';
+		var transition = 'paper-dialog-transition-bottom';//paper-dialog-transition-center
+		var dialog = this.shadowRoot.querySelector('paper-dialog[transition=' + transition + ']');
+		//console.log(dialog);
+		
+		moneyform.addEventListener('invalid', function() {
+		    console.log("Validation error");
+		    alertify.error('Some form fields are invalid!');
+		});
+		
+		/**
+		 * Submit form
+		 */
+		if(!confirm("Are you sure want to add money item?"))
+		    return false;
+		
+		moneyform.addEventListener('submitting', function(event) {
+		    //alert("Submitting");
+		    pleaseWait.className = '';
+		    content.className = 'hidden';
+//		    event.detail.raytest = 'foobar';
+//		    event.detail.color = 'blue';
+		});
+		
+		moneyform.addEventListener('submitted', function(event) {
+		    event.preventDefault();
+		    moneyform.removeEventListener('submitted', eventCleared, false);
+		    
+//		    alert("Submitted");
+//		    console.log(event.detail);
+		    console.log(dialog);
+		    
+		    pleaseWait.className = 'hidden';
+		    content.className = '';
+
+		    if (event.detail.status > 299) {
+			alertify.error('Submission failed!  Please try again.');
+		    }
+		    else {
+			//console.log(event.detail.response);
+			var output=JSON.parse(event.detail.response); //console.log(output);
+			if(output.status=='success')
+			{
+			    alert(output.response);//'Your money item added successfully';
+			    dialog.toggle();
+//			    this.$.moneylist.params = (this.money_url);   
+//			    this.$.moneylist.go(); 
+			    
+			    window.location.reload(false);
+			    
+				/*Window.Location Object Description
+				assign(url)::Load the document at the provided URL.
+				reload(forceget)::Reload the document from the current URL. forceget is a boolean, which, when it is true, causes the page to always be reloaded from the server. If it is false or not specified, the browser may reload the page from its cache.
+				replace(url)::Replace the current document with the one at the provided URL. The difference from the assign() method is that after using replace() the current page will not be saved in session history, meaning the user won't be able to use the Back button to navigate to it.
+				toString()::Returns the string representation of the Location object's URL. See the JavaScript reference for details.*/
+			}
+			else
+			{
+			    content.innerHTML = output.message;
+			}
+			
+		    }
+		    
+		    // clean listeners
+		    
+		},false);
+		
+	    }
+	    ,handleSubmitClick : function(e, detail, sender) {
+		//this.$.container.querySelector
+		var moneyform = this.shadowRoot.querySelector("#money-add-form"); //document.getElementsByTagName('form')[0],
+		moneyform.submit();
+	    }
+	    ,toggleDialog : function(e, detail, sender) {
+		//var story = e.target.templateInstance.model.s;
+		
+//		console.log(e);
+//		console.log(detail);
+//		console.log(e.detail.label);
+//		console.log(sender);
+		var transition = 'paper-dialog-transition-bottom';//paper-dialog-transition-center
+		var dialog = this.$.container.querySelector('paper-dialog[transition=' + transition + ']');
+//		console.log(dialog);
+		dialog.toggle();
+		   		   
+		//console.log("Clicked " + story.headline);
+		//this.loadStory(story.id); // accessing non-rendered data from the model
+	    }
+	    ,handleRemoveItem : function(e, detail, sender) {
+		if(confirm("Are you sure want to remove this item?"))
+		{
+		    console.log("Remove");
+//		    console.log(e);
+//		    console.log(detail);
+//		    console.log(sender);
+//		    console.log("====================");
+//		    console.log(sender.parentNode);
+		    var card=(sender.parentNode);
+		    var money_id=(card.attributes.money_id.value);
+		    console.log("====================");
+		    this.loading = "Removing now...";
+
+		    //action=delete&module=money&content_style=single_content&uid=4523623456456456&money_id=5
+		    var params = {
+			alt: "json"
+			,action: "delete"
+			,module: "money"
+			,content_style: "single_content"
+			,money_id : money_id
+			,uid : ""+this.uid+""
+		    };
+		    this.$.card_remove.params = JSON.stringify(params);   
+		    this.$.card_remove.go(); 
+		}
+		return false;
+	    }
+	    ,moneyremoveResponse : function(evevt, resp){
+		if(resp.response.status=='success')
+		{
+		    alert(""+resp.response.result);
+		    
+		    this.$.moneylist.params = (this.money_url);   
+		    this.$.moneylist.go(); 
+		}
+		else
+		{
+		    alert("Error : "+resp.response.response);
+		}
+		
+	    }
+	    ,handleEditItem : function(e, detail, sender){
+		console.log("Edit");
+		console.log(detail);
+		console.log(sender);
+	    }
+	    ,removed : function()
+	    {
+		alert("ddddd");
+	    }
+	});
+	
+//	document.addEventListener('polymer-ready', function() {
+//	    document.querySelector('#cards').addEventListener('polymer-card-swipe-away', function(e) {
+//		alert("sdhfsdf");
+//		e.target.parentNode.removeChild(e.target);
+//	    });
+//	});
+	function eventCleared(e) {
+	    console.log(e);
+	}
+//		    Polymer('ajax-form', {
+//			ready: function(event, detail, sender) {
+//			    console.log(":In Ready");
+//			}
+//			,handleClick: function(event, detail, sender) {
+//			    console.log(":Handle click");
+//			}
+//			,prepareSubmit: function(event, detail, sender) {
+//			    console.log(":Prepare submit");
+//			}
+//		    });
+		    
+//		    (function() {
+//			var form = document.getElementById('money-add-form'); //document.getElementsByTagName('form')[0],
+//			var content = document.getElementById('notify_block');
+//
+//			form.addEventListener('invalid', function() {
+//			    alert("Validation error");
+//			    alertify.error('Some form fields are invalid!');
+//			});
+//
+//			form.addEventListener('submitting', function(event) {
+//			    alert("Submitting");
+//			    document.getElementById('pleaseWait').className = '';
+//			    content.className = 'hidden';
+//			    event.detail.raytest = 'foobar';
+//			    event.detail.color = 'blue';
+//			});
+//
+//			form.addEventListener('submitted', function(event) {
+//			    alert("Submitted");
+//			    console.log(event.detail);
+//			    
+//			    document.getElementById('pleaseWait').className = 'hidden';
+//			    content.className = '';
+//
+//			    if (event.detail.status > 299) {
+//				alertify.error('Submission failed!  Please try again.')
+//			    }
+//			    else {
+//				
+//				content.innerHTML = 'Thanks!  Your choices have been submitted!';
+//			    }
+//			});
+//		    }());
+    </script>
+
+</polymer-element>
+<!--<template repeat="{{ foo, i in foos }}">
+  <template repeat="{{ value, j in foo }}">
+    {{ i }}:{{ j }}. {{ value }}
+  </template>
+</template>-->

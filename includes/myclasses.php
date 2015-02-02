@@ -78,6 +78,26 @@
     }
     
     /**
+     * Function return default location latitude value
+     * @author Shivaraj<mrshivaraj123@gmail.com>_Jan_22_2014
+     * @return real
+     */
+    function _get_lat()
+    {
+	return 12.9715990;
+    }
+    
+    /**
+     * Function return default location longitude value
+     * @author Shivaraj<mrshivaraj123@gmail.com>_Jan_22_2014
+     * @return real
+     */
+    function _get_long()
+    {
+	return 77.5945630;
+    }
+    
+    /**
      * Stopping words will be removed from array
      * @author shivaraj <mrshivaraj123@gmail.com>
      * @param type $q_arr array

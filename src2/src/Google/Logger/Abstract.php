@@ -392,9 +392,11 @@ abstract class Google_Logger_Abstract
       return self::$levels[$level];
     }
 
-    throw new Google_Logger_Exception(
-        sprintf("Unknown LogLevel: '%s'", $level)
-    );
+    //throw new Google_Logger_Exception(
+    //    sprintf("Unknown LogLevel: '%s'", $level)
+    //);
+    echo json_encode(array('status'=>FALSE,'response-code'=>400,'response'=>"Unknown LogLevel: $level" ,'message'=>''));
+    die();
   }
 
   /**

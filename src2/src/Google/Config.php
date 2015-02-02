@@ -22,8 +22,8 @@ class Google_Config
 {
   /*const GZIP_DISABLED = true;
   const GZIP_ENABLED = false;*/
-const GZIP_DISABLED = true;
-const GZIP_ENABLED = false;
+const GZIP_DISABLED = false;
+const GZIP_ENABLED = true;
   const GZIP_UPLOADS_ENABLED = true;
   const GZIP_UPLOADS_DISABLED = false;
   const USE_AUTO_IO_SELECTION = "auto";

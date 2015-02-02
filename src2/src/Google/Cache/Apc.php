@@ -38,7 +38,9 @@ class Google_Cache_Apc extends Google_Cache_Abstract
       $error = "Apc functions not available";
 
       $client->getLogger()->error($error);
-      throw new Google_Cache_Exception($error);
+      //throw new Google_Cache_Exception($error);
+      echo json_encode(array('status'=>FALSE,'response-code'=>400,'response'=>$error ,'message'=>$error,'map'=>''));
+      die();
     }
 
     $this->client = $client;
@@ -87,7 +89,9 @@ class Google_Cache_Apc extends Google_Cache_Abstract
           'APC cache set failed',
           array('key' => $key, 'var' => $var)
       );
-      throw new Google_Cache_Exception("Couldn't store data");
+      //throw new Google_Cache_Exception("Couldn't store data");
+      echo json_encode(array('status'=>FALSE,'response-code'=>400,'response'=>"Couldn't store data" ,'message'=>"Couldn't store data",'map'=>''));
+      die();
     }
 
     $this->client->getLogger()->debug(

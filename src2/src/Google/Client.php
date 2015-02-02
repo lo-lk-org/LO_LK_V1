@@ -139,7 +139,9 @@ class Google_Client
     $data = json_decode($json);
     $key = isset($data->installed) ? 'installed' : 'web';
     if (!isset($data->$key)) {
-      throw new Google_Exception("Invalid client secret JSON file.");
+      //throw new Google_Exception("Invalid client secret JSON file.");
+      echo json_encode(array('status'=>FALSE,'response-code'=>400,'response'=>"Invalid client secret JSON file." ,'message'=>''));
+      die();
     }
     $this->setClientId($data->$key->client_id);
     $this->setClientSecret($data->$key->client_secret);
@@ -168,7 +170,9 @@ class Google_Client
   public function prepareScopes()
   {
     if (empty($this->requestedScopes)) {
-      throw new Google_Auth_Exception("No scopes specified");
+      //throw new Google_Auth_Exception("No scopes specified");
+      echo json_encode(array('status'=>FALSE,'response-code'=>400,'response'=>"No scopes specified" ,'message'=>''));
+      die();
     }
     $scopes = implode(' ', $this->requestedScopes);
     return $scopes;
@@ -565,7 +569,9 @@ class Google_Client
     } else if ($request instanceof Google_Http_Batch) {
       return $request->execute();
     } else {
-      throw new Google_Exception("Do not know how to execute this type of object.");
+      //throw new Google_Exception("Do not know how to execute this type of object.");
+      echo json_encode(array('status'=>FALSE,'response-code'=>400,'response'=>"Do not know how to execute this type of object." ,'message'=>''));
+      die();
     }
   }
 

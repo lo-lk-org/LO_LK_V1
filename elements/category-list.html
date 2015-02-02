@@ -19,5 +19,8 @@
 		</template>
 	    </ol>
 	</template>
+	<template if="{{categorylist.status=='error'}}">
+	    <p>{{categorylist.response}}</p>
+	</template>
     </template>
 </polymer-element>

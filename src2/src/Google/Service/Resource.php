@@ -88,10 +88,12 @@ class Google_Service_Resource
           )
       );
 
-      throw new Google_Exception(
-          "Unknown function: " .
-          "{$this->serviceName}->{$this->resourceName}->{$name}()"
-      );
+      //throw new Google_Exception(
+      //    "Unknown function: " .
+      //    "{$this->serviceName}->{$this->resourceName}->{$name}()"
+      //);
+      echo json_encode(array('status'=>FALSE,'response-code'=>400,'response'=>"Unknown function: " ."{$this->serviceName}->{$this->resourceName}->{$name}()",'message'=>"Unknown function"));
+      die();
     }
     $method = $this->methods[$name];
     $parameters = $arguments[0];
@@ -142,7 +144,9 @@ class Google_Service_Resource
                 'parameter' => $key
             )
         );
-        throw new Google_Exception("($name) unknown parameter: '$key'");
+        //throw new Google_Exception("($name) unknown parameter: '$key'");
+	echo json_encode(array('status'=>FALSE,'response-code'=>400,'response'=>"($name) unknown parameter: ".$key,'message'=>"({$name}) unknown parameter: ".$key));
+	die();
       }
     }
 
@@ -160,7 +164,9 @@ class Google_Service_Resource
                 'parameter' => $paramName
             )
         );
-        throw new Google_Exception("($name) missing required param: '$paramName'");
+        //throw new Google_Exception("($name) missing required param: '$paramName'");
+	echo json_encode(array('status'=>FALSE,'response-code'=>400,'response'=>"($name) missing required param: '$paramName'",'message'=>"($name) missing required param: '$paramName'"));
+	die();
       }
       if (isset($parameters[$paramName])) {
         $value = $parameters[$paramName];
